@@ -21,6 +21,10 @@ class Oog(models.Model):
                             blank=True,null=True)
     class Meta:
         unique_together = ['booking', 'container']
+        indexes = [
+            models.Index(fields=['booking','container'],name='idx_oog_oog_booking_container'),
+            models.Index(fields=['container'],name='idx_oog_oog_container'),
+        ]
 
     def __str__(self):  # __unicode__ for Python 2
         return f'{self.container} on {self.booking}'
