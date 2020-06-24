@@ -1,0 +1,52 @@
+# docker-compose.yml
+
+version: '3'
+
+services:
+  db-server:
+    restart: always
+    image: postgres:latest
+    container_name: epayment-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=epayment_sa
+      - POSTGRES_PASSWORD=pAssw0rd!
+      - POSTGRES_DB=epayment_db
+    networks:
+      - main
+    volumes:
+      - pgdata:/var/lib/postgresql/epayment_db/
+
+  web-server:
+    container_name: epayment-server
+    restart: always
+    build: ./src
+    expose:
+      - "8000"
+    links:
+      - db-server:postgres
+      # - redis:redis
+    networks:
+      - main
+    volumes:
+      # - web-django:/usr/src/app
+      - web-static:/staticfiles
+      - web-media:/media
+    # env_file: .env
+    command: gunicorn ePayment.wsgi:application -w 2 -b :8000
+    ports:
+      - 8000:8000
+
+# gunicorn --workers=3 wmp.wsgi -b 0.0.0.0:8000
+
+
+
+volumes:  
+  cache_data:
+  web-media:
+  web-static:
+  pgdata:
+
+networks:
+  main:

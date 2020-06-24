@@ -1,0 +1,98 @@
+
+{% load static %}
+{% block title %}
+    Your Shopping Cart
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row" style="margin-top: 6%">
+        <h2>Your Payment Cart
+
+            <span class="badge pull-right">
+                {% with totail_items=cart|length %}
+                    {% if cart|length > 0 %}
+                        My Order:
+                        <a href="{% url "cart:cart_detail" %}" >
+                            {{ totail_items }} item {{ totail_items|pluralize }}, Price. {{ cart.get_total_price }}
+                        </a>
+                        {% else %}
+                        Your cart is empty.
+                    {% endif %}
+                {% endwith %}
+            </span>
+        </h2>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Container</th>
+                        <th>Export</th>
+                        <th>Size</th>
+                        <th>Type</th>
+                        <th>Full</th>
+                        <th>OOG</th>
+                        <th>Unit Price</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in cart %}
+
+                    {% with product=item  %}
+                        <tr>
+                           <td>{{ item.status }}</td>
+                            <td>{{ item.container }}</td>
+                            <td>
+
+                                {% if item.category == 'E' %}
+                                    Export
+                                {% else %}
+                                    Import
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ item.size }}
+                            </td>
+                            <td>
+                                {{ item.type }}
+                            </td>
+                            <td>
+                                {% if item.full %}
+                                    Full
+                                {% else %}
+                                    MTY
+                                {% endif %}
+                            </td>
+                            <td>{{ item.oog }}</td>
+                            <td>
+                                {% for k, v in item.tariff.items %}
+                                    <li>{{k}} -> {{v}}</li>
+                                {% endfor%}
+                            </td>
+                            <td>{{ item.total_price }}</td>
+                            <td>
+                                <a href="{% url 'cart:cart_remove' item.container %}">Remove</a>
+                            </td>
+                        </tr>
+                    {% endwith %}
+                {% endfor %}
+                <tr>
+                    <td><b>Total</b></td>
+                    <td colspan="4"></td>
+                    <td colspan="num"><b>Baht. {{ cart.get_total_price }}</b></td>
+                </tr>
+                </tbody>
+            </table>
+        <p class="text-right">
+            
+            <a href="/">Continue Shopping</a>
+
+             | Checkout
+             | <a href="{% url 'cart:cart_clear' %}">Clear Cart</a>
+          
+        </p>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container">
+{% if not user.profile.approved %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>This user is not approved yet</strong> Please wait LCB1 approve this user.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+{% endif %}
+
+<div class="row justify-content-center">
+    <div class="col-sm-8">
+      <div class="card">
+        <div class="card-body">
+          <h2>Address Settings</h2>
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {{ address_form|crispy }}
+            <button type="submit" class="btn btn-primary">Update Address</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block style %} 
+<style type="text/css">
+</style>
+{% endblock style %}

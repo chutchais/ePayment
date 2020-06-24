@@ -1,0 +1,13 @@
+Django==3.0.5
+djangorestframework
+markdown
+django-filter
+django-import-export
+gunicorn==19.9.0
+django-environ
+urllib3
+django-cors-headers
+six
+django-crispy_forms
+django-redis
+django-debug-toolbar

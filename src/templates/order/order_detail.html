@@ -1,0 +1,404 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+  const booking ='{{ object.booking.name }}';
+  const terminal = '{{object.booking.terminal}}'
+  const order ='{{ object.name }}';
+  const ref1 = '{{object.ref}}';
+  const total = '{{object.grand_total}}';
+  const company = '{{object.address.company}}';
+  const tax = '{{object.address.tax}}';
+  const qr_url = '{{qr_url}}';
+  const slip_verify_url = '{{slip_verify_url}}';
+</script>
+
+<div id="app">
+  <v-app>
+<div class="containeer">
+
+<div class="row wrapper">
+
+  <div class="col-sm-12 col-md-12">
+    <div class="row">
+    	
+      <div class="col-12 mb-2">
+        <div class="content">
+        	
+        	<div class="card">
+		        <div class="card-body">
+		          <h2>[[order]]
+
+                {% if object.paid %}
+                  <span class="badge badge-success">Paid</span>
+                {% else %}
+                  <span class="badge badge-secondary">UnPaid</span>
+                  <a href="{% url 'order:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
+                {% endif %}
+              </h2>
+
+              {% if object.paid %}
+                <div class="alert alert-info" role="alert">
+                  Payment Confirmed on : {{object.payment_date}} (BankRef : {{object.payment_ref}})
+                   Verified by {{object.payment_inspector}}
+                  <a href="{% url 'order:payslip' object.id %}">See pay slip picture</a>
+                </div>
+              {% else %}
+                <!-- Show QR Code -->
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
+                          <div class="card ">
+                            <img class="card-img-top" 
+                            :src="[[qr]]" alt="Card image cap">
+                            <div class="card-body">
+                              <h5 class="card-title">[[booking]]</h5>
+                              <p class="card-text">
+                                <div>Ref1  : [[ref1]]</div>
+                                <div>Total : [[total]] Baht</div>
+                                <div>Address : [[company]] [[tax]]</div>
+                                {% if not object.payment_slip %}
+                                <div>To post confirmed pay slip-> <a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></div>
+                                {% endif %}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {% if object.payment_slip %}
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
+                          <div class="card ">
+                            <img class="card-img-top" 
+                            src="{{object.payment_slip.url}}" alt="Card image cap">
+                            <div class="card-body">
+                              <h5 class="card-title">Update Pay Slip <a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
+                              <p class="card-text">
+                                
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Payment Confirmation -->
+                        {% if perms.order.verify_payment %}
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
+                          <div class="card ">
+                            <div class="card-body">
+                              <h5 class="card-title">Payment Confirmation</h5>
+                              <p class="card-text">
+                                {% if object.paid %}
+                                  <div>Paid</div>
+                                  <div>On : {{object.payment_date}} </div>
+                                {% else %}
+                                  Waiting for Payment confirmation
+                                    {% if user.is_staff %}
+                                     
+                                      <div class="alert alert-info" role="alert" v-if="paid">
+                                        Payment Confirmed on : [[notify.TransDate]] 
+                                        Amount : [[notify.Amount]]
+                                        Booking : [[notify.QRId]]
+                                        Ref1 : [[notify.Ref1]] 
+                                        BankRef : [[notify.BankRef]]<br>
+
+                                        
+                                        <a href="{% url 'order:payment-confirm' object.id %}">
+                                        <button type="button" class="btn btn-info" {% if not  perms.order.update_payment %}disabled{% endif %}>Update</button>
+                                        </a>
+                                        
+                                        </div>
+                                      </div>
+                                      <div class="alert alert-danger" role="alert" v-if="payment_status">
+                                        [[payment_status]]
+                                      </div>
+
+                                    <button type="button" class="btn btn-warning mb-2" v-on:click="check_payment_local()" :disabled="paid"  >Check on Local</button>
+                                    
+
+
+                                    <button type="button" class="btn btn-danger" :disabled="!paid" v-on:click="check_payment()">VerifySlip</button>
+                                    {% endif %}
+                                {% endif %}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %} <!-- End permission -->
+                        <!-- End Payment confirmation -->
+
+                    </div>
+                
+              {% endif %}
+
+
+              <div class="containeer">
+                 <div class="col-12 mb-2">
+		            <div class="row justify-content-center">
+                  
+                  <div class="col-sm-6 col-md-6 col-lg-3 mb-1">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Charge</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Total Charge</h6>
+                        <span class="charge">{{object.charge}}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6 col-md-6 col-lg-3 mb-1">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Tax Rate 
+                          <span class="badge badge-success">{{object.vat_rate}}%</span></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Tax rate</h6>
+                        <span class="charge">{{object.vat_total}}</span>
+                        
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6 col-md-6 col-lg-3 mb-1">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">WHT Rate
+                        <span class="badge badge-warning">{{object.wht_rate}}%</span></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">WithHolding Tax rate</h6>
+                        <span class="charge">
+                        {% if object.wht %}
+                          {{object.wht_total}}
+                        {% else %}
+                          0
+                        {% endif %}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6 col-md-6 col-lg-3 mb-1">
+                    <div class="card bg-info">
+                      <div class="card-body">
+                        <h5 class="card-title">Grand Total {% if object.wht %}<span class="badge badge-warning">WTH</span>{% endif %} 
+                         
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Grand Total</h6>
+                        <span class="charge">{{object.grand_total}}</span>
+                        
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div> <!-- end row -->
+              </div> <!-- end col12-->
+              </div> <!-- end container -->
+
+
+              <div class="containeer">
+                <div class="col-12">
+                <div class="row">
+                  <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
+                    <!-- <div class="content"> -->
+                      <h4>Container List</h4>
+                      <table class="table table-responsive-md">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Container</th>
+                          <th scope="col">Size</th>
+                          <th scope="col">OOG?</th>
+                          <th scope="col">Tariff Charge(s)</th>
+                          <th scope="col">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for container in object.containers.all %}
+                        <tr>
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{container.container}}</td>
+                          <td>{{container.cont_size}}</td>
+                          <td>{% if container.is_oog %}
+                              <span style="color: green;">
+                              <i class="fas fa-check-circle"></i>
+                              </span>{% endif %}</td>
+                          <td>
+                            <table class="table table-sm">
+                              <tbody>
+                                {% for key,value in container.tariff_json.items %}
+                                  <tr>
+                                    <td>{{key}}</td><td>{{value}}</td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                          </td>
+                          <td class="subtotal">{{container.total}}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+
+                    </div>
+                  </div>
+                </div><!-- end row -->
+              </div>
+
+              
+
+
+
+		        </div>
+		      </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+	
+</div>
+</v-app>
+</div>
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+
+  .charge {
+    font-size: 50px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 800;
+    text-align:center
+  }
+
+  .subtotal {
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+    text-align:center
+  }
+
+/*
+  @media screen and (min-width: 576px) {
+      .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 768px) {
+    .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 992px) {
+
+  }
+
+
+@media screen and (min-width: 1200px) {
+
+}*/
+
+</style>
+{% endblock style %}
+
+
+{% block script %}
+  <script>
+
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    vuetify: new Vuetify(),
+    data: {
+      booking: booking,
+      order : order,
+      terminal : terminal,
+      ref1 : ref1,
+      total: total,
+      company:company,
+      tax:tax,
+      paid: false,
+      notify:[],
+      payment_status:''
+    },
+    computed: {
+      qr () {
+        console.log(qr_url)
+        return qr_url + 'qr?tax=&ref1=' +
+          this.ref1 + '&ref2=&amount=' + (Number(this.total)) +
+          '&terminal=' + this.terminal + '&qrid=' + this.booking
+      }
+    },
+    methods: {
+          check_payment_local: function() {
+              var currentDate = new Date();
+              this.loading = true;
+              this.paid = false;
+              this.payment_status = '';
+              // console.log('Hello from ' + name + '!');
+              axios
+              .get( slip_verify_url + 'verifyslip-local/?qrid=' + this.booking + '&ref1=' + this.ref1)//Only internal use.
+              .then(
+                  response => {
+                    // this.paid = true;
+                    this.loading = false;
+                    this.paid = (response.data.count > 0) ? true : false; 
+                    if (this.paid) {
+                      this.notify = response.data.results[0]
+                    }
+                    else {
+                      this.payment_status = 'Not found payment of Booking:' + this.booking + ' Ref1: ' + this.ref1;
+                    }
+                    console.log(response.data.results[0])
+                  })
+              .catch(error =>{
+                    this.loading = false;
+                })
+              
+          },//End check_payment_local
+          check_payment: function() {
+              var currentDate = new Date();
+              this.loading = true;
+              this.paid = false;
+              this.payment_status = '';
+              // console.log('Hello from ' + name + '!');
+              axios
+              .get( slip_verify_url + 'verifyslip/?QRid=' + this.booking + '&billerid=010553811088480')//Only internal use.
+              .then(
+                  response => {
+                    // this.paid = true;
+                    this.loading = false;
+                    this.paid = (response.data.resultCode == '000') ? true : false; 
+                    if (this.paid) {
+                      this.notify = response.data
+                    }
+                    else {
+                      this.payment_status = 'Not found payment of Booking:' + this.booking + ' Ref1: ' + this.ref1;
+                    }
+                    console.log(response.data)
+                  })
+              .catch(error =>{
+                    this.loading = false;
+                })
+              
+          },//End check_payment
+      },
+  })
+  </script>
+{% endblock %}

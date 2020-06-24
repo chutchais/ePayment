@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+{% if not user.profile.approved %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>This user is not approved yet</strong> Please wait LCB1 approve this user.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+{% endif %}
+
+<h2>Profile Settings</h2>
+  <div class="row">
+    
+    <div class="col-sm-6 col-md-4">
+      <div class="card">
+        <div class="card-body">
+            <h3>Avatar</h3>
+            {% if profile.avartar %}
+              <img class="card-img-top" alt="Card image cap" src="{{ profile.avartar.url }}">
+            {% endif %}
+            <form method="post" enctype="multipart/form-data" novalidate>
+              {% csrf_token %}
+              {{ formavatar|crispy }}
+              <button type="submit" class="btn btn-primary" >Change Avatar</button>
+            </form>
+        </div> 
+      </div><!-- End Avatar-->
+    </div>
+
+    <div class="col-sm-6 col-md-4">
+      <div class="card">
+        <div class="card-body">
+            <h3>ID Card</h3>
+
+            {% if profile.idcard %}
+              <img class="card-img-top" alt="Card image cap" src="{{ profile.idcard.url }}">
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+              {% csrf_token %}
+              {{ formidcard|crispy }}
+              <button type="submit" class="btn btn-primary" {% if user.profile.approved %}disabled{% endif %}>Change ID Card</button>
+            </form>
+        </div> 
+      </div><!-- End ID Card-->
+    </div>
+
+    <div class="col-sm-6 col-md-4">
+      <div class="card">
+        <div class="card-body">
+            <h3>Signature</h3>
+            {% if profile.signature %}
+              <img class="card-img-top" alt="Card image cap" src="{{ profile.signature.url }}">
+            {% endif %}
+            <form method="post" enctype="multipart/form-data" novalidate>
+              {% csrf_token %}
+              {{ formsignature|crispy }}
+              <button type="submit" class="btn btn-primary" {% if user.profile.approved %}disabled{% endif %}>Change ID Card</button>
+            </form>
+        </div> 
+      </div><!-- End ID Card-->
+  </div>
+  </div>
+
+  <h2>Address Settings</h2>
+  <a href="{% url 'profile:add' %}">Add New Address</a>
+    <div class="row">
+       <div class="col-sm-12">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Address</th>
+                <th scope="col">Tax</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+          {% for address in profile.user.addresses.all %}
+              <tr>
+                <td><a href="{% url 'profile:update' address.pk %}">{{address.company}}</a></td>
+                <td>{{address.address|linebreaksbr}}</td>
+                <td>{{address.tax}}</td>
+                <td>
+                 <a href="{% url 'profile:delete' address.pk %}"><i class="fas fa-trash-alt"></i></a>
+               </td>
+              </tr>
+          {% endfor %}
+            </tbody>
+          </table>
+      </div>
+    </div>
+    </div>
+
+
+
+{% endblock %}
+
+{% block style %} 
+<style type="text/css">
+  a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}

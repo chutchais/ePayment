@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="containeer">
+<form class='form' method='GET' action='.'>
+                        <input type='text' id='search' placeholder="ค้นหา" name="q" value='{{ request.GET.q}}'>
+                        <button class='btn btn-default' type='submit'>Search</button>
+                        <a href="">ล้างข้อมูล</a>
+    		</form>
+<div class="row wrapper">
+
+  <div class="col-sm-12 col-md-9">
+    <div class="row">
+    	
+      <div class="col-12 mb-2">
+        <div class="content">
+        	
+        	<div class="card">
+		        <div class="card-body">
+		          <h4>Order List</h4>
+
+		          รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทังหมด {{ page_obj.paginator.count }} รายการ <br>
+     {% if is_paginated %}
+                  <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                      <li><a href="?q={{ request.GET.q}}&page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                      <li class="disabled"><span>&laquo;</span></li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                      {% if page_obj.number == i %}
+                        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                      {% else %}
+                        <li><a href="?q={{ request.GET.q}}&page={{ i }}">{{ i }}</a></li>
+                      {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                      <li><a href="?q={{ request.GET.q}}&page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                    {% else %}
+                      <li class="disabled"><span>&raquo;</span></li>
+                    {% endif %}
+                  </ul>
+      {% endif %}
+      
+		          <table class="table table-striped">
+					  <thead>
+					    <tr>
+					      <th scope="col">Order</th>
+					      <th scope="col">booking</th>
+					      <th scope="col">created</th>
+					      <th scope="col">Paid</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+		          {% for order in orders %}
+					    <tr>
+					      <td>{{order.name}}</td>
+					      <td>{{order.booking}}</td>
+					      <td>{{order.created}}</td>
+					      <td>{{order.paid}}</td>
+					    </tr>
+					    
+		          {% endfor %}
+		          </tbody>
+					</table>
+		        </div>
+		      </div>
+        </div>
+      </div>
+
+  <!--     <div class="col-12 mb-2" >
+        <div class="content">
+        	<div class="card">
+		        <div class="card-body">
+		          <h4>Success Booking</h4>
+		          <ul>
+		          	<li>#1</li>
+		          	<li>#2</li>
+		          </ul>
+		        </div>
+		      </div>
+        </div>
+      </div> -->
+    </div>
+
+  </div>
+
+  <div class="col-sm-12 col-md-3">
+    <div class="sidebar">
+    	
+		          {% for address in addresses %}
+		          	<div class="card mb-2" >
+					  <div class="card-body">
+					    <a href="{% url 'profile:update' address.pk %}"><h5 class="card-title">{{address}}</h5></a>
+					    <p class="card-text">{{address.address}}</p>
+					    <p class="card-text"><i>Tax : {{address.tax}}</i></p>
+					  </div>
+					</div>
+		          {% endfor %}
+    </div>
+  </div>
+</div>
+
+	
+</div>
+
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}

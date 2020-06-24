@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+  const booking ='{{ object.name }}';
+  const tax_rate = {{tax.tax}};
+  const wht_rate = {{tax.wht}};
+  var people = '{{ items_json|safe }}';
+  const export_url = '{{export_booking_url}}';
+</script>
+
+<div id="app">
+  <v-app>
+    <div class="containeer">
+      <div class="row wrapper">
+        <div class="col-sm-12 col-md-12">
+                 <div class="row">
+                  <div class="col-12 mb-2">
+                    <div class="content">
+                      <h4>Booking : [[booking]] <a href="{% url 'booking:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a></h4>
+                      <button type="button" class="btn btn-success mb-2" v-on:click="greet(booking)">Get Container</button>
+                      
+                      <div v-if="containers">
+                      <template>
+
+                        <v-card>
+                          <v-card-title>
+                            Container
+                            <v-spacer></v-spacer>
+                            <v-text-field
+                              v-model="search"
+                              append-icon="mdi-magnify"
+                              label="Search"
+                              single-line
+                              hide-details
+                            ></v-text-field>
+                          </v-card-title>
+
+                      <v-data-table
+                        :items-per-page="10"
+                        class="elevation-1"
+                        v-model="selected"
+                        :headers="headers"
+                        :items="containers"
+                        :single-select="singleSelect"
+                        :search="search"
+                        item-key="hdid10"
+                        show-select
+                        show-expand
+                        class="elevation-1"
+                        :single-expand="singleExpand"
+                        :expanded.sync="expanded"
+                        dense
+                        :loading="loading"
+                        loading-text="Loading... Please wait"
+                      >
+                        <template v-slot:item.full="{ item }">
+                          <div v-if="item.full == 'F'">
+                            FULL
+                          </div>
+                          <div v-else>
+                            EMPTY
+                          </div>
+                        </template>
+
+                        <template v-slot:expanded-item="{ headers, item }">
+                          <td :colspan="4">
+                            <h3>Port of Discharge</h3>
+                            Vessel Code: [[item.vessel_code ]] / [[ item.voy ]] <br>
+                            [[ item.pod.country ]] -->[[ item.pod.port ]] --> [[ item.pod.port_name ]]
+                          </td>
+                          <td :colspan="4">
+                            <h3>Tariff Charge(s)</h3>
+                            <span v-for="(value, key) in item.tariff" :key="key.id">
+                              [[key]] : [[value]] Baht<br>
+                            </span>
+                          </td>
+
+                        </template>
+
+
+                        <template v-slot:item.tariff="{ item }">
+                          <v-list-item v-for="(value, key) in item.tariff" :key="key.id">
+                            <v-list-item-content>
+                             <v-list-item-title>[[key]] : [[value]] Baht</v-list-item-title><br>
+                            </v-list-item-content>
+                          </v-list-item>
+
+                      </template>
+                      <template v-slot:item.tariff_sum_total="{ item }">
+                        <v-chip color="green" dark>[[ item.tariff_sum_total ]]</v-chip>
+                      </template>
+                  </v-data-table>
+                </v-card>
+                </template>
+                 
+
+                  <div v-if="selected.length > 0">
+
+                  <template>
+                    <v-card
+                      cols="12"
+                      class="mt-2"
+                      v-if="selected"
+                    >
+                          <v-card-title>
+                            Charge Summary
+                          </v-card-title>
+                          <v-card-subtitle>
+                            [[selected.length]] container(s)
+                          </v-card-subtitle>
+                          
+                   
+                   <v-row no-gutters>
+
+                    <v-col
+                      cols="6"
+                       md="3"
+                    >
+                        <v-card
+                          class="pa-2 ma-2"
+                          outlined
+                        >
+                          <v-card-title>
+                              Total
+                            </v-card-title>
+                            <v-card-subtitle>
+                              Tariff charge(s)
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary">
+                                [[total]]
+                              </p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    
+                    <v-col
+                      cols="6"
+                       md="3"
+                    >
+                        <v-card
+                          class="pa-2 ma-2"
+                          outlined
+                        >
+                          <v-card-title>
+                              Vat
+                            </v-card-title>
+                            <v-card-subtitle>
+                              [[tax.tax]]%
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary">
+                                [[vat]]
+                              </p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+
+                    <v-col
+                      cols="6"
+                       md="3"
+                    >
+                      <v-card
+                          class="pa-2 ma-2"
+                          outlined
+                        >
+                            <v-card-title>
+                              WHT
+                            </v-card-title>
+                            <v-card-subtitle>
+                              [[tax.wht]]%
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary">
+                                [[wht]]
+                              </p>
+                            </v-tacard-text>
+                        </v-card>
+                    </v-col>
+
+                    <v-col
+                      cols="6"
+                       md="3"
+                    >
+                      <v-card
+                          class="pa-2 ma-2 bg-info"
+                          outlined
+                        >
+                          <v-card-title>
+                              Grand Total
+                            </v-card-title>
+                            <v-card-subtitle>
+                              Final charge
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary font-weight-black">
+                                [[net]]
+                              </p>
+                            </v-card-text>
+                        </v-card>
+                  </v-col>
+                  </v-row>
+
+                  <v-card-actions>
+                    
+                    
+      <!--               <v-btn 
+                      large color="primary"
+                      >
+                      Pay
+                    </v-btn>
+ -->
+                   <!--  <form action="{% url 'order:post_order' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="booking" :value="booking">
+                        <input type="hidden" name="charge" :value="total">
+                        <input type="hidden" name="grand_total" :value="net">
+                        <input type="hidden" name="vat_rate" :value="tax.tax">
+                        <input type="hidden" name="wht_rate" :value="tax.wht">
+                        <input type="hidden" name="wht" :value="isWht">
+                        <input type="hidden" name="containers" :value="selected_json">
+                        <label for="company">Choose Address:</label>
+                        <select id="address" name="address">
+                          {% for address in addresses %}
+                            <option value="{{address.pk}}">{{address.company}} -- {{address.address}} -- {{address.tax}}</option>
+                          {% endfor %}
+                        </select>
+
+                        <input type="submit" value="Pay" class="btn btn-primary">
+                    </form> -->
+
+                    <!-- <v-checkbox v-model="isWht" 
+                      class="mx-2" 
+                      label="Withholding Tax">
+                      </v-checkbox> -->
+                  </v-card-actions>
+
+
+                  <form action="{% url 'order:post_order' %}" method="post">
+                    <div class="col-sm-12 col-md-10">
+                    {% csrf_token %}
+
+                        <input type="hidden" name="booking" :value="booking">
+                        <input type="hidden" name="charge" :value="total">
+                        <input type="hidden" name="grand_total" :value="net">
+                        <input type="hidden" name="vat_rate" :value="tax.tax">
+                        <input type="hidden" name="wht_rate" :value="tax.wht">
+                        <input type="hidden" name="wht" :value="isWht">
+                        <input type="hidden" name="containers" :value="selected_json">
+
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">Company Address</label>
+                        <select class="form-control" id="address" name="address">
+                              {% for address in addresses %}
+                                <option value="{{address.pk}}">{{address.company}} -- {{address.address}} -- {{address.tax}}</option>
+                              {% endfor %}
+                            </select>
+                        <small id="emailHelp" class="form-text text-muted">This address will be printed on receipt</small>
+                      </div>
+
+                      <v-checkbox v-model="isWht" 
+                          class="mx-2" 
+                          label="Withholding Tax">
+                          </v-checkbox>
+
+                      <button type="submit" class="btn btn-primary">Continue Payment ([[net]] Baht)</button>
+                    </div>
+                  </form>
+
+                 
+
+                  </v-card>
+                  </template>
+                </div> <!-- vif -->
+                 
+              </div> <!-- End if -->
+              </div>
+              </div>
+
+                 
+
+                </div><!-- end row -->
+      		        </div>
+      		      </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </v-app>
+</div>
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+
+  .charge {
+    font-size: 50px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 800;
+    text-align:center
+  }
+
+  .subtotal {
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+    text-align:center
+  }
+
+
+  @media screen and (min-width: 576px) {
+      .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 768px) {
+    .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 992px) {
+
+  }
+
+
+@media screen and (min-width: 1200px) {
+
+}
+
+</style>
+{% endblock style %}
+
+
+{% block script %}
+  <script>
+
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    vuetify: new Vuetify(),
+    data: {
+      loading : false,
+      search: '',
+      booking: booking,
+      containers :[],
+      singleSelect: false,
+      selected: [],
+      selected_json:'',
+      expanded: [],
+      singleExpand: true,
+      tariff: [],
+      headers: [
+        {
+          text: 'Container',
+          align: 'start',
+          sortable: false,
+          value: 'container'
+        },
+        { text: 'Status', value: 'status' },
+        { text: 'Size', value: 'size' },
+        { text: 'Full/Empty', value: 'full' },
+        { text: 'Is OOG?', value: 'oog' },
+        // { text: 'Tariff', value: 'tariff' },
+        { text: 'Item Price', value: 'tariff_sum_total' }
+      ],
+      tax: {
+        tax: tax_rate,
+        wht: wht_rate
+      },
+      isWht: false,
+    },
+    watch: {
+      selected () {
+        this.selected_json = JSON.stringify(this.selected)
+      },
+
+    },
+    computed: {
+      total () {
+        return this.selected.reduce(function (sum, item) {
+          return sum + item.tariff_sum_total
+        }, 0)
+      },
+      vat () {
+        return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+      },
+      wht () {
+        return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+      },
+      net () {
+        let wht = 0
+        if (this.isWht) {
+          wht = Number(this.wht)
+        }
+        // console.log(wht)
+        return (Number(this.total) + Number(this.vat)) - wht
+      },
+      // qr () {
+      //   return 'http://10.24.50.91:8010/billing/qr?tax=&ref1=' +
+      //     this.booking + '&ref2=&amount=' + (Number(this.net)) +
+      //     '&terminal=' + this.terminal
+      // }
+    },
+    methods: {
+          greet: function(name) {
+              this.loading = true;
+              this.containers = [];
+              // console.log('Hello from ' + name + '!');
+              axios
+              // .get('http://127.0.0.1:8000/order/booking/'+ this.booking)
+              .get(export_url + this.booking)
+              .then(
+                  response => {
+                    this.containers = response.data
+                    this.loading = false;
+                  })
+              .catch(error =>{
+                    this.loading = false;
+                })
+              
+          }
+      }
+  })
+  </script>
+{% endblock %}

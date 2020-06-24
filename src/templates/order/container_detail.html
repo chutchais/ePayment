@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="app">
+
+<div class="containeer">
+
+<div class="row wrapper">
+
+  <div class="col-sm-12 col-md-12">
+    <div class="row">
+    	
+      <div class="col-12 mb-1">
+        <div class="content">
+        	
+        	<div class="card">
+		        <div class="card-body">
+		          <h4>Container detail</h4>
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th scope="col">Item</th>
+                        <th scope="col">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      
+                      <tr>
+                        <td>Number</td>
+                        <td>{{ object.container}}</td>
+                      </tr>
+                      <tr>
+                        <td>Order</td>
+                        <td><a href="{{object.order.get_absolute_url}}">{{ object.order}}</a>
+                          {% if object.order.paid %}
+                            <span class="badge badge-success">Paid</span>
+                          {% else %}
+                            <span class="badge badge-secondary">UnPaid</span>
+                            
+                          {% endif %}
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td>ISO</td>
+                        <td>{{ object.iso}}</td>
+                      </tr>
+
+                      <tr>
+                        <td>is OOG?</td>
+                        <td>{{ object.is_oog}}</td>
+                      </tr>
+
+                      <tr>
+                        <td>Tariff</td>
+                        <td>
+                            <table class="table table-sm">
+                              <tbody>
+                                {% for key,value in object.tariff_json.items %}
+                                  <tr>
+                                    <td>{{key}}</td><td>{{value}}</td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td>Total Charge</td>
+                        <td>{{ object.total}}</td>
+                      </tr>
+
+                      <tr>
+                        <td>Datetime</td>
+                        <td>{{ object.created}}</td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+		        </div>
+		      </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+	
+</div>
+</div>
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}
+

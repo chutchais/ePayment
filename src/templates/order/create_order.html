@@ -1,0 +1,51 @@
+ 
+	<form action="" method="post">
+	    {% csrf_token %}
+	    <input type="text" name="booking" placeholder="Enter Booking Number" value="{{booking}}">
+	    <input type="submit" value="Get Container Details" class="btn btn-primary">
+	</form>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script type='text/javascript'>
+
+    var object_list = {{ object_list|safe }};
+  </script>
+
+
+<div id="app">
+	<input type="text" v-model="booking">
+	[[booking]]
+    <ul>
+      <li v-for="person in object_list">
+        <a v-bind:href="person.url">[[ person.container ]]</a> <button v-on:click="greet(person.name)">hey</button>
+      </li>
+    </ul>
+    [[info]]
+  </div>
+
+
+
+  <script>
+  	import axios from 'axios';
+
+    var app = new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#app',
+      data: {
+      	  booking : '',
+          message: 'Hello Vue!',
+          object_list: object_list,
+          info : ''
+      },
+      methods: {
+          greet: function(name) {
+              console.log('Hello from ' + name + '!')
+          }
+      },
+		  mounted () {
+		    axios
+		      .get('https://api.coindesk.com/v1/bpi/currentprice.json')
+		      .then(response => (this.info = response))
+		  }
+    });
+  </script>
