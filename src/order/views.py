@@ -57,6 +57,7 @@ def post_container(request):
                         address=address_obj,
                         charge=charge,grand_total=grand_total,
                         vat_rate = vat_rate, wht_rate=wht_rate,
+                        container_count=len(containers),
                         wht=wht,user=user)
                 order.save()
                 # save containers
