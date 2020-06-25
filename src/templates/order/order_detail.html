@@ -131,14 +131,14 @@
 
 
               <div class="containeer">
-                 <div class="col-12 mb-2">
+                 <div class="col-12 mb-1">
 		            <div class="row justify-content-center">
                   
                   <div class="col-sm-6 col-md-6 col-lg-3 mb-1">
                     <div class="card">
                       <div class="card-body">
                         <h5 class="card-title">Charge</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Total Charge</h6>
+                        <h6 class="card-subtitle mb-1 text-muted">Total Charge</h6>
                         <span class="charge">{{object.charge}}</span>
                       </div>
                     </div>
@@ -149,7 +149,7 @@
                       <div class="card-body">
                         <h5 class="card-title">Tax Rate 
                           <span class="badge badge-success">{{object.vat_rate}}%</span></h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Tax rate</h6>
+                        <h6 class="card-subtitle mb-1 text-muted">Tax rate</h6>
                         <span class="charge">{{object.vat_total}}</span>
                         
                       </div>
@@ -161,7 +161,7 @@
                       <div class="card-body">
                         <h5 class="card-title">WHT Rate
                         <span class="badge badge-warning">{{object.wht_rate}}%</span></h5>
-                        <h6 class="card-subtitle mb-2 text-muted">WithHolding Tax rate</h6>
+                        <h6 class="card-subtitle mb-1 text-muted">WithHolding Tax rate</h6>
                         <span class="charge">
                         {% if object.wht %}
                           {{object.wht_total}}
@@ -179,7 +179,7 @@
                         <h5 class="card-title">Grand Total {% if object.wht %}<span class="badge badge-warning">WTH</span>{% endif %} 
                          
                         </h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Grand Total</h6>
+                        <h6 class="card-subtitle mb-1 text-muted">Grand Total</h6>
                         <span class="charge">{{object.grand_total}}</span>
                         
 

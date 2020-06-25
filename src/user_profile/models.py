@@ -32,6 +32,7 @@ class Address(models.Model):
     company             = models.CharField(max_length=100)
     address             = models.CharField(max_length=300)
     tax                 = models.CharField(max_length=20,null=True,blank = True)
+    branch              = models.CharField(max_length=30,null=True,blank = True)
     created             = models.DateTimeField(auto_now_add=True)
     updated             = models.DateTimeField(blank=True, null=True,auto_now=True)
     status              = models.BooleanField(default=True)

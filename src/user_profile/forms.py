@@ -34,6 +34,7 @@ class ProfileSigForm(forms.ModelForm):
         fields = ['signature']
 
 class AddressForm(forms.ModelForm):
+    address = forms.CharField(widget=forms.Textarea)
     class Meta:
         model = Address
-        fields = ['company','address','tax']
+        fields = ['company','address','branch','tax']

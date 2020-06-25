@@ -75,6 +75,7 @@
               <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Address</th>
+                <th scope="col">Branch</th>
                 <th scope="col">Tax</th>
                 <th scope="col"></th>
               </tr>
@@ -84,6 +85,7 @@
               <tr>
                 <td><a href="{% url 'profile:update' address.pk %}">{{address.company}}</a></td>
                 <td>{{address.address|linebreaksbr}}</td>
+                <td>{{address.branch|default_if_none:""}}</td>
                 <td>{{address.tax}}</td>
                 <td>
                  <a href="{% url 'profile:delete' address.pk %}"><i class="fas fa-trash-alt"></i></a>
