@@ -151,7 +151,7 @@
                             </v-card-subtitle>
                             <v-card-text>
                               <p class="display-1 text--primary">
-                                [[vat]]
+                                [[vat_text]]
                               </p>
                             </v-card-text>
                         </v-card>
@@ -173,7 +173,7 @@
                             </v-card-subtitle>
                             <v-card-text>
                               <p class="display-1 text--primary">
-                                [[wht]]
+                                [[wht_text]]
                               </p>
                             </v-tacard-text>
                         </v-card>
@@ -195,7 +195,7 @@
                             </v-card-subtitle>
                             <v-card-text>
                               <p class="display-1 text--primary font-weight-black">
-                                [[net]]
+                                [[net_text]]
                               </p>
                             </v-card-text>
                         </v-card>
@@ -264,7 +264,7 @@
                           label="Withholding Tax">
                           </v-checkbox>
 
-                      <button type="submit" class="btn btn-primary">Continue Payment ([[net]] Baht)</button>
+                      <button type="submit" class="btn btn-primary">Continue Payment ([[net_text]] Baht)</button>
                     </div>
                   </form>
 
@@ -401,18 +401,31 @@
         }, 0)
       },
       vat () {
+        // return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+        return (this.total * (this.tax.tax / 100))
+      },
+      vat_text () {
         return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
       },
-      wht () {
+      wht_text () {
         return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+      },
+      wht () {
+        // return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+        return (this.total * (this.tax.wht / 100))
       },
       net () {
         let wht = 0
         if (this.isWht) {
           wht = Number(this.wht)
         }
+        // console.log(Number(this.total))
+        // console.log(Number(this.vat))
         // console.log(wht)
         return (Number(this.total) + Number(this.vat)) - wht
+      },
+      net_text(){
+        return this.net.toLocaleString(undefined, {maximumFractionDigits:2})
       },
       // qr () {
       //   return 'http://10.24.50.91:8010/billing/qr?tax=&ref1=' +

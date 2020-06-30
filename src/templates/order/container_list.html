@@ -15,7 +15,7 @@
   		        <div class="card-body">
   		          <h4>Container List</h4>
 
-  		          รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทังหมด {{ page_obj.paginator.count }} รายการ <br>
+  		          รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทั้งหมด {{ page_obj.paginator.count }} รายการ <br>
        {% if is_paginated %}
                     <ul class="pagination">
                       {% if page_obj.has_previous %}

@@ -20,5 +20,5 @@ class CreateOrderForm(forms.Form):
     vat_rate	= forms.CharField(max_length=10)
     wht_rate	= forms.CharField(max_length=10)
     grand_total = forms.CharField(max_length=10)
-    containers 	= forms.CharField(max_length=5000)
+    containers 	= forms.CharField()
     address     = forms.IntegerField()
