@@ -63,6 +63,15 @@
                           </div>
                         </template>
 
+                        <template v-slot:item.oog="{ item }">
+                          <div v-if="item.oog">
+                            <v-chip color="green" dark>Y</v-chip>
+                          </div>
+                          <div v-else>
+                            
+                          </div>
+                        </template>
+
                         <template v-slot:expanded-item="{ headers, item }">
                           <td :colspan="4">
                             <h3>Port of Discharge</h3>
@@ -372,11 +381,12 @@
         {
           text: 'Container',
           align: 'start',
-          sortable: false,
+          sortable: true,
           value: 'container'
         },
         { text: 'Status', value: 'status' },
         { text: 'Size', value: 'size' },
+        { text: 'Type', value: 'container_type' },
         { text: 'Full/Empty', value: 'full' },
         { text: 'Is OOG?', value: 'oog' },
         // { text: 'Tariff', value: 'tariff' },
