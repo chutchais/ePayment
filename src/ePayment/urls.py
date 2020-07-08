@@ -82,3 +82,8 @@ if settings.DEBUG:
     urlpatterns = [
         path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
+
+
+from django.contrib import admin
+admin.site.site_header = 'LCB1 ePayment System'
+admin.site.site_title = 'LCB1 ePayment System'
