@@ -151,7 +151,8 @@ class OrderDetailView(LoginRequiredMixin,DetailView):
     queryset = Order.objects.select_related('booking','address')
     def get_context_data(self,**kwargs):
         context = super(OrderDetailView,self).get_context_data(**kwargs)
-        context['qr_url'] = settings.QR_CODE_ENDPOINT_URL#'http://10.24.50.91:8010/billing/'#
+        # context['qr_url'] = settings.QR_CODE_ENDPOINT_URL#'http://10.24.50.91:8010/billing/'#
+        context['qr_url'] = reverse_lazy('order:list')
         context['slip_verify_url'] = settings.SLIP_VERIFY_ENDPOINT_URL
         # print('X====================X', settings.QR_CODE_ENDPOINT_URL)
         return context

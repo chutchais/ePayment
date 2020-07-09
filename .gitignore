@@ -1,3 +1,5 @@
 env
 media
 src/db.sqlite3
+src/qr.png
+src/qr_out.png
