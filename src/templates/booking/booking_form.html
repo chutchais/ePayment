@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
- {% load crispy_forms_tags %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -12,7 +12,8 @@
 
             <form method="post" novalidate>{% csrf_token %}
                 {{ form|crispy }}
-                <input type="submit" value="Save">
+                <!-- <input type="submit" value="Save"> -->
+                <button type="submit" class="btn btn-primary">Create Booking</button>
             </form>
 
         </div>

@@ -57,7 +57,12 @@
                                 <div>Total : [[total]] Baht</div>
                                 <div>Address : [[company]] [[tax]]</div>
                                 {% if not object.payment_slip %}
-                                <div>To post confirmed pay slip-> <a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></div>
+                                
+                                  <a href="{% url 'order:payslip' object.id %}">
+                                    <button type="button" class="btn btn-success" >
+                                    Upload Pay Slip</button>
+                                  </a>
+                                
                                 {% endif %}
                               </p>
 
@@ -92,6 +97,9 @@
                               <p class="card-text">
                                 
                               </p>
+
+                              
+
                             </div>
                           </div>
                         </div>
@@ -99,7 +107,7 @@
 
                         <!-- Payment Confirmation -->
                         {% if perms.order.verify_payment %}
-                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-1">
                           <div class="card ">
                             <div class="card-body">
                               <h5 class="card-title">Payment Confirmation</h5>

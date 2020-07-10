@@ -13,6 +13,7 @@ class Booking(models.Model):
         )
 
     name                = models.CharField(max_length=100,
+                            verbose_name='Booking number',
                             validators=[
                                 RegexValidator(
                                     regex='^[\w-]+$',
