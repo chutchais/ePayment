@@ -120,11 +120,11 @@
                                     {% if user.is_staff %}
                                      
                                       <div class="alert alert-info" role="alert" v-if="paid">
-                                        Payment Confirmed on : [[notify.TransDate]] 
-                                        Amount : [[notify.Amount]]
-                                        Booking : [[notify.QRId]]
-                                        Ref1 : [[notify.Ref1]] 
-                                        BankRef : [[notify.BankRef]]<br>
+                                        Payment Confirmed on : [[notify.TransDate]][[notify.transDate]]
+                                        Amount : [[notify.Amount]][[notify.amount]]
+                                        QRid : [[notify.QRId]][[notify.qRId]]
+                                        Ref1 : [[notify.Ref1]][[notify.ref1]] 
+                                        BankRef : [[notify.BankRef]][[notify.bankRef]]<br>
 
                                         
                                         <a href="{% url 'order:payment-confirm' object.id %}">
@@ -405,8 +405,11 @@
               this.paid = false;
               this.payment_status = '';
               // console.log('Hello from ' + name + '!');
+              var qrid = 'D' + (this.terminal=='LCB1' ? 'LCB' : 'LCM') + this.booking
+              var billerid = this.terminal=='LCB1' ? '010553811088480' : '011554701016180'
+              console.log(qrid,billerid)
               axios
-              .get( slip_verify_url + 'verifyslip/?QRid=' + this.booking + '&billerid=010553811088480')//Only internal use.
+              .get( slip_verify_url + 'verifyslip/?QRid=' + qrid + '&billerid=' + billerid)//Only internal use.
               .then(
                   response => {
                     // this.paid = true;
