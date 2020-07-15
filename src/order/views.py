@@ -160,8 +160,8 @@ class OrderDetailView(LoginRequiredMixin,DetailView):
         summary = order.containers.values('cont_size').annotate(
                 count=Count('container'),
                 total_ex_vat= Sum('total') 
-                                + ((Sum('total')*order.vat_rate)/100) 
-                                - ((Sum('total')*order.wht_rate)/100) if order.wht else 0
+                                # + ((Sum('total')*order.vat_rate)/100) 
+                                # - ((Sum('total')*order.wht_rate)/100) if order.wht else 0
                 )
         context['summary'] = summary
         # for c in obj.containers.all():
