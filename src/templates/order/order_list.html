@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
 <div id="app">
@@ -52,8 +53,10 @@
                 
                 <th scope="col">Created</th>
 
+                <th scope="col">Payment Slip</th>
+
                 {% if perms.order.verify_payment %}
-                  <th scope="col">Slip</th>
+                  
                   <th scope="col">Execute Job</th>
                 {% endif %}
 					      
@@ -73,19 +76,22 @@
                   </td>
                 <td><a href="{{order.get_absolute_url}}">{{order.name}}</a></td>
                 <td>{{order.container_count}}</td>
-                 <td>{{order.grand_total}}</td>
-					      <td>{{order.created}}</td>
-                {% if perms.order.verify_payment or perms.order.execute_job  %}
-                    {% if order.payment_slip %}
-                      <td>Yes</td>
+                 <td>{{order.grand_total|floatformat:2|intcomma}}</td>
+					      <td>{{order.created|naturalday}}</td>
+
+                {% if order.payment_slip %}
+                      <td><a href="{% url 'order:payslip' order.id %}"><span class="badge badge-success">Yes</span></a></td>
                     {% else %}
-                      <td>No</td>
-                    {% endif %}
+                      <td><a href="{% url 'order:payslip' order.id %}"><span class="badge badge-danger">No</span></a></td>
+                  {% endif %}
+
+                {% if perms.order.verify_payment or perms.order.execute_job  %}
+                    
 
                     {% if order.execute_job %}
-                      <td>Yes</td>
+                      <td><span class="badge badge-success">Yes</span></td>
                     {% else %}
-                      <td><a href="{% url 'order:execute' order.id %}">No</a></td>
+                      <td><a href="{% url 'order:execute' order.id %}"><span class="badge badge-danger">No</span></a></td>
                     {% endif %}
 
                 {% endif %}
