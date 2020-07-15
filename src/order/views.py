@@ -10,6 +10,7 @@ from django.urls import reverse_lazy
 from django.views.generic import DetailView,CreateView,UpdateView,DeleteView,ListView
 from django.db.models import Q,F
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count,Sum
 from user_profile.models import Address
 from order.models import Order,Container
 from order.forms import OrderPaySlipForm,CreateOrderForm,OrderPaymentForm
@@ -154,7 +155,17 @@ class OrderDetailView(LoginRequiredMixin,DetailView):
         # context['qr_url'] = settings.QR_CODE_ENDPOINT_URL#'http://10.24.50.91:8010/billing/'#
         context['qr_url'] = reverse_lazy('order:list')
         context['slip_verify_url'] = settings.SLIP_VERIFY_ENDPOINT_URL
-        # print('X====================X', settings.QR_CODE_ENDPOINT_URL)
+        # For Container summary , SizeXCount(*) -- Total Price
+        order = super().get_object()
+        summary = order.containers.values('cont_size').annotate(
+                count=Count('container'),
+                total_ex_vat= Sum('total') 
+                                + ((Sum('total')*order.vat_rate)/100) 
+                                - ((Sum('total')*order.wht_rate)/100) if order.wht else 0
+                )
+        context['summary'] = summary
+        # for c in obj.containers.all():
+        #     print(c)
         return context
 
 class OrderUpdateSlip(LoginRequiredMixin,UpdateView):

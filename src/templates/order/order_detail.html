@@ -53,9 +53,14 @@
                             <div class="card-body">
                               <h5 class="card-title">[[booking]]</h5>
                               <p class="card-text">
+                                <div>Terminal  : {{object.booking.terminal}}</div>
                                 <div>Ref1  : [[ref1]]</div>
                                 <div>Total : [[total]] Baht</div>
                                 <div>Address : [[company]] [[tax]]</div>
+                                <div><u>Details</u> :</div>
+                                {% for s in summary %}
+                                  {{s.cont_size}}"x{{s.count}} = {{s.total_ex_vat}}<br>
+                                {% endfor %}
                                 {% if not object.payment_slip %}
                                 
                                   <a href="{% url 'order:payslip' object.id %}">
