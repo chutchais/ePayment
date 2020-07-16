@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
 <script>
@@ -35,14 +36,33 @@
                   <span class="badge badge-secondary">UnPaid</span>
                   <a href="{% url 'order:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
                 {% endif %}
+                {% if not object.payment_slip %}
+                  <span class="badge badge-danger">Need Payslip</span>
+                {% endif %}
+                {% if object.execute_job %}
+                  <span class="badge badge-success">Order Completed</span>
+                {% endif %}
               </h2>
+              <span>Created on : {{object.created}} ({{object.created|naturaltime}})</span>
+
+              
 
               {% if object.paid %}
                 <div class="alert alert-info" role="alert">
                   Payment Confirmed on : {{object.payment_date}} (BankRef : {{object.payment_ref}})
                    Verified by {{object.payment_inspector}}
-                  <a href="{% url 'order:payslip' object.id %}">See pay slip picture</a>
+                   {% if object.payment_slip %}
+                      <a href="{% url 'order:payslip' object.id %}">See pay slip picture</a>
+                  {% endif %}
                 </div>
+
+                {% if not object.payment_slip %}
+                    <div class="alert alert-danger" role="alert">
+                      To continue in next process,Please upload Bank Payslip picture.
+                    <a href="{% url 'order:payslip' object.id %}">Upload Payslip</a>
+                  </div>
+                {% endif %}
+
               {% else %}
                 <!-- Show QR Code -->
                     <div class="row justify-content-center">
