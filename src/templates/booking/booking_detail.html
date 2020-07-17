@@ -96,9 +96,15 @@
                           </v-list-item>
 
                       </template>
+
                       <template v-slot:item.tariff_sum_total="{ item }">
                         <v-chip color="green" dark>[[ item.tariff_sum_total ]]</v-chip>
                       </template>
+
+                      <template v-slot:item.paid="{ item }">
+                        <v-chip v-if="item.paid" color="green" dark>Y</v-chip>
+                      </template>
+
                   </v-data-table>
                 </v-card>
                 </template>
@@ -390,7 +396,8 @@
         { text: 'Full/Empty', value: 'full' },
         { text: 'Is OOG?', value: 'oog' },
         // { text: 'Tariff', value: 'tariff' },
-        { text: 'Item Price', value: 'tariff_sum_total' }
+        { text: 'Item Price', value: 'tariff_sum_total' },
+        { text: 'Paid', value: 'paid' }
       ],
       tax: {
         tax: tax_rate,

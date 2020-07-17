@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'oog',
     'booking',
     'order',
+    'bl'
 
 ]
 

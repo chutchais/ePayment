@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div id="app">
+  <v-app>
+    <div class="containeer">
+  <div class="row wrapper">
+
+    <div class="col-sm-12 col-md-12">
+      <div class="row">	
+        
+        <div class="col-12 mb-1">
+          <div class="content">
+          	<div class="card">
+  		        <div class="card-body">
+  		          <h4>Book of Landing Report</h4>
+                
+               
+                  <v-form>
+                    <v-container>
+                      <v-row>
+                        <v-col cols="12" sm="6" md="6">
+                          <v-text-field
+                            label="Bill Of Landing Number"
+                            outlined
+                          ></v-text-field>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-form>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        </div><!-- End row -->
+      </div> <!-- End col-sm-12 col-md-12 -->
+
+    </div><!-- End row wrapper -->
+  </div><!-- End container -->
+  </v-app>
+</div> <!-- End App -->
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}
+
+
+{% block script %}
+  <script>
+
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    vuetify: new Vuetify(),
+    data: {
+          }
+  })
+  </script>
+{% endblock %}
+

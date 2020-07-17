@@ -28,6 +28,7 @@ urlpatterns = [
 	
     path('admin/', admin.site.urls),
     path('auth/', include('django.contrib.auth.urls')),
+    path('bl/',include(('bl.urls','bl'), namespace='bl')),
     path('booking/',include(('booking.urls','booking'), namespace='booking')),
     path('user_profile/', include('user_profile.urls',namespace='user_profile')),
     path('order/',include(('order.urls','order'), namespace='order')),
