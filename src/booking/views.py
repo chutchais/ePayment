@@ -38,7 +38,10 @@ class BookingDetailView(LoginRequiredMixin,DetailView):
 		context = super(BookingDetailView,self).get_context_data(**kwargs)
 		context['tax'] = Tax.objects.get(name='Default')
 		context['addresses'] = Address.objects.filter(user__username=self.request.user)
-		context['export_booking_url'] = settings.EXPORT_BOOKING_ENDPOINT_URL
+		# http://192.168.10.16:5001/booking/
+		booking_url = f"{reverse_lazy('order:list')}booking/"
+		# print (f"{reverse_lazy('order:list')}booking/")
+		context['export_booking_url'] = booking_url#settings.EXPORT_BOOKING_ENDPOINT_URL
 		return context
 
 class BookingCreateView(LoginRequiredMixin,CreateView):

@@ -559,9 +559,20 @@ def db_ctcs_exp_get_booking(booking):
         # print(results, file=sys.stdout)
         return results
 
+# def get_booking_info(request,booking):
+#     Objects = db_ctcs_exp_get_booking(booking)
+#     response = JsonResponse(Objects, safe=False)
+#     response['Access-Control-Allow-Origin'] = '*'
+#     response['Access-Control-Allow-Headers'] = '*'
+#     return response
+
 def get_booking_info(request,booking):
-    Objects = db_ctcs_exp_get_booking(booking)
-    response = JsonResponse(Objects, safe=False)
+    import json
+    http = urllib3.PoolManager()
+    # print ('get_booking_info')
+    r = http.request('GET', f'http://192.168.10.16:5001/booking/{booking}')
+    # return json.loads(r.data.decode('utf-8'))
+    response = JsonResponse(json.loads(r.data.decode('utf-8')), safe=False)
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Headers'] = '*'
     return response
