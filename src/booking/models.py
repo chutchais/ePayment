@@ -20,7 +20,8 @@ class Booking(models.Model):
                                     message='Name does not allow special charecters',
                                 ),
                             ])
-    terminal            = models.CharField(max_length=10,choices=TERMINAL_CHOICES,default='LCB1')
+    terminal            = models.CharField(max_length=10,blank=True,null=True
+                            ,choices=TERMINAL_CHOICES)
     created             = models.DateTimeField(auto_now_add=True)
     updated             = models.DateTimeField(blank=True, null=True,auto_now=True)
     status              = models.BooleanField(default=True)

@@ -73,6 +73,12 @@ def post_container(request):
                         user=user)
                     c.save()
 
+                # Update Booking Terminal
+                # Added on July 22,2020 by Chutchai
+                if not booking_obj.terminal :
+                    booking_obj.terminal = 'LCMT'
+                    booking_obj.save()
+
             # redirect to a new URL:
             return HttpResponseRedirect(reverse_lazy('order:detail',kwargs={'pk': order.id}))
 

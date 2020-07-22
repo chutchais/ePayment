@@ -247,6 +247,15 @@
                 <div class="col-12">
                 <div class="row">
                   <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
+                    <h4>Address Detail</h4>
+                    <span>{{object.address}}</span><br>
+                    Address : {{object.address.address}}<br>
+                    Tax : {{object.address.tax}}<br>
+                    Branch :{{object.address.branch|default_if_none:""}}<br>
+                  </div>
+                </div><!--end tow-->
+                <div class="row">
+                  <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
                     <!-- <div class="content"> -->
                       <h4>Container List</h4>
                       <div class="table-responsive-md">

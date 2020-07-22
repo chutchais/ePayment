@@ -68,7 +68,7 @@
   		          {% for object in object_list %}
   					    <tr>
                   <td><a href="{{object.get_absolute_url}}">{{object.name}}</a></td>
-                  <td>{{object.terminal}}</td>
+                  <td>{{object.terminal|default_if_none:""}}</td>
   					      <td>{{object.created}}</td>
   					      <td>{{object.user}}</td>
   					    </tr>

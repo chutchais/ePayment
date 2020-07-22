@@ -15,8 +15,6 @@
           	<div class="card">
   		        <div class="card-body">
   		          <h4>Book of Landing Report</h4>
-                
-               
                   <v-form>
                     <v-container>
                       <v-row>
@@ -24,9 +22,18 @@
                           <v-text-field
                             label="Bill Of Landing Number"
                             outlined
+                            :value="bl_number"
                           ></v-text-field>
                         </v-col>
+                        
                       </v-row>
+                      <v-btn
+                          color="success"
+                          class="mr-4"
+                          @click="get_data(bl_number)"
+                        >
+                          Get Data
+                        </v-btn>
                     </v-container>
                   </v-form>
 
@@ -62,7 +69,27 @@
     el: '#app',
     vuetify: new Vuetify(),
     data: {
+            bl_number : 'test'
+          },
+    methods: {
+          get_data: function(bl_name) {
+              this.loading = true;
+              this.containers = [];
+              console.log('Hello from ' + bl_name + '!');
+              // axios
+              // // .get('http://127.0.0.1:8000/order/booking/'+ this.booking)
+              // .get(export_url + this.booking)
+              // .then(
+              //     response => {
+              //       this.containers = response.data
+              //       this.loading = false;
+              //     })
+              // .catch(error =>{
+              //       this.loading = false;
+              //   })
+              
           }
+      }
   })
   </script>
 {% endblock %}

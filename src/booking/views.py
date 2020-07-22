@@ -47,6 +47,7 @@ class BookingDetailView(LoginRequiredMixin,DetailView):
 class BookingCreateView(LoginRequiredMixin,CreateView):
 	model = Booking
 	fields = ['name','terminal']
+	# fields = ['name']
 	success_url = reverse_lazy('booking:list')
 
 	def form_valid(self, form):
