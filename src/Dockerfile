@@ -34,6 +34,13 @@ RUN apk add curl sudo build-base unixodbc-dev unixodbc freetds-dev && pip instal
 ENV LIBRARY_PATH=/lib:/usr/lib
 
 WORKDIR /usr/src/epayment
+
+# set environment variables
+# Added by Chutchai on July 24,2020
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+
 COPY ./requirements.txt /usr/src/epayment
 
 RUN pip install --upgrade pip

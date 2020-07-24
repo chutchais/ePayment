@@ -22,8 +22,7 @@ services:
     container_name: epayment-server
     restart: always
     build: ./src
-    expose:
-      - "8000"
+    
     links:
       - db-server:postgres
       # - redis:redis
@@ -35,8 +34,22 @@ services:
       - web-media:/media
     # env_file: .env
     command: gunicorn ePayment.wsgi:application -w 2 -b :8000
+    # Internal only
+    expose:
+      - "8000"
+    #External ,Removed on July 24,2020
+    # ports:
+    #   - 8000:8000
+
+  nginx:
+    container_name: nginx
+    build: ./nginx
     ports:
-      - 8000:8000
+      - 1337:80
+    networks:
+      - main
+    depends_on:
+      - web-server
 
 # gunicorn --workers=3 wmp.wsgi -b 0.0.0.0:8000
 
