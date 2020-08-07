@@ -76,7 +76,9 @@
                           <td :colspan="4">
                             <h3>Port of Discharge</h3>
                             Vessel Code: [[item.vessel_code ]] / [[ item.voy ]] <br>
-                            [[ item.pod.country ]] -->[[ item.pod.port ]] --> [[ item.pod.port_name ]]
+                            [[ item.pod.country ]] -->[[ item.pod.port ]] --> [[ item.pod.port_name ]]<br>
+                            Line : [[item.line ]] , Agent : [[item.agent ]]<br>
+                            Terminal : [[item.terminal ]]
                           </td>
                           <td :colspan="4">
                             <h3>Tariff Charge(s)</h3>
@@ -390,6 +392,7 @@
           sortable: true,
           value: 'container'
         },
+        { text: 'Terminal', value: 'terminal' },
         { text: 'Status', value: 'status' },
         { text: 'Size', value: 'size' },
         { text: 'Type', value: 'container_type' },
