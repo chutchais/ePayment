@@ -75,8 +75,9 @@ def post_container(request):
 
                 # Update Booking Terminal
                 # Added on July 22,2020 by Chutchai
+                terminal = container['terminal']
                 if not booking_obj.terminal :
-                    booking_obj.terminal = 'LCMT'
+                    booking_obj.terminal = terminal
                     booking_obj.save()
 
             # redirect to a new URL:
