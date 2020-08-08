@@ -35,28 +35,28 @@ services:
     # env_file: .env
     command: gunicorn ePayment.wsgi:application -w 2 -b :8000
     # Internal only
-    expose:
-      - "8000"
+    # expose:
+    #   - "8000"
     #External ,Removed on July 24,2020
-    # ports:
-    #   - 80:8000
-
-  nginx:
-    container_name: nginx
-    restart: unless-stopped
-    build: ./nginx
     ports:
-      - 80:80
-      - 443:443
-    volumes:
-      # - ./data/nginx:/etc/nginx/conf.d
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-    networks:
-      - main
-    depends_on:
-      - web-server
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+      - 80:8000
+
+  # nginx:
+  #   container_name: nginx
+  #   restart: unless-stopped
+  #   build: ./nginx
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   volumes:
+  #     # - ./data/nginx:/etc/nginx/conf.d
+  #     - ./data/certbot/conf:/etc/letsencrypt
+  #     - ./data/certbot/www:/var/www/certbot
+  #   networks:
+  #     - main
+  #   depends_on:
+  #     - web-server
+  #   command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
   # certbot:
   #   container_name: certbot
