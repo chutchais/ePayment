@@ -441,7 +441,8 @@
               // console.log('Hello from ' + name + '!');
               var qrid = 'D' + (this.terminal=='LCB1' ? 'LCB' : 'LCM') + this.booking
               var billerid = this.terminal=='LCB1' ? '010553811088480' : '011554701016180'
-              console.log(qrid,billerid)
+              // console.log(qrid,billerid)
+              // console.log(slip_verify_url + 'verifyslip/?QRid=' + qrid + '&billerid=' + billerid)
               axios
               .get( slip_verify_url + 'verifyslip/?QRid=' + qrid + '&billerid=' + billerid)//Only internal use.
               .then(
@@ -449,8 +450,15 @@
                     // this.paid = true;
                     this.loading = false;
                     this.paid = (response.data.resultCode == '000') ? true : false; 
+                    // Added by Chutchai on Aug 13,2020
+                    // To verify ref1 data must be match. 
                     if (this.paid) {
-                      this.notify = response.data
+                      if (response.data.ref1 != this.ref1){
+                        this.paid = false
+                        this.payment_status = 'Not found payment of Booking:' + this.booking + ' Ref1: ' + this.ref1;
+                      }else{
+                        this.notify = response.data
+                      }
                     }
                     else {
                       this.payment_status = 'Not found payment of Booking:' + this.booking + ' Ref1: ' + this.ref1;
