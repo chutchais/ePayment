@@ -281,7 +281,7 @@
                           label="Withholding Tax">
                           </v-checkbox>
 
-                      <button type="submit" class="btn btn-primary">Continue Payment ([[net_text]] Baht)</button>
+                      <button type="submit" class="btn btn-primary" :disabled="net == 0">Continue Payment ([[net_text]] Baht)</button>
                     </div>
                   </form>
 
@@ -392,15 +392,16 @@
           sortable: true,
           value: 'container'
         },
+        { text: 'Item Price', value: 'tariff_sum_total' },
+        { text: 'Paid', value: 'paid' },
         { text: 'Terminal', value: 'terminal' },
         { text: 'Status', value: 'status' },
         { text: 'Size', value: 'size' },
         { text: 'Type', value: 'container_type' },
         { text: 'Full/Empty', value: 'full' },
-        { text: 'Is OOG?', value: 'oog' },
+        { text: 'Is OOG?', value: 'oog' }
         // { text: 'Tariff', value: 'tariff' },
-        { text: 'Item Price', value: 'tariff_sum_total' },
-        { text: 'Paid', value: 'paid' }
+        
       ],
       tax: {
         tax: tax_rate,
