@@ -401,9 +401,14 @@
     computed: {
       qr () {
         console.log(qr_url)
+        // return qr_url + 'qr?tax=&ref1=' +
+        //   this.ref1 + '&ref2=&amount=' + (Number(this.total)) +
+        //   '&terminal=' + this.terminal + '&qrid=' + this.booking
+        // Modify by Chutchai on Aug 13,2020
+        // To change QRid to Booking+Ref1
         return qr_url + 'qr?tax=&ref1=' +
           this.ref1 + '&ref2=&amount=' + (Number(this.total)) +
-          '&terminal=' + this.terminal + '&qrid=' + this.booking
+          '&terminal=' + this.terminal + '&qrid=' + this.booking + this.ref1
       }
     },
     methods: {
@@ -439,7 +444,11 @@
               this.paid = false;
               this.payment_status = '';
               // console.log('Hello from ' + name + '!');
-              var qrid = 'D' + (this.terminal=='LCB1' ? 'LCB' : 'LCM') + this.booking
+              // var qrid = 'D' + (this.terminal=='LCB1' ? 'LCB' : 'LCM') + this.booking
+              // Modify by Chutchai on Aug 13,2020
+              // To change QRid to Booking + Ref1
+              var qrid = 'D' + (this.terminal=='LCB1' ? 'LCB' : 'LCM') + this.booking + this.ref1
+
               var billerid = this.terminal=='LCB1' ? '010553811088480' : '011554701016180'
               // console.log(qrid,billerid)
               // console.log(slip_verify_url + 'verifyslip/?QRid=' + qrid + '&billerid=' + billerid)

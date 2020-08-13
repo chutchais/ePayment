@@ -45,7 +45,10 @@ def post_container(request):
             containers = json.loads(containers_json)
             # Create Order
             ref = datetime.now().strftime("%H%M%S")
-            order_name = f'{booking}-{ref}'
+            # order_name = f'{booking}-{ref}'
+            # Modify on Aug 13,2020
+            # To change order name to be Booking+Ref1 (same as QRid)
+            order_name = f'{booking}{ref}'
             user = User.objects.get(username=request.user)
             booking_obj = Booking.objects.get(name=booking,user=user)
             address_obj = Address.objects.get(pk=address)
