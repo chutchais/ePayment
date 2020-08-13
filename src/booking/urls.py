@@ -1,11 +1,12 @@
 from django.urls import path, include
 from . import views
 from django.views.decorators.cache import cache_page
-from .views import BookingListView,BookingCreateView,BookingDetailView,BookingDeleteView
+from .views import BookingListView,BookingCreateView,BookingDetailView,BookingDeleteView,BookingDetailQueryView
 
 urlpatterns = [
     # path('', views.index, name='index'),
     path('',BookingListView.as_view(),name='list'),
+    path('report',BookingDetailQueryView.as_view(),name='report'),
     path('create',BookingCreateView.as_view(),name='create'),
     # path('booking/<booking>',get_booking_info,name='booking'),
     path('<pk>',BookingDetailView.as_view(),name='detail'),

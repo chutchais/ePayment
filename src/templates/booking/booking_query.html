@@ -1,0 +1,539 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+    const tax_rate = {{tax.tax}};
+    const wht_rate = {{tax.wht}};
+    const export_url = '{{export_booking_url}}';
+</script>
+
+<div id="app">
+  <v-app>
+    <div class="containeer">
+      <div class="row wrapper">
+        <div class="col-sm-12 col-md-12">
+                 <div class="row">
+                  <div class="col-12 mb-2">
+                    <div class="content">
+                      <h4>Booking Report</h4> 
+                    
+                      <input type="text" class="form-control mb-2" v-model="booking" placeholder="Booking number">
+                      <button type="button" class="btn btn-success mb-2" v-on:click="greet(booking)">Get Container</button>
+
+
+
+                      <div v-if="containers">
+
+                        <div v-if="selected.length > 0">
+
+                            <template>
+                              <v-card
+                                cols="12"
+                                class="mt-2"
+                                v-if="selected"
+                              >
+                                    <v-card-title>
+                                      Charge Summary
+                                    </v-card-title>
+                                    <v-card-subtitle>
+                                      [[selected.length]] container(s)
+                                    </v-card-subtitle>
+                                    
+                             
+                             <v-row no-gutters>
+          
+                              <v-col
+                                cols="6"
+                                 md="3"
+                              >
+                                  <v-card
+                                    class="pa-2 ma-2"
+                                    outlined
+                                  >
+                                    <v-card-title>
+                                        Total
+                                      </v-card-title>
+                                      <v-card-subtitle>
+                                        Tariff charge(s)
+                                      </v-card-subtitle>
+                                      <v-card-text>
+                                        <p class="display-1 text--primary">
+                                          [[total]]
+                                        </p>
+                                      </v-card-text>
+                                  </v-card>
+                              </v-col>
+                              
+                              <v-col
+                                cols="6"
+                                 md="3"
+                              >
+                                  <v-card
+                                    class="pa-2 ma-2"
+                                    outlined
+                                  >
+                                    <v-card-title>
+                                        Vat
+                                      </v-card-title>
+                                      <v-card-subtitle>
+                                        [[tax.tax]]%
+                                      </v-card-subtitle>
+                                      <v-card-text>
+                                        <p class="display-1 text--primary">
+                                          [[vat_text]]
+                                        </p>
+                                      </v-card-text>
+                                  </v-card>
+                              </v-col>
+          
+                              <v-col
+                                cols="6"
+                                 md="3"
+                              >
+                                <v-card
+                                    class="pa-2 ma-2"
+                                    outlined
+                                  >
+                                      <v-card-title>
+                                        WHT
+                                      </v-card-title>
+                                      <v-card-subtitle>
+                                        [[tax.wht]]%
+                                      </v-card-subtitle>
+                                      <v-card-text>
+                                        <p class="display-1 text--primary">
+                                          [[wht_text]]
+                                        </p>
+                                      </v-tacard-text>
+                                  </v-card>
+                              </v-col>
+          
+                              <v-col
+                                cols="6"
+                                 md="3"
+                              >
+                                <v-card
+                                    class="pa-2 ma-2 bg-info"
+                                    outlined
+                                  >
+                                    <v-card-title>
+                                        Grand Total
+                                      </v-card-title>
+                                      <v-card-subtitle>
+                                        Final charge
+                                      </v-card-subtitle>
+                                      <v-card-text>
+                                        <p class="display-1 text--primary font-weight-black">
+                                          [[net_text]]
+                                        </p>
+                                      </v-card-text>
+                                  </v-card>
+                            </v-col>
+                            </v-row>
+                            </template>
+                          </div> <!-- vif -->
+
+
+
+
+                      <template>
+
+                        <v-card>
+                          <v-card-title>
+                            Container Details
+                            <v-spacer></v-spacer>
+                            <v-text-field
+                              v-model="search"
+                              append-icon="mdi-magnify"
+                              label="Search"
+                              single-line
+                              hide-details
+                            ></v-text-field>
+                          </v-card-title>
+
+                      <v-data-table
+                        :items-per-page="50"
+                        class="elevation-1"
+                        v-model="selected"
+                        :headers="headers"
+                        :items="containers"
+                        :single-select="singleSelect"
+                        :search="search"
+                        item-key="hdid10"
+                        show-select
+                        show-expand
+                        class="elevation-1"
+                        :single-expand="singleExpand"
+                        :expanded.sync="expanded"
+                        dense
+                        :loading="loading"
+                        loading-text="Loading... Please wait"
+                      >
+                        <template v-slot:item.full="{ item }">
+                          <div v-if="item.full == 'F'">
+                            FULL
+                          </div>
+                          <div v-else>
+                            EMPTY
+                          </div>
+                        </template>
+
+                        <template v-slot:item.oog="{ item }">
+                          <div v-if="item.oog">
+                            <v-chip color="green" dark>Y</v-chip>
+                          </div>
+                          <div v-else>
+                            
+                          </div>
+                        </template>
+
+                        <template v-slot:expanded-item="{ headers, item }">
+                          <td :colspan="4">
+                            <h3>Port of Discharge</h3>
+                            Vessel Code: [[item.vessel_code ]] / [[ item.voy ]] <br>
+                            [[ item.pod.country ]] -->[[ item.pod.port ]] --> [[ item.pod.port_name ]]<br>
+                            Line : [[item.line ]] , Agent : [[item.agent ]]<br>
+                            Terminal : [[item.terminal ]]
+                          </td>
+                          <td :colspan="4">
+                            <h3>Tariff Charge(s)</h3>
+                            <span v-for="(value, key) in item.tariff" :key="key.id">
+                              [[key]] : [[value]] Baht<br>
+                            </span>
+                          </td>
+
+                        </template>
+
+
+                        <template v-slot:item.tariff="{ item }">
+                          <v-list-item v-for="(value, key) in item.tariff" :key="key.id">
+                            <v-list-item-content>
+                             <v-list-item-title>[[key]] : [[value]] Baht</v-list-item-title><br>
+                            </v-list-item-content>
+                          </v-list-item>
+
+                      </template>
+
+                      <template v-slot:item.tariff_sum_total="{ item }">
+                        <v-chip color="green" dark>[[ item.tariff_sum_total ]]</v-chip>
+                      </template>
+
+                      <template v-slot:item.paid="{ item }">
+                        <v-chip v-if="item.paid" color="green" dark>Y</v-chip>
+                      </template>
+
+                  </v-data-table>
+                </v-card>
+                </template>
+                 
+
+                  <div v-if="selected.length > 0">
+
+                  <template>
+                    <v-card
+                      cols="12"
+                      class="mt-2"
+                      v-if="selected"
+                    >
+                          <v-card-title>
+                            Charge Summary
+                          </v-card-title>
+                          <v-card-subtitle>
+                            [[selected.length]] container(s)
+                          </v-card-subtitle>
+                          
+                   
+                   <v-row no-gutters>
+
+                    <v-col
+                      cols="6"
+                       md="3"
+                    >
+                        <v-card
+                          class="pa-2 ma-2"
+                          outlined
+                        >
+                          <v-card-title>
+                              Total
+                            </v-card-title>
+                            <v-card-subtitle>
+                              Tariff charge(s)
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary">
+                                [[total]]
+                              </p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    
+                    <v-col
+                      cols="6"
+                       md="3"
+                    >
+                        <v-card
+                          class="pa-2 ma-2"
+                          outlined
+                        >
+                          <v-card-title>
+                              Vat
+                            </v-card-title>
+                            <v-card-subtitle>
+                              [[tax.tax]]%
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary">
+                                [[vat_text]]
+                              </p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+
+                    <v-col
+                      cols="6"
+                       md="3"
+                    >
+                      <v-card
+                          class="pa-2 ma-2"
+                          outlined
+                        >
+                            <v-card-title>
+                              WHT
+                            </v-card-title>
+                            <v-card-subtitle>
+                              [[tax.wht]]%
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary">
+                                [[wht_text]]
+                              </p>
+                            </v-tacard-text>
+                        </v-card>
+                    </v-col>
+
+                    <v-col
+                      cols="6"
+                       md="3"
+                    >
+                      <v-card
+                          class="pa-2 ma-2 bg-info"
+                          outlined
+                        >
+                          <v-card-title>
+                              Grand Total
+                            </v-card-title>
+                            <v-card-subtitle>
+                              Final charge
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary font-weight-black">
+                                [[net_text]]
+                              </p>
+                            </v-card-text>
+                        </v-card>
+                  </v-col>
+                  </v-row>
+                  </template>
+                  
+                </div> <!-- vif -->
+             
+              </div> <!-- End if -->
+              <div v-else>
+                
+                <div v-if="booking" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Not found booking [[booking]]</strong> 
+                    Please try again.
+                    </button>
+                </div>
+              </div>
+
+              </div>
+              </div>
+                </div><!-- end row -->
+      		        </div>
+      		      </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </v-app>
+</div>
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+
+  .charge {
+    font-size: 50px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 800;
+    text-align:center
+  }
+
+  .subtotal {
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+    text-align:center
+  }
+
+
+  @media screen and (min-width: 576px) {
+      .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 768px) {
+    .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 992px) {
+
+  }
+
+
+@media screen and (min-width: 1200px) {
+
+}
+
+</style>
+{% endblock style %}
+
+
+{% block script %}
+  <script>
+
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    vuetify: new Vuetify(),
+    data: {
+      loading : false,
+      search: '',
+      booking: '',
+      containers :[],
+      singleSelect: false,
+      selected: [],
+      selected_json:'',
+      expanded: [],
+      singleExpand: true,
+      tariff: [],
+      notfound: false,
+      headers: [
+        {
+          text: 'Container',
+          align: 'start',
+          sortable: true,
+          value: 'container'
+        },
+        { text: 'Item Price', value: 'tariff_sum_total' },
+        { text: 'Paid', value: 'paid' },
+        { text: 'Terminal', value: 'terminal' },
+        { text: 'Status', value: 'status' },
+        { text: 'Size', value: 'size' },
+        { text: 'Type', value: 'container_type' },
+        { text: 'Full/Empty', value: 'full' },
+        { text: 'Is OOG?', value: 'oog' }
+        // { text: 'Tariff', value: 'tariff' },
+        
+      ],
+      tax: {
+        tax: tax_rate,
+        wht: wht_rate
+      },
+      isWht: false,
+    },
+    watch: {
+      selected () {
+        this.selected_json = JSON.stringify(this.selected)
+      },
+    //   booking () {
+    //     this.selected_json = '',
+    //     // this.containers = [],
+    //     this.notfound = false
+    //   },
+
+    },
+    computed: {
+      total () {
+        return this.selected.reduce(function (sum, item) {
+          return sum + item.tariff_sum_total
+        }, 0)
+      },
+      vat () {
+        // return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+        return (this.total * (this.tax.tax / 100))
+      },
+      vat_text () {
+        return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+      },
+      wht_text () {
+        return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+      },
+      wht () {
+        // return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+        return (this.total * (this.tax.wht / 100))
+      },
+      net () {
+        let wht = 0
+        if (this.isWht) {
+          wht = Number(this.wht)
+        }
+        // console.log(Number(this.total))
+        // console.log(Number(this.vat))
+        // console.log(wht)
+        return (Number(this.total) + Number(this.vat)) - wht
+      },
+      net_text(){
+        return this.net.toLocaleString(undefined, {maximumFractionDigits:2})
+      },
+      // qr () {
+      //   return 'http://10.24.50.91:8010/billing/qr?tax=&ref1=' +
+      //     this.booking + '&ref2=&amount=' + (Number(this.net)) +
+      //     '&terminal=' + this.terminal
+      // }
+    },
+    methods: {
+          greet: function(name) {
+              this.loading = true;
+              this.containers = [];
+              this.notfound = false;
+            //   console.log(export_url + this.booking);
+              axios
+              // .get('http://127.0.0.1:8000/order/booking/'+ this.booking)
+              .get(export_url + this.booking.toUpperCase())
+              .then(
+                  response => {
+                    // console.log(response.data)
+                    this.containers = response.data
+                    this.loading = false;
+                    
+                  })
+              .catch(error =>{
+                    this.loading = false;
+                })
+              
+          }
+      }
+  })
+  </script>
+{% endblock %}

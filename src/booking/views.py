@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError
 from django.views.generic import DetailView,CreateView,UpdateView,DeleteView,ListView
+from django.views.generic.base import TemplateView
 from django.db.models import Q,F
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
@@ -44,6 +45,17 @@ class BookingDetailView(LoginRequiredMixin,DetailView):
 		context['export_booking_url'] = booking_url#settings.EXPORT_BOOKING_ENDPOINT_URL
 		return context
 
+
+class BookingDetailQueryView(TemplateView):
+	template_name = "booking/booking_query.html"
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['tax'] = Tax.objects.get(name='Default')
+		booking_url = f"{reverse_lazy('order:list')}booking/"
+		context['export_booking_url'] = booking_url
+		return context
+
 class BookingCreateView(LoginRequiredMixin,CreateView):
 	model = Booking
 	# fields = ['name','terminal']
@@ -60,5 +72,5 @@ class BookingCreateView(LoginRequiredMixin,CreateView):
 		return super(BookingCreateView, self).form_valid(form)
 
 class BookingDeleteView(DeleteView):
-    model = Booking
-    success_url = reverse_lazy('booking:list')
+	model = Booking
+	success_url = reverse_lazy('booking:list')
