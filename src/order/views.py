@@ -48,7 +48,11 @@ def post_container(request):
             # order_name = f'{booking}-{ref}'
             # Modify on Aug 13,2020
             # To change order name to be Booking+Ref1 (same as QRid)
-            order_name = f'{booking}{ref}'
+            # order_name = f'{booking}{ref}'
+            # Mofigy on Aug 17,2020
+            # To limit Order name to be 15 digits (last 15 digits) , without DLCB or DLCM
+            order_name = f'{booking}{ref}'[-15:0]
+
             user = User.objects.get(username=request.user)
             booking_obj = Booking.objects.get(name=booking,user=user)
             address_obj = Address.objects.get(pk=address)
@@ -82,6 +86,11 @@ def post_container(request):
                 if not booking_obj.terminal :
                     booking_obj.terminal = terminal
                     booking_obj.save()
+                
+                # Added on Aug 17,2020 -- to update QRid to Order
+                terminal_prefix = 'LCB' if terminal=='LCB1' else 'LCM'
+                order.qrid = f'D{terminal_prefix}{order_name}'
+                order.save()
 
             # redirect to a new URL:
             return HttpResponseRedirect(reverse_lazy('order:detail',kwargs={'pk': order.id}))
