@@ -80,6 +80,7 @@ class Order(models.Model):
         ]
         indexes = [
             models.Index(fields=['name'],name='idx_order_order_name'),
+            models.Index(fields=['qrid'],name='idx_order_qrid')
         ]
 
     def get_absolute_url(self):
