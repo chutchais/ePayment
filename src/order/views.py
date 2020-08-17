@@ -51,7 +51,7 @@ def post_container(request):
             # order_name = f'{booking}{ref}'
             # Mofigy on Aug 17,2020
             # To limit Order name to be 15 digits (last 15 digits) , without DLCB or DLCM
-            order_name = f'{booking}{ref}'[-15:0]
+            order_name = f'{booking}{ref}'[-15:]
 
             user = User.objects.get(username=request.user)
             booking_obj = Booking.objects.get(name=booking,user=user)

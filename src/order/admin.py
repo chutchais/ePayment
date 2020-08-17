@@ -17,7 +17,7 @@ class ContainerInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-	search_fields = ['name','ref','booking__name']
+	search_fields = ['name','qrid']
 	list_filter = ['paid','execute_job']
 	list_display = ('name','ref','booking','container_count','charge','vat_rate','grand_total','paid',
 					'created','user')
@@ -32,7 +32,7 @@ class OrderAdmin(admin.ModelAdmin):
 	# filter_horizontal = ('childs',)
 
 	fieldsets = [
-		('Basic Information',{'fields': ['name','ref','booking','status']}),
+		('Basic Information',{'fields': ['name','ref','booking','qrid','status']}),
 		('Charge(s)',{'fields': ['charge',('vat_rate','wht_rate'),
 								('wht','grand_total')]}),
 		('Payment',{'fields': ['address','paid','payment_date','payment_ref','payment_inspector']}),
