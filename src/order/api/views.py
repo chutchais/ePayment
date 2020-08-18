@@ -14,9 +14,12 @@ def update_payment(request):
 
     SECRET_KEY = env('SECRET_KEY')
     if request.method == 'POST':
-        if request.data['key'] == SECRET_KEY :
-            update_order_payment ('','','')
-            return JsonResponse({"result":True,"message": "", "data": request.data})
+        if request.data['token'] == SECRET_KEY :
+            qrid        = request.data['QRId']
+            bankref     = request.data['BankRef']
+            transdate   = request.data['TransDate']
+            update_order_payment (qrid,bankref,transdate)
+            return JsonResponse({"result":True,"message": "Update payment successful"})
         else:
             return JsonResponse({"result":False,"message":"Key is not match"})
-    return JsonResponse({"message":SECRET_KEY})
+    return JsonResponse({"message":"ePayment Update Service"})
