@@ -8,6 +8,8 @@ from .views import (OrderListView,OrderDetailView,
                     OrderUpdateExecuteJob,
                     ContainerListView,ContainerDetailView)
 
+from .api.views import update_payment
+
 from .qrcode import qr_image,billing_qr_image,billing_barcode_image
 
 urlpatterns = [
@@ -15,6 +17,7 @@ urlpatterns = [
     path('containers',ContainerListView.as_view(),name='container-list'),
     path('containers/<pk>',ContainerDetailView.as_view(),name='container-detail'),
     path('',OrderListView.as_view(),name='list'),
+    path('api/update-payment',update_payment,name='update-payment'),
     path('create',OrderCreateView.as_view(),name='create'),
     path('post_order',post_container,name='post_order'),
     path('booking/<booking>',get_booking_info,name='booking'),
