@@ -54,11 +54,12 @@
                 <th scope="col">Created</th>
 
                 <th scope="col">Payment Slip</th>
+                
+                <th scope="col">Execute Job</th>
 
-                {% if perms.order.verify_payment %}
-                  
+                <!-- {% if perms.order.verify_payment %}
                   <th scope="col">Execute Job</th>
-                {% endif %}
+                {% endif %} -->
 					      
 					    </tr>
 					  </thead>
@@ -89,10 +90,17 @@
                     
 
                     {% if order.execute_job %}
-                      <td><span class="badge badge-success">Yes</span></td>
+                      <td><span class="badge badge-success">Completed</span></td>
                     {% else %}
-                      <td><a href="{% url 'order:execute' order.id %}"><span class="badge badge-danger">No</span></a></td>
+                      <td><a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting...</span></a></td>
                     {% endif %}
+                
+                {% else %}
+                  {% if order.execute_job %}
+                    <td><span class="badge badge-success">Completed</span></td>
+                  {% else %}
+                    <td><span class="badge badge-warning">Waiting...</span></td>
+                  {% endif %}
 
                 {% endif %}
 					      
