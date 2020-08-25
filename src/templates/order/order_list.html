@@ -57,9 +57,9 @@
                 
                 <th scope="col">Execute Job</th>
 
-                <!-- {% if perms.order.verify_payment %}
-                  <th scope="col">Execute Job</th>
-                {% endif %} -->
+                {% if perms.order.verify_payment or perms.order.execute_job %}
+                  <th scope="col">User</th>
+                {% endif %}
 					      
 					    </tr>
 					  </thead>
@@ -94,6 +94,8 @@
                     {% else %}
                       <td><a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting...</span></a></td>
                     {% endif %}
+
+                    <td>{{order.user}}</td>
                 
                 {% else %}
                   {% if order.execute_job %}
