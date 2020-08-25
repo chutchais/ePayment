@@ -270,7 +270,7 @@
                         <label for="exampleInputEmail1">Company Address</label>
                         <select class="form-control" id="address" name="address">
                               {% for address in addresses %}
-                                <option value="{{address.pk}}">{{address.company}} -- {{address.address}} -- {{address.tax}}</option>
+                                <option value="{{address.pk}}">{{address.company}}</option>
                               {% endfor %}
                             </select>
                         <small id="emailHelp" class="form-text text-muted">This address will be printed on receipt</small>
