@@ -65,6 +65,8 @@ class BookingCreateView(LoginRequiredMixin,CreateView):
 	def form_valid(self, form):
 		form.instance.user = self.request.user
 		try:
+			# Added on Aug 25,2020 -- To convert to capital char.
+			form.instance.name = form.instance.name.upper()
 			form.save()  # should raise an exception if unique_together constrain fails
 		except :
 			form.add_error('name', 'Booking already Exist!')  # add custom error to form
