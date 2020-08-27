@@ -36,6 +36,7 @@
                   <span class="badge badge-secondary">UnPaid</span>
                   <a href="{% url 'order:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
                 {% endif %}
+
                 {% if not object.payment_slip %}
                   <span class="badge badge-danger">Need Payslip</span>
                 {% endif %}
@@ -61,6 +62,15 @@
                       To continue in next process,Please upload Bank Payslip picture.
                     <a href="{% url 'order:payslip' object.id %}">Upload Payslip</a>
                   </div>
+                {% else %}
+                  {% if perms.order.verify_payment or perms.order.execute_job  %}
+                  <div class="row">
+                    <div class="col-md-4">
+                      <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
+                    </div>
+                    </div>
+                    
+                  {% endif %}
                 {% endif %}
 
               {% else %}
@@ -119,12 +129,8 @@
                             src="{{object.payment_slip.url}}" alt="Card image cap">
                             <div class="card-body">
                               <h5 class="card-title">Update Pay Slip <a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
-                              <p class="card-text">
-                                
+                              <p class="card-text">      
                               </p>
-
-                              
-
                             </div>
                           </div>
                         </div>
@@ -254,6 +260,7 @@
                     Branch :{{object.address.branch|default_if_none:""}}<br>
                   </div>
                 </div><!--end tow-->
+
                 <div class="row">
                   <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
                     <!-- <div class="content"> -->
@@ -300,6 +307,10 @@
                     </div>
                   </div>
                 </div><!-- end row -->
+                {% if perms.order.verify_payment or perms.order.execute_job  %}
+                  <a href="{% url 'order:execute' order.id %}"><button type="button" class="btn btn-info">Execute Job</button></a>
+                {% endif %}
+
               </div>
 
               
