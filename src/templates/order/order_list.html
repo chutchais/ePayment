@@ -16,7 +16,14 @@
         	
         	<div class="card">
 		        <div class="card-body">
-		          <h4>Order List</h4>
+              <h4>Order List</h4>
+
+
+              <a href="{% url 'booking:create' %}">
+                <button type="button" class="btn btn-primary float-right mb-1"
+                {% if not user.profile.approved %}disabled{% endif%}>Create New Booking</button>
+              </a>
+
 
 		          รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทั้งหมด {{ page_obj.paginator.count }} รายการ <br>
      {% if is_paginated %}
@@ -44,18 +51,18 @@
 		          <table class="table table-striped">
 					  <thead>
 					    <tr>
-                <th scope="col">Paid</th>
+                <th scope="col">Status</th>
                 <th scope="col">Order</th>
 					      <!-- <th scope="col">booking</th>
                 <th scope="col">Ref</th> -->
-                <th scope="col">#Container</th>
-                <th scope="col">Total Charge</th>
+                <th class="text-center" scope="col">#Container</th>
+                <th class="text-right" scope="col">Total Charge</th>
                 
-                <th scope="col">Created</th>
+                <th class="text-center" scope="col">Created</th>
 
-                <th scope="col">Payment Slip</th>
+                <!-- <th scope="col">Payment Slip</th>
                 
-                <th scope="col">Execute Job</th>
+                <th scope="col">Execute Job</th> -->
 
                 {% if perms.order.verify_payment or perms.order.execute_job %}
                   <th scope="col">User</th>
@@ -68,42 +75,35 @@
 					    <tr>
                 <td>
                     {% if order.paid %}
-                      <a href="{% url 'order:payslip' order.id %}">
-                        <span class="badge badge-success">Paid</span>
-                      </a>
+                      {% if not order.payment_slip %}
+                        <a href="{% url 'order:payslip' order.id %}">
+                            <span class="badge badge-danger">Need pay slip</span>
+                        </a>
+                      {% else %}
+                        {% if order.execute_job %}
+                          
+                            <span class="badge badge-success">Order Completed</span>
+                          
+                        {% else %}
+                          {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          <a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
+                          {% else %}
+                            <span class="badge badge-warning">Waiting for Execution</span>
+                          {% endif %}
+                        {% endif %}
+                      {% endif %}
+
                     {% else %}
                       <span class="badge badge-secondary">UnPaid</span>
                     {% endif %}
                   </td>
                 <td><a href="{{order.get_absolute_url}}">{{order.name}}</a></td>
-                <td>{{order.container_count}}</td>
-                 <td>{{order.grand_total|floatformat:2|intcomma}}</td>
-					      <td>{{order.created|naturalday}}</td>
-
-                {% if order.payment_slip %}
-                      <td><a href="{% url 'order:payslip' order.id %}"><span class="badge badge-success">Yes</span></a></td>
-                    {% else %}
-                      <td><a href="{% url 'order:payslip' order.id %}"><span class="badge badge-danger">No</span></a></td>
-                  {% endif %}
+                <td class="text-center">{{order.container_count}}</td>
+                 <td class="text-right">{{order.grand_total|floatformat:2|intcomma}}</td>
+					      <td class="text-right">{{order.created}}</td>
 
                 {% if perms.order.verify_payment or perms.order.execute_job  %}
-                    
-
-                    {% if order.execute_job %}
-                      <td><span class="badge badge-success">Completed</span></td>
-                    {% else %}
-                      <td><a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting...</span></a></td>
-                    {% endif %}
-
                     <td>{{order.user}}</td>
-                
-                {% else %}
-                  {% if order.execute_job %}
-                    <td><span class="badge badge-success">Completed</span></td>
-                  {% else %}
-                    <td><span class="badge badge-warning">Waiting...</span></td>
-                  {% endif %}
-
                 {% endif %}
 					      
 					    </tr>

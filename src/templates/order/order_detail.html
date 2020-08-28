@@ -30,19 +30,31 @@
 		        <div class="card-body">
 		          <h2>[[order]]
 
-                {% if object.paid %}
-                  <span class="badge badge-success">Paid</span>
-                {% else %}
-                  <span class="badge badge-secondary">UnPaid</span>
-                  <a href="{% url 'order:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
-                {% endif %}
 
-                {% if not object.payment_slip %}
-                  <span class="badge badge-danger">Need Payslip</span>
-                {% endif %}
-                {% if object.execute_job %}
-                  <span class="badge badge-success">Order Completed</span>
-                {% endif %}
+
+                {% if order.paid %}
+                      {% if not order.payment_slip %}
+                        <a href="{% url 'order:payslip' order.id %}">
+                            <span class="badge badge-danger">Need pay slip</span>
+                        </a>
+                      {% else %}
+                        {% if order.execute_job %}
+                          
+                            <span class="badge badge-success">Order Completed</span>
+                          
+                        {% else %}
+                          {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          <a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
+                          {% else %}
+                            <span class="badge badge-warning">Waiting for Execution</span>
+                          {% endif %}
+                        {% endif %}
+                      {% endif %}
+
+                    {% else %}
+                      <span class="badge badge-secondary">UnPaid</span>
+                      <a href="{% url 'order:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
+                    {% endif %}
               </h2>
               <span>Created on : {{object.created}} ({{object.created|naturaltime}})</span>
 
@@ -51,7 +63,7 @@
               {% if object.paid %}
                 <div class="alert alert-info" role="alert">
                   Payment Confirmed on : {{object.payment_date}} (BankRef : {{object.payment_ref}})
-                   Verified by {{object.payment_inspector}}
+                   Verified by {{object.payment_inspector|default_if_none:"AutoPayment"}}
                    {% if object.payment_slip %}
                       <a href="{% url 'order:payslip' object.id %}">See pay slip picture</a>
                   {% endif %}
