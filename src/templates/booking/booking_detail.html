@@ -7,6 +7,7 @@
   const wht_rate = {{tax.wht}};
   var people = '{{ items_json|safe }}';
   const export_url = '{{export_booking_url}}';
+  var address_items = '{{addresses_items|safe}}';
 </script>
 
 <div id="app">
@@ -221,36 +222,7 @@
 
                   <v-card-actions>
                     
-                    
-      <!--               <v-btn 
-                      large color="primary"
-                      >
-                      Pay
-                    </v-btn>
- -->
-                   <!--  <form action="{% url 'order:post_order' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="booking" :value="booking">
-                        <input type="hidden" name="charge" :value="total">
-                        <input type="hidden" name="grand_total" :value="net">
-                        <input type="hidden" name="vat_rate" :value="tax.tax">
-                        <input type="hidden" name="wht_rate" :value="tax.wht">
-                        <input type="hidden" name="wht" :value="isWht">
-                        <input type="hidden" name="containers" :value="selected_json">
-                        <label for="company">Choose Address:</label>
-                        <select id="address" name="address">
-                          {% for address in addresses %}
-                            <option value="{{address.pk}}">{{address.company}} -- {{address.address}} -- {{address.tax}}</option>
-                          {% endfor %}
-                        </select>
 
-                        <input type="submit" value="Pay" class="btn btn-primary">
-                    </form> -->
-
-                    <!-- <v-checkbox v-model="isWht" 
-                      class="mx-2" 
-                      label="Withholding Tax">
-                      </v-checkbox> -->
                   </v-card-actions>
 
 
@@ -265,15 +237,55 @@
                         <input type="hidden" name="wht_rate" :value="tax.wht">
                         <input type="hidden" name="wht" :value="isWht">
                         <input type="hidden" name="containers" :value="selected_json">
+                        <input v-if ="selected_address" type="hidden" name="address" :value="selected_address.pk">
 
                       <div class="form-group">
                         <label for="exampleInputEmail1">Company Address</label>
-                        <select class="form-control" id="address" name="address">
+                         <v-autocomplete
+                          item-text="company"
+                          item-value="pk"
+                          :items="address_list"
+                          v-model ="selected_address"
+                          no-data-text="Not found address"
+                          return-object
+                        >
+                          <template slot='item' slot-scope='data'>
+                            [[data.item.company]] - [[data.item.address]]
+                          </template>
+                        </v-autocomplete>
+
+
+                        <v-list-item 
+                          three-line 
+                          v-if="selected_address" 
+                          outlined
+                          color="light-blue lighten-4">
+                          <v-list-item-content>
+                            <v-list-item-title>Name</v-list-item-title>
+                            <v-list-item-subtitle>
+                              [[selected_address.company]]
+                            </v-list-item-subtitle>
+
+                            <v-list-item-title>Address</v-list-item-title>
+                            <v-list-item-subtitle>
+                              [[selected_address.address]]
+                            </v-list-item-subtitle>
+
+                            <v-list-item-title>Tax</v-list-item-title>
+                            <v-list-item-subtitle>
+                              [[selected_address.tax]]
+                            </v-list-item-subtitle>
+
+                          </v-list-item-content>
+                        </v-list-item>
+                        
+
+                        <!-- <select class="form-control" id="address" name="address">
                               {% for address in addresses %}
                                 <option value="{{address.pk}}">{{address.company}}</option>
                               {% endfor %}
                             </select>
-                        <small id="emailHelp" class="form-text text-muted">This address will be printed on receipt</small>
+                        <small id="emailHelp" class="form-text text-muted">This address will be printed on receipt</small> -->
                       </div>
 
                       <v-checkbox v-model="isWht" 
@@ -281,8 +293,10 @@
                           label="Withholding Tax">
                           </v-checkbox>
 
-                      <button type="submit" class="btn btn-primary" :disabled="net == 0">Continue Payment ([[net_text]] Baht)</button>
+                      <button type="submit" class="btn btn-primary" :disabled="net == 0 || selected_address == null">Continue Payment ([[net_text]] Baht)</button>
                     </div>
+
+                    
                   </form>
 
                  
@@ -408,6 +422,8 @@
         wht: wht_rate
       },
       isWht: false,
+      address_list: JSON.parse(address_items),
+      selected_address : null, //JSON.parse(address_items)[0],
     },
     watch: {
       selected () {
@@ -416,6 +432,7 @@
 
     },
     computed: {
+      
       total () {
         return this.selected.reduce(function (sum, item) {
           return sum + item.tariff_sum_total

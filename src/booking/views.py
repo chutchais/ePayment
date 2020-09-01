@@ -11,6 +11,7 @@ from django.conf import settings
 from .models import Booking
 from user_profile.models import Address
 from tax.models import Tax
+import json
 
 class BookingListView(LoginRequiredMixin,ListView):
 	model = Booking
@@ -38,7 +39,10 @@ class BookingDetailView(LoginRequiredMixin,DetailView):
 	def get_context_data(self,**kwargs):
 		context = super(BookingDetailView,self).get_context_data(**kwargs)
 		context['tax'] = Tax.objects.get(name='Default')
-		context['addresses'] = Address.objects.filter(user__username=self.request.user)
+		# context['addresses'] = Address.objects.filter(user__username=self.request.user)
+		context['addresses_items'] = json.dumps(list(Address.objects.filter(
+									user__username=self.request.user
+									).order_by('company').values('pk', 'company','address','tax'))).replace('\\r\\n',' ')
 		# http://192.168.10.16:5001/booking/
 		booking_url = f"{reverse_lazy('order:list')}booking/"
 		# print (f"{reverse_lazy('order:list')}booking/")
