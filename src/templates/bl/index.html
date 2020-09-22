@@ -2,6 +2,11 @@
 {% load humanize %}
 
 {% block content %}
+
+<script>
+  const import_url = 'http://192.168.10.16:5000/bl/';
+</script>
+
 <div id="app">
   <v-app>
     <div class="containeer">
@@ -14,28 +19,98 @@
           <div class="content">
           	<div class="card">
   		        <div class="card-body">
-  		          <h4>Book of Landing Report</h4>
-                  <v-form>
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12" sm="6" md="6">
+                <h4>Bill of Lading Report</h4>
+                <input type="text" class="form-control mb-2" v-model="bl_number" placeholder="BL number">
+                <button type="button" class="btn btn-success mb-2" v-on:click="get_data(bl_number)">Get Container</button>
+                
+                <div v-if="containers">
+                <template>
+                  <v-row>         
+                    <v-col cols="12" sm="6" md="4">
+                      <v-menu
+                        v-model="menu2"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
                           <v-text-field
-                            label="Bill Of Landing Number"
-                            outlined
-                            :value="bl_number"
+                            v-model="date"
+                            label="Select delivery date"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
                           ></v-text-field>
-                        </v-col>
-                        
-                      </v-row>
-                      <v-btn
-                          color="success"
-                          class="mr-4"
-                          @click="get_data(bl_number)"
-                        >
-                          Get Data
-                        </v-btn>
-                    </v-container>
-                  </v-form>
+                        </template>
+                        <v-date-picker v-model="date" @input="menu2 = false" :min="nowDate"></v-date-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-spacer></v-spacer>
+                  </v-row>
+                </template>
+
+              <template>
+                    <v-card>
+                      <v-card-title>
+                        Container Details
+                        <v-spacer></v-spacer>
+                        <v-text-field
+                          v-model="search"
+                          append-icon="mdi-magnify"
+                          label="Search"
+                          single-line
+                          hide-details
+                        ></v-text-field>
+                      </v-card-title>
+                    </v-card>
+                    <v-data-table
+                    :items-per-page="50"
+                    class="elevation-1"
+                    v-model="selected"
+                    :headers="headers"
+                    :items="containers"
+                    :search="search"
+                    item-key="container"
+                    show-select
+                    show-expand
+                    class="elevation-1"
+                    dense
+                    :loading="loading"
+                    loading-text="Loading... Please wait"
+                  >
+                    <template v-slot:item.on_yard="{ item }">
+                        <div v-if="item.delivery">
+                            <v-chip v-if="item.delivery.out_by" color="gray" dark>
+                              [[dWell(item.delivery.datetime_out,item.discharge.datetime_in)]]
+                            </v-chip>
+                            <!-- Still in yard -->
+                            <v-chip v-else color="green" dark>
+                              [[dWell(item.delivery.datetime_out,item.discharge.datetime_in)]]
+                            </v-chip>
+                        </div>
+                        <div v-else>
+                          <v-chip color="green" dark>
+                            On Yard
+                        </v-chip>
+                        </div>
+                    </template>
+
+                    <template v-slot:item.delivery.datetime_out="{ item }">
+                        <div v-if="item.delivery">
+                          <div v-if="item.delivery.out_by">
+                            [[item.delivery.datetime_out]]
+                          </div>
+                         
+                        </div>
+
+                    </template>
+
+                  </template>
+              </div>
+
+
 
               </div>
             </div>
@@ -69,27 +144,135 @@
     el: '#app',
     vuetify: new Vuetify(),
     data: {
-            bl_number : 'test'
+            // to_day : new Date(),
+            bl_number : '',
+            loading : false,
+            containers :[],
+            selected :[],
+            search:'',
+            delivery:'',
+            headers: [
+                {
+                  text: 'Container',
+                  align: 'start',
+                  sortable: true,
+                  value: 'container'
+                },
+                { text: 'Size', value: 'discharge.size' },
+                { text: 'Item Price', value: 'total' },
+                { text: 'On Yard(days)', value: 'on_yard' },
+                { text: 'Discharge', value: 'discharge.datetime_in' },
+                { text: 'Delivery', value: 'delivery.datetime_out' },
+                
+                
+              ],
+              date: new Date().toISOString().substr(0, 10),
+              nowDate: new Date().toISOString().substr(0, 10),
+              menu: false,
+              modal: false,
+              menu2: false,
           },
+    computed:{
+      
+    },//end computed
     methods: {
-          get_data: function(bl_name) {
+        get_data: function(bl_name) {
               this.loading = true;
               this.containers = [];
-              console.log('Hello from ' + bl_name + '!');
-              // axios
-              // // .get('http://127.0.0.1:8000/order/booking/'+ this.booking)
-              // .get(export_url + this.booking)
-              // .then(
-              //     response => {
-              //       this.containers = response.data
-              //       this.loading = false;
-              //     })
-              // .catch(error =>{
-              //       this.loading = false;
-              //   })
+              // console.log('Hello from ' + bl_name + '!');
+              // console.log(import_url + this.bl_number)
+              this.date = new Date().toISOString().substr(0, 10)
+              axios
+              // .get('http://127.0.0.1:8000/order/booking/'+ this.booking)
+              .get(import_url + this.bl_number)
+              .then(
+                  response => {
+                    console.log(response.data)
+                    this.containers = response.data
+                    this.loading = false;
+                    this.update_delivery(this.date);
+                  })
+              .catch(error =>{
+                    this.loading = false;
+                })
               
-          }
-      }
+          },
+          dWell:function(date_in,date_out){
+            var starts = moment(date_in);
+            var new_starts = starts.hour(0);
+            new_starts = new_starts.minute(0);
+            new_starts = new_starts.second(0);
+            new_starts = new_starts.milliseconds(0);
+            // Free first day
+            // new_starts = new_starts.add(1,"day")
+
+            var ends = moment(date_out);
+            var new_ends = ends.hour(0);
+            new_ends = new_ends.minute(0);
+            new_ends = new_ends.second(0);
+            new_ends = new_ends.milliseconds(0);
+
+            
+            var duration = moment.duration(new_starts.diff(new_ends));
+            return duration.asDays()
+        },
+        add_day:function(today,n){
+          // console.log(n)
+          
+          var newdate = new Date();
+          newdate.setDate(today.getDate()+n);
+          // console.log(newdate)
+          return moment(newdate).format("MMM D")
+            // return date.setDate(date.getDate()+n)
+        },
+        moment: function () {
+          return moment();
+        },
+        
+        lolo:function(container_size){
+          // console.log('LoLo function')
+          var cost = 0;
+          if (container_size == 20){ cost=670}
+          if (container_size == 40){ cost=1000}
+          if (container_size == 45){ cost=1070}
+          // // this.total_LoLo = cost;
+          // // this.container.lolo = cost;
+          // // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // // this.container.total = this.grand_total;
+          console.log('LOLO :' + cost);
+          return cost
+        },
+        update_delivery:function(delivery_date){
+          console.log('Delivery date :' + delivery_date )
+          this.containers.forEach(function (arrayItem) {
+          // this.containers.forEach((arrayItem) => {
+              if (arrayItem.delivery == null) {
+                arrayItem.delivery = {'datetime_out': delivery_date};
+                arrayItem.total = 5//this.lolo(arrayItem.discharge.size);
+                console.log('No delivery');
+              }
+              else{
+                console.log('With delivery');
+                arrayItem.total = this.lolo(arrayItem.discharge.size);
+                console.log('Total:' + arrayItem.total);
+                // Update datetime_out (**if out_by exist)
+                if (arrayItem.delivery.out_by == null) {
+                  arrayItem.delivery.datetime_out = delivery_date;
+                  console.log('Size:'+arrayItem.discharge.size)
+                  console.log(arrayItem)
+                  arrayItem.total = this.lolo(20);
+                  
+                }
+              }//end delivery==null
+          }.bind(this));//forEach
+        },//End update_delivery
+      },//End Method
+    watch: {
+      date () {
+        this.update_delivery(this.date);
+      },
+    },
+    
   })
   </script>
 {% endblock %}
