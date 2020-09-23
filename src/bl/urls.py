@@ -1,8 +1,9 @@
 from django.urls import path, include
 from . import views
-from .views import index
+from .views import index,get_bl_info
 
 urlpatterns = [
-    # path('', views.index, name='index'),
+    path('', index, name='home'),
     path('report',index,name='report'),
+    path('api/bl/<bl>',get_bl_info,name='bl'),
     ]
