@@ -132,14 +132,124 @@
 
                   </template>
               </div>
-
-
-
               </div>
             </div>
           </div>
         </div>
         </div><!-- End row -->
+
+        <!-- Start Summary -->
+        <div v-if="selected.length > 0">
+
+          <template>
+            <v-card
+              cols="12"
+              class="mt-2"
+              v-if="selected"
+            >
+                  <v-card-title>
+                    Charge Summary
+                  </v-card-title>
+                  <v-card-subtitle>
+                    [[selected.length]] container(s)
+                  </v-card-subtitle>
+                  
+           
+           <v-row no-gutters>
+
+            <v-col
+              cols="6"
+               md="3"
+            >
+                <v-card
+                  class="pa-2 ma-2"
+                  outlined
+                >
+                  <v-card-title>
+                      Lift On
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Total charge
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p class="display-1 text--primary">
+                        [[total_lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </p>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+            
+            <v-col
+              cols="6"
+               md="3"
+            >
+                <v-card
+                  class="pa-2 ma-2"
+                  outlined
+                >
+                  <v-card-title>
+                      Relocation
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Total charge
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p class="display-1 text--primary">
+                        [[total_relo.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </p>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+
+            <v-col
+              cols="6"
+               md="3"
+            >
+              <v-card
+                  class="pa-2 ma-2"
+                  outlined
+                >
+                    <v-card-title>
+                      Storage
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Total Charge
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p class="display-1 text--primary">
+                        [[total_storage.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </p>
+                    </v-tacard-text>
+                </v-card>
+            </v-col>
+
+            <v-col
+              cols="6"
+               md="3"
+            >
+              <v-card
+                  class="pa-2 ma-2 bg-info"
+                  outlined
+                >
+                  <v-card-title>
+                      Grand Total
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Not include Tax
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p class="display-1 text--primary font-weight-black">
+                        [[total_grand.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </p>
+                    </v-card-text>
+                </v-card>
+          </v-col>
+          </v-row>
+          </template>
+          
+        </div> <!-- vif -->
+        <!-- End Summary -->
+
       </div> <!-- End col-sm-12 col-md-12 -->
 
     </div><!-- End row wrapper -->
@@ -174,6 +284,10 @@
             selected :[],
             search:'',
             delivery:'',
+            total_lolo:0,
+            total_relo:0,
+            total_storage:0,
+            total_grand:0,
             headers: [
                 {
                   text: 'Container',
@@ -377,10 +491,28 @@
 
           }.bind(this));//forEach
         },//End update_delivery
+        update_charge:function(){
+          console.log('Update Charge :')
+          this.total_lolo=0;
+          this.total_relo=0;
+          this.total_storage=0;
+          this.total_grand=0;
+          this.selected.forEach(function (arrayItem) {
+              // console.log(arrayItem)
+              this.total_lolo=this.total_lolo + arrayItem.lolo;
+              this.total_relo=this.total_relo + arrayItem.relo;
+              this.total_storage= this.total_storage + (arrayItem.rate1+arrayItem.rate2+arrayItem.rate3);
+              this.total_grand=this.total_grand + arrayItem.total;
+          }.bind(this));//forEach
+        },//End update_charge
       },//End Method
     watch: {
       date () {
         this.update_delivery(this.date);
+      },
+      selected () {
+        //this.selected_json = JSON.stringify(this.selected)
+        this.update_charge();
       },
     },
     
