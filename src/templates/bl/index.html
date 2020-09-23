@@ -96,15 +96,38 @@
                         </v-chip>
                         </div>
                     </template>
+                    
+                    <template v-slot:item.total="{ item }">
+                          [[item.total.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                        
+                  </template>
 
                     <template v-slot:item.delivery.datetime_out="{ item }">
                         <div v-if="item.delivery">
                           <div v-if="item.delivery.out_by">
                             [[item.delivery.datetime_out]]
                           </div>
-                         
                         </div>
+                    </template>
 
+                    <template v-slot:expanded-item="{ headers, item }">
+                      <td :colspan="8">
+                          <v-chip class="ma-1" color="green" text-color="white">
+                            Lift On : [[item.lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                            </v-chip>
+                          <v-chip v-if="item.relo" class="ma-1" color="green" text-color="white">
+                            Relocation : [[item.relo.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
+                          <v-chip v-if="item.rate1" class="ma-1" color="green" text-color="white">
+                            Storage (1-7 days) : [[item.rate1.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
+                          <v-chip v-if="item.rate2" class="ma-1" color="green" text-color="white">
+                            Storage (8-14 days) : [[item.rate2.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
+                          <v-chip v-if="item.rate3" class="ma-1" color="green" text-color="white">
+                            Storage (15 days over) : [[item.rate3.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
+                        </td  >
                     </template>
 
                   </template>
@@ -242,28 +265,116 @@
           console.log('LOLO :' + cost);
           return cost
         },
+        relo:function(container_size,dWell){
+            // console.log('Relo function' + container_size + dWell)
+            var cost = 0;
+            if (dWell <= 7){return 0}
+            if (container_size == 20){ cost=300}
+            if (container_size == 40){ cost=510}
+            if (container_size == 45){ cost=600}
+            // this.total_Relo = cost
+            // this.container.relo = cost;
+            // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+            // this.container.total = this.grand_total;
+            return cost
+        },
+        rate1_day:function(dWell){
+            var day = 0;
+            var day_after_3day = dWell - 3;
+            if (day_after_3day <= 0){
+                return 0;}
+            if (day_after_3day > 7) {
+                return 7;}
+            return day_after_3day
+            },
+        rate2_day:function(dWell){
+          var day = 0;
+          var day_after_rate2 = dWell -10 ;
+          if (day_after_rate2 <= 0 ){
+              return 0;}
+          if (day_after_rate2 <= 7 ){
+              return day_after_rate2;}
+          if (day_after_rate2 > 7) {
+              return 7;}
+          },
+        rate3_day:function(dWell){
+          // console.log('rate3_day' + dWell);
+          var day = 0;
+          var day_after_rate3 = dWell -17 ;
+          // console.log('rate3_day' + day_after_rate3);
+          if (day_after_rate3 <= 0 ){
+              // console.log('rate3_day : return 0' );
+              return 0;
+              }
+          return day_after_rate3
+          },
+        rate1:function(container_size,dWell){
+          var cost = 0;
+          var day = 0;
+          day = this.rate1_day(dWell)
+          if (container_size == 20){ cost=125*day}
+          if (container_size == 40){ cost=250*day}
+          if (container_size == 45){ cost=310*day}
+          // this.total_rate1 = cost;
+          // this.container.rate1 = cost;
+          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // this.container.total = this.grand_total;
+          return cost
+          },
+          //.toLocaleString(undefined, {maximumFractionDigits:2})
+        rate2:function(container_size,dWell){
+          var cost = 0;
+          var day = 0;
+          day = this.rate2_day(dWell)
+          if (container_size == 20){ cost=250*day}
+          if (container_size == 40){ cost=500*day}
+          if (container_size == 45){ cost=620*day}
+          // this.total_rate2 = cost;
+          // this.container.rate2 = cost;
+          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // this.container.total = this.grand_total;
+          return cost
+          },
+        rate3:function(container_size,dWell){
+          // console.log('rate3 -' + dWell);
+          var cost = 0;
+          var day = 0;
+          day = this.rate3_day(dWell)
+          // console.log('rate3:Day -' + day);
+          if (container_size == 20){ cost=400*day}
+          if (container_size == 40){ cost=800*day}
+          if (container_size == 45){ cost=990*day}
+          // this.total_rate3 = cost;
+          // this.container.rate3 = cost;
+          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // this.container.total = this.grand_total;
+          return cost
+          },
         update_delivery:function(delivery_date){
           console.log('Delivery date :' + delivery_date )
           this.containers.forEach(function (arrayItem) {
           // this.containers.forEach((arrayItem) => {
               if (arrayItem.delivery == null) {
                 arrayItem.delivery = {'datetime_out': delivery_date};
-                arrayItem.total = 5//this.lolo(arrayItem.discharge.size);
                 console.log('No delivery');
               }
               else{
                 console.log('With delivery');
-                arrayItem.total = this.lolo(arrayItem.discharge.size);
                 console.log('Total:' + arrayItem.total);
                 // Update datetime_out (**if out_by exist)
                 if (arrayItem.delivery.out_by == null) {
                   arrayItem.delivery.datetime_out = delivery_date;
-                  console.log('Size:'+arrayItem.discharge.size)
-                  console.log(arrayItem)
-                  arrayItem.total = this.lolo(20);
-                  
                 }
               }//end delivery==null
+
+              arrayItem.on_yard   = this.dWell(arrayItem.delivery.datetime_out,arrayItem.discharge.datetime_in)
+              arrayItem.lolo      = this.lolo(arrayItem.discharge.size);
+              arrayItem.relo      = this.relo(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate1     = this.rate1(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate2     = this.rate2(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate3     = this.rate3(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.total     = Number(arrayItem.lolo)+Number(arrayItem.relo)+Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
+
           }.bind(this));//forEach
         },//End update_delivery
       },//End Method
