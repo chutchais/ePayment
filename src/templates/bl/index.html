@@ -280,7 +280,7 @@
             // to_day : new Date(),
             bl_number : '',
             loading : false,
-            containers :[],
+            containers :null,
             selected :[],
             search:'',
             delivery:'',
@@ -315,7 +315,7 @@
     methods: {
         get_data: function(bl_name) {
               this.loading = true;
-              this.containers = [];
+              this.containers = null;
               // console.log('Hello from ' + bl_name + '!');
               // console.log(import_url + this.bl_number)
               this.date = new Date().toISOString().substr(0, 10)
@@ -515,6 +515,10 @@
         //this.selected_json = JSON.stringify(this.selected)
         this.update_charge();
       },
+      bl_number (){
+        this.containers = null
+        
+      }
     },
     
   })
