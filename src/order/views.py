@@ -43,6 +43,10 @@ def post_container(request):
             containers_json = form.cleaned_data['containers']
             address = form.cleaned_data['address']
             containers = json.loads(containers_json)
+            # Added on Oct 8,2020 
+            seperate_bill = form.cleaned_data['seperatebill']
+            # ----------------------------
+
             # Create Order
             ref = datetime.now().strftime("%H%M%S")
             # order_name = f'{booking}-{ref}'
@@ -66,7 +70,7 @@ def post_container(request):
                         charge=charge,grand_total=grand_total,
                         vat_rate = vat_rate, wht_rate=wht_rate,
                         container_count=len(containers),
-                        wht=wht,user=user)
+                        wht=wht,user=user,seperate_bill=seperate_bill)
                 order.save()
                 # save containers
                 for container in containers:

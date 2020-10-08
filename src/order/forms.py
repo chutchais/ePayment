@@ -22,3 +22,4 @@ class CreateOrderForm(forms.Form):
     grand_total = forms.CharField(max_length=10)
     containers 	= forms.CharField()
     address     = forms.IntegerField()
+    seperatebill= forms.BooleanField(required=False)

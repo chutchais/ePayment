@@ -20,7 +20,7 @@ class OrderAdmin(admin.ModelAdmin):
 	search_fields = ['name','qrid']
 	list_filter = ['paid','execute_job']
 	list_display = ('name','ref','booking','container_count','charge','vat_rate','grand_total','paid',
-					'created','user')
+					'seperate_bill','created','user')
 	# list_editable = ('color','move_performa')
 	# autocomplete_fields = ['parent']
 	readonly_fields = ('created','updated','user','vat_rate','wht_rate','wht')
@@ -34,7 +34,7 @@ class OrderAdmin(admin.ModelAdmin):
 	fieldsets = [
 		('Basic Information',{'fields': ['name','ref','booking','qrid','status']}),
 		('Charge(s)',{'fields': ['charge',('vat_rate','wht_rate'),
-								('wht','grand_total')]}),
+								('wht','grand_total'),'seperate_bill']}),
 		('Payment',{'fields': ['address','paid','payment_date','payment_ref','payment_inspector']}),
 		('Pay Slip',{'fields': ['payment_slip']}),
 		('Execute job',{'fields': ['execute_job','execute_date']}),

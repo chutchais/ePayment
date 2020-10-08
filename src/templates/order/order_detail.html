@@ -12,6 +12,7 @@
   const tax = '{{object.address.tax}}';
   const qr_url = '{{qr_url}}';
   const slip_verify_url = '{{slip_verify_url}}';
+  const seperate_bill = '{{object.seperate_bill}}';
 </script>
 
 <div id="app">
@@ -55,6 +56,8 @@
                       <span class="badge badge-secondary">UnPaid</span>
                       <a href="{% url 'order:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
                     {% endif %}
+
+                    <span v-if="seperate_bill" class="badge badge-primary">แยกใบเสร็จ</span>
               </h2>
               <span>Created on : {{object.created}} ({{object.created|naturaltime}})</span>
 
@@ -99,6 +102,14 @@
                                 <div>Ref1  : [[ref1]]</div>
                                 <div>Total : [[total]] Baht</div>
                                 <div>Address : [[company]] [[tax]]</div>
+
+                                <v-chip v-if="seperate_bill"
+                                  class="ma-2"
+                                  color="primary"
+                                >
+                                  แยกใบเสร็จ
+                                </v-chip>
+
                                 <div><u>Details</u> :</div>
                                 {% for s in summary %}
                                   {{s.cont_size}}"x{{s.count}} = {{s.total_ex_vat}}<br>
@@ -420,7 +431,8 @@
       tax:tax,
       paid: false,
       notify:[],
-      payment_status:''
+      payment_status:'',
+      seperate_bill:(seperate_bill === 'True') ? true : false
     },
     computed: {
       qr () {

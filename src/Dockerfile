@@ -48,3 +48,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 #ENTRYPOINT ["python"]
 COPY . /usr/src/epayment
+
+# ADD docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod a+x docker-entrypoint.sh
+ENTRYPOINT ["/usr/src/epayment/docker-entrypoint.sh"]

@@ -236,6 +236,7 @@
                         <input type="hidden" name="vat_rate" :value="tax.tax">
                         <input type="hidden" name="wht_rate" :value="tax.wht">
                         <input type="hidden" name="wht" :value="isWht">
+                        <input type="hidden" name="seperatebill" :value="isSeperateBill">
                         <input type="hidden" name="containers" :value="selected_json">
                         <input v-if ="selected_address" type="hidden" name="address" :value="selected_address.pk">
 
@@ -289,9 +290,16 @@
                       </div>
 
                       <v-checkbox v-model="isWht" 
-                          class="mx-2" 
-                          label="Withholding Tax">
-                          </v-checkbox>
+                          class="ml-2" 
+                          label="Withholding Tax"
+                          color="success">
+                      </v-checkbox>
+                      
+                      <v-checkbox v-model="isSeperateBill" 
+                          class="ml-2" 
+                          label="แยกใบเสร็จ"
+                          color="success">
+                      </v-checkbox>
 
                       <button type="submit" class="btn btn-primary" :disabled="net == 0 || selected_address == null">Continue Payment ([[net_text]] Baht)</button>
                     </div>
@@ -422,6 +430,7 @@
         wht: wht_rate
       },
       isWht: false,
+      isSeperateBill : false,
       address_list: JSON.parse(address_items),
       selected_address : null, //JSON.parse(address_items)[0],
     },
