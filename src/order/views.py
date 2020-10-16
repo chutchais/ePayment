@@ -148,12 +148,12 @@ class OrderListView(LoginRequiredMixin,ListView):
         if query :
             return Order.objects.filter(Q(name__icontains=query) |
                                     Q(booking__name__icontains=query) ,
-                                    user__username=self.request.user ).order_by('-updated')
+                                    user__username=self.request.user ).select_related('booking').order_by('-updated')
 
         if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
-            return Order.objects.all().order_by('-updated')
+            return Order.objects.all().select_related('booking').order_by('-updated')
 
-        return Order.objects.filter(user__username=self.request.user).order_by('-updated')
+        return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')
     
     def get_context_data(self,**kwargs):
         context = super(OrderListView,self).get_context_data(**kwargs)
