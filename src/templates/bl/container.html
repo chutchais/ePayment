@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load humanize %}
 
 {% block content %}
 
 <script>
-  const import_url = '{{import_bl_url}}';
+  const import_container_url = '{{import_container_url}}';
 </script>
 
 <div id="app">
@@ -19,21 +20,119 @@
           <div class="content">
           	<div class="card">
   		        <div class="card-body">
-                <h4>Bill of Lading Report</h4>
-                <input type="text" class="form-control mb-2" v-model="bl_number" placeholder="BL number">
-                <button type="button" class="btn btn-success mb-2" v-on:click="get_data(bl_number)">Get Container</button>
+                <h4>Import Container Report</h4>
+                <input type="text" class="form-control mb-2" v-model="container_number" placeholder="Container number">
+                <button type="button" class="btn btn-success mb-2" v-on:click="get_data(container_number)">Get Information</button>
                 
-                <div v-if="containers">
+                <div v-if="container">
                 <template>
-                  <v-row>         
-                    <v-col v-if="containers.length > 0" cols="12" sm="6" md="4">
-                      <v-menu
+                  
+                </template>
+
+                <!-- Show Container detail -->
+                <!-- [[container]] -->
+
+                <template>
+                    <v-card
+                      v-if="container"
+                      :loading="loading"
+                      class="mx-auto my-12"
+                      max-width="374"
+                      
+                    >
+                      <template slot="progress">
+                        <v-progress-linear
+                          color="deep-purple"
+                          height="10"
+                          indeterminate
+                        ></v-progress-linear>
+                      </template>
+                  
+                      <v-img
+                        height="250"
+                        src="{% static 'container.jpg' %}"
+                      ></v-img>
+                      
+                      <v-card-title>[[container_number]]</v-card-title>
+                      <v-card-subtitle>BL :[[container.bill_of_landing]]</v-card-subtitle>
+                     
+                      <v-card-text>               
+                        <div>
+                            Call sign :[[container.callsign]] , Voy :[[container.voy]] <br>
+                            [[container.consigneeinfo_name]]
+                        </div>
+                      </v-card-text> 
+                      
+                      <v-card-text>
+                        <div class="font-weight-bold ml-8 mb-2">
+                          Status
+                        </div>
+              
+                        <v-timeline
+                          align-top
+                          dense
+                        >
+                          <v-timeline-item
+                            :color="color_exist(container.discharge.datetime_in)"
+                            small
+                          >
+                            <div>
+                                <div class="font-weight-normal">
+                                  <strong>Discharge</strong> 
+                                </div>
+                                <div v-if="container.discharge.datetime_in">
+                                  @[[container.discharge.datetime_in]] <br>
+                                    [[container.discharge.terminal]] : 
+                                    [[container.discharge.vessel_name]]
+                                    ([[container.discharge.voy_in]])
+                                  </div>
+                                  <div v-else>
+                                    Not discharge
+                                </div>
+                            </div>
+                            
+                          </v-timeline-item>
+
+                          <v-timeline-item
+                          :color="color_exist(container.delivery.out_by)"
+                            small
+                          >
+                            <div>
+                                <div class="font-weight-normal">
+                                  <strong>Delivery</strong> 
+                                </div>
+                                <div v-if="container.delivery.out_by">
+                                  @[[container.delivery.datetime_out]] <br>
+                                  By : [[container.delivery.license_number]] ([[container.delivery.out_by]])
+                                </div>
+                                <div v-else>
+                                   <div v-if="container.discharge.datetime_in">
+                                      Still on yard for [[container.on_yard]] day(s)
+                                    </div>
+                                    <div v-else>
+                                      Not discharge 
+                                    </div>
+                                </div>
+                            </div>
+                          </v-timeline-item>
+
+                        </v-timeline>
+                        <div v-if="container.delivery.out_by" class="font-weight-bold ml-8 mb-2">
+                            Total on Yard : [[container.on_yard]] day(s)
+                          </div>
+                      </v-card-text>
+
+                      <v-divider class="mx-4"></v-divider>
+                      <v-card-title>Charge Detail for [[container.on_yard]] day(s)</v-card-title>
+                      <v-card-text>
+                    <v-menu
                         v-model="menu2"
                         :close-on-content-click="false"
                         :nudge-right="40"
                         transition="scale-transition"
                         offset-y
                         min-width="290px"
+                        v-if="container.delivery.out_by == null"
                       >
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
@@ -46,102 +145,46 @@
                         </template>
                         <v-date-picker v-model="date" @input="menu2 = false" :min="nowDate"></v-date-picker>
                       </v-menu>
-                    </v-col>
-                    <v-spacer></v-spacer>
-                  </v-row>
-                </template>
 
-              <template>
-                    <v-card>
-                      <v-card-title>
-                        Container Details
-                        <v-spacer></v-spacer>
-                        <v-text-field
-                          v-model="search"
-                          append-icon="mdi-magnify"
-                          label="Search"
-                          single-line
-                          hide-details
-                        ></v-text-field>
-                      </v-card-title>
-                    </v-card>
-                    <v-data-table
-                    :items-per-page="50"
-                    class="elevation-1"
-                    v-model="selected"
-                    :headers="headers"
-                    :items="containers"
-                    :search="search"
-                    item-key="container"
-                    show-select
-                    show-expand
-                    class="elevation-1"
-                    dense
-                    :loading="loading"
-                    loading-text="Loading... Please wait"
-                  >
-                    <template v-slot:item.on_yard="{ item }">
-                        <div v-if="item.delivery">
-                            <v-chip v-if="item.delivery.out_by" color="gray" dark>
-                              [[dWell(item.delivery.datetime_out,item.discharge.datetime_in)]]
+                        <v-chip-group 
+                          active-class="deep-purple accent-4 white--text"
+                          column
+                          v-if="container.discharge.datetime_in !== null"
+                        >
+                        <v-chip class="ma-1" color="green" text-color="white">
+                            Lift On : [[container.lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
                             </v-chip>
-                            <!-- Still in yard -->
-                            <v-chip v-else color="green" dark>
-                              [[dWell(item.delivery.datetime_out,item.discharge.datetime_in)]]
-                            </v-chip>
-                        </div>
-                        <div v-else>
-                          <v-chip color="green" dark>
-                            On Yard
-                        </v-chip>
-                        </div>
-                    </template>
-                    
-                    <template v-slot:item.total="{ item }">
-                          [[item.total.toLocaleString(undefined, {maximumFractionDigits:2})]]
-                        
-                   </template>
-
-                    <template v-slot:item.delivery.datetime_out="{ item }">
-                        <div v-if="item.delivery">
-                          <div v-if="item.delivery.out_by">
-                            [[item.delivery.datetime_out]]
-                          </div>
-                        </div>
-                    </template>
-
-                    <template v-slot:expanded-item="{ headers, item }">
-                      <td :colspan="8">
-                          <v-chip class="ma-1" color="green" text-color="white">
-                            Lift On : [[item.lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
-                            </v-chip>
-                          <v-chip v-if="item.relo" class="ma-1" color="green" text-color="white">
-                            Relocation : [[item.relo.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          <v-chip v-if="container.relo" class="ma-1" color="green" text-color="white">
+                            Relocation : [[container.relo.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
-                          <v-chip v-if="item.rate1" class="ma-1" color="green" text-color="white">
-                            Storage (1-7 days) : [[item.rate1.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          <v-chip v-if="container.rate1" class="ma-1" color="green" text-color="white">
+                            Storage (1-7 days) : [[container.rate1.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
-                          <v-chip v-if="item.rate2" class="ma-1" color="green" text-color="white">
-                            Storage (8-14 days) : [[item.rate2.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          <v-chip v-if="container.rate2" class="ma-1" color="green" text-color="white">
+                            Storage (8-14 days) : [[container.rate2.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
-                          <v-chip v-if="item.rate3" class="ma-1" color="green" text-color="white">
-                            Storage (15 days over) : [[item.rate3.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          <v-chip v-if="container.rate3" class="ma-1" color="green" text-color="white">
+                            Storage (15 days over) : [[container.rate3.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
-                        </td  >
-                    </template>
-
+                        </v-chip-group>
+                      </v-card-text>
+                      <v-btn block color="secondary">
+                        Total :[[container.total.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </v-btn>
+                     </v-card>
+                     
                   </template>
-              </div> <!--  End of Container-->
-              <div v-else>
-                  <!-- Not Found BL -->
                   
+                <!-- End Show Container detail -->
+              </div> <!--  End of Container-->
+              <!-- <div v-if="notfound">               
                   <v-alert
                       color="red lighten-2"
                       dark
                     >
-                    Not found BL number [[bl_number]]
+                    Not found container number : [[container_number]]
                     </v-alert>
-              </div>
+              </div> -->
               
             </div>
             </div>
@@ -150,7 +193,7 @@
         </div><!-- End row -->
 
         <!-- Start Summary -->
-        <div v-if="selected.length > 0">
+        <!-- <div v-if="selected.length > 0">
 
           <template>
             <v-card
@@ -258,7 +301,7 @@
           </v-row>
           </template>
           
-        </div> <!-- vif -->
+        </div>  -->
         <!-- End Summary -->
 
       </div> <!-- End col-sm-12 col-md-12 -->
@@ -288,32 +331,18 @@
     el: '#app',
     vuetify: new Vuetify(),
     data: {
-            // to_day : new Date(),
-            bl_number : '',
+            to_day : new Date(),
+            container_number : '',
             loading : false,
-            containers :[],
-            selected :[],
+            // containers :[],
+            // selected :[],
+            container : null,
             search:'',
             delivery:'',
             total_lolo:0,
             total_relo:0,
             total_storage:0,
             total_grand:0,
-            headers: [
-                {
-                  text: 'Container',
-                  align: 'start',
-                  sortable: true,
-                  value: 'container'
-                },
-                { text: 'Size', value: 'discharge.size' },
-                { text: 'Item Price', value: 'total' },
-                { text: 'On Yard(days)', value: 'on_yard' },
-                { text: 'Discharge', value: 'discharge.datetime_in' },
-                { text: 'Delivery', value: 'delivery.datetime_out' },
-                
-                
-              ],
               date: new Date().toISOString().substr(0, 10),
               nowDate: new Date().toISOString().substr(0, 10),
               menu: false,
@@ -321,22 +350,28 @@
               menu2: false,
           },
     computed:{
-      
+
     },//end computed
     methods: {
-        get_data: function(bl_name) {
+      color_exist(obj) {
+            let color = (obj) ? 'green' : 'black';
+            return color;
+      },
+        get_data: function(container_number) {
               this.loading = true;
-              this.containers = [];
+              this.container = null;
+            //   this.containers = [];
               // console.log('Hello from ' + bl_name + '!');
-              // console.log(import_url + this.bl_number)
+              // console.log(import_url + this.container_number)
               this.date = new Date().toISOString().substr(0, 10)
               axios
               // .get('http://127.0.0.1:8000/order/booking/'+ this.booking)
-              .get(import_url + this.bl_number.toUpperCase())
+              .get(import_container_url + this.container_number.toUpperCase())
               .then(
                   response => {
                     console.log(response.data)
-                    this.containers = response.data
+                    // this.containers = response.data
+                    this.container = response.data
                     this.loading = false;
                     this.update_delivery(this.date);
                   })
@@ -477,30 +512,34 @@
           },
         update_delivery:function(delivery_date){
           console.log('Delivery date :' + delivery_date )
-          this.containers.forEach(function (arrayItem) {
+        //   this.containers.forEach(function (arrayItem) {
           // this.containers.forEach((arrayItem) => {
-              if (arrayItem.delivery == null) {
-                arrayItem.delivery = {'datetime_out': delivery_date};
+              if (this.container.delivery == null) {
+                container.delivery = {'datetime_out': delivery_date};
                 console.log('No delivery');
               }
               else{
                 console.log('With delivery');
-                console.log('Total:' + arrayItem.total);
+                console.log('Total:' + this.container.total);
                 // Update datetime_out (**if out_by exist)
-                if (arrayItem.delivery.out_by == null) {
-                  arrayItem.delivery.datetime_out = delivery_date;
+                if (this.container.delivery.out_by == null) {
+                    this.container.delivery.datetime_out = delivery_date;
                 }
               }//end delivery==null
 
-              arrayItem.on_yard   = this.dWell(arrayItem.delivery.datetime_out,arrayItem.discharge.datetime_in)
-              arrayItem.lolo      = this.lolo(arrayItem.discharge.size);
-              arrayItem.relo      = this.relo(arrayItem.discharge.size,arrayItem.on_yard);
-              arrayItem.rate1     = this.rate1(arrayItem.discharge.size,arrayItem.on_yard);
-              arrayItem.rate2     = this.rate2(arrayItem.discharge.size,arrayItem.on_yard);
-              arrayItem.rate3     = this.rate3(arrayItem.discharge.size,arrayItem.on_yard);
-              arrayItem.total     = Number(arrayItem.lolo)+Number(arrayItem.relo)+Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
-
-          }.bind(this));//forEach
+              this.container.on_yard   = this.dWell(this.container.delivery.datetime_out,this.container.discharge.datetime_in)
+              this.container.lolo      = this.lolo(this.container.discharge.size);
+              this.container.relo      = this.relo(this.container.discharge.size,this.container.on_yard);
+              this.container.rate1     = this.rate1(this.container.discharge.size,this.container.on_yard);
+              this.container.rate2     = this.rate2(this.container.discharge.size,this.container.on_yard);
+              this.container.rate3     = this.rate3(this.container.discharge.size,this.container.on_yard);
+              this.container.total     = Number(this.container.lolo)+Number(this.container.relo)+Number(this.container.rate1)+Number(this.container.rate2)+Number(this.container.rate3)
+              
+              this.total_lolo=this.container.lolo;
+              this.total_relo=this.container.relo;
+              this.total_storage= this.container.rate1+this.container.rate2+this.container.rate3;
+              this.total_grand=this.container.total;
+        //   }.bind(this));//forEach
         },//End update_delivery
         update_charge:function(){
           console.log('Update Charge :')
@@ -508,27 +547,27 @@
           this.total_relo=0;
           this.total_storage=0;
           this.total_grand=0;
-          this.selected.forEach(function (arrayItem) {
+        //   this.selected.forEach(function (arrayItem) {
               // console.log(arrayItem)
-              this.total_lolo=this.total_lolo + arrayItem.lolo;
-              this.total_relo=this.total_relo + arrayItem.relo;
-              this.total_storage= this.total_storage + (arrayItem.rate1+arrayItem.rate2+arrayItem.rate3);
-              this.total_grand=this.total_grand + arrayItem.total;
-          }.bind(this));//forEach
+              this.total_lolo=this.container.lolo;
+              this.total_relo=this.container.relo;
+              this.total_storage= this.container.rate1+this.container.rate2+this.container.rate3;
+              this.total_grand=this.container.total;
+        //   }.bind(this));//forEach
         },//End update_charge
       },//End Method
     watch: {
       date () {
         this.update_delivery(this.date);
-        this.update_charge();
+        // this.update_charge();
       },
-      selected () {
-        //this.selected_json = JSON.stringify(this.selected)
-        this.update_charge();
-      },
-      bl_number (){
-        this.containers = []
-        
+    //   selected () {
+    //     //this.selected_json = JSON.stringify(this.selected)
+    //     this.update_charge();
+    //   },
+      container_number (){
+        // this.containers = []
+        this.container = null
       }
     },
     

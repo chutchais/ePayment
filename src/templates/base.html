@@ -83,7 +83,8 @@
                 {% if user.is_authenticated %}
                   <div class="dropdown-divider"></div>
                 {% endif %}
-                <a class="dropdown-item" href="{% url 'bl:report' %}">Report</a>
+                <a class="dropdown-item" href="{% url 'bl:report' %}">Bill of Lading Report</a>
+                <a class="dropdown-item" href="{% url 'bl:container' %}">Container Report</a>
               </div>
             </li>
 
