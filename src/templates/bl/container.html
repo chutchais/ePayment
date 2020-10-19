@@ -535,11 +535,13 @@
           },
         update_delivery:function(delivery_date){
           console.log('Delivery date :' + delivery_date )
+          console.log(this.container.delivery)
         //   this.containers.forEach(function (arrayItem) {
           // this.containers.forEach((arrayItem) => {
               if (this.container.delivery == null) {
-                container.delivery = {'datetime_out': delivery_date};
+                this.container.delivery = {'datetime_out': delivery_date};
                 console.log('No delivery');
+                // console.log(this.container.delivery)
               }
               else{
                 console.log('With delivery');
