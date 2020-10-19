@@ -24,6 +24,16 @@
                 <input type="text" class="form-control mb-2" v-model="container_number" placeholder="Container number">
                 <button type="button" class="btn btn-success mb-2" v-on:click="get_data(container_number)">Get Information</button>
                 
+
+                <div class="text-center">
+                  <v-progress-circular
+                    :size="50"
+                    color="primary"
+                    indeterminate
+                    v-if="loading"
+                  ></v-progress-circular>
+                </div>
+
                 <div v-if="container">
                 <template>
                   
@@ -54,7 +64,7 @@
                       ></v-img>
                       
                       <v-card-title>[[container_number]]</v-card-title>
-                      <v-card-subtitle>BL :[[container.bill_of_landing]]</v-card-subtitle>
+                      <v-card-subtitle>Bill of Ladding :[[container.bill_of_landing]]</v-card-subtitle>
                      
                       <v-card-text>               
                         <div>

@@ -23,6 +23,15 @@
                 <input type="text" class="form-control mb-2" v-model="bl_number" placeholder="BL number">
                 <button type="button" class="btn btn-success mb-2" v-on:click="get_data(bl_number)">Get Container</button>
                 
+                <div class="text-center">
+                  <v-progress-circular
+                    :size="50"
+                    color="primary"
+                    indeterminate
+                    v-if="loading"
+                  ></v-progress-circular>
+                </div>
+                
                 <div v-if="containers">
                 <template>
                   <v-row>         

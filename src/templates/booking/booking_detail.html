@@ -21,6 +21,15 @@
                       <h4>Booking : [[booking]] <a href="{% url 'booking:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a></h4>
                       <button type="button" class="btn btn-success mb-2" v-on:click="greet(booking)">Get Container</button>
                       
+                      <div class="text-center">
+                        <v-progress-circular
+                          :size="50"
+                          color="primary"
+                          indeterminate
+                          v-if="loading"
+                        ></v-progress-circular>
+                      </div>
+                      
                       <div v-if="containers">
                       <template>
 
