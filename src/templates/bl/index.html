@@ -5,6 +5,7 @@
 
 <script>
   const import_url = '{{import_bl_url}}';
+  const bl_input = '{{bl}}'
 </script>
 
 <div id="app">
@@ -298,7 +299,7 @@
     vuetify: new Vuetify(),
     data: {
             // to_day : new Date(),
-            bl_number : '',
+            bl_number : bl_input,
             loading : false,
             containers :[],
             selected :[],
@@ -329,10 +330,30 @@
               modal: false,
               menu2: false,
           },
+          created: function () {
+            // `this` points to the vm instance
+            console.log('Created' + this.bl_number)
+          },
+          mounted: function () {
+            this.$nextTick(function () {
+              // Code that will run only after the
+              // entire view has been rendered
+              
+              if (this.bl_number != ''){
+                console.log('Pulling data of :' + this.bl_number)
+                this.get_data(this.bl_number)
+              }
+            })
+          },
     computed:{
       
     },//end computed
+    
     methods: {
+      container_link(url,bl) {
+            let link = url + '/' + container;
+            return link;
+      },
         get_data: function(bl_name) {
               this.loading = true;
               this.containers = [];

@@ -64,8 +64,17 @@
                       ></v-img>
                       
                       <v-card-title>[[container_number]]</v-card-title>
-                      <v-card-subtitle>Bill of Ladding :[[container.bill_of_landing]]</v-card-subtitle>
-                     
+                      <v-card-subtitle  >
+                        Bill of Ladding : 
+                        <v-chip
+                          class="ma-2"
+                          color="primary"
+                          :href="bl_link('{% url 'bl:report'%}',container.bill_of_landing)"
+                        >
+                        [[container.bill_of_landing]]
+                        </v-chip>
+                      </v-card-subtitle>
+                      
                       <v-card-text>               
                         <div>
                             Call sign :[[container.callsign]] , Voy :[[container.voy]] <br>
@@ -363,6 +372,10 @@
 
     },//end computed
     methods: {
+      bl_link(url,bl) {
+            let link = url + '/' + bl;
+            return link;
+      },
       color_exist(obj) {
             let color = (obj) ? 'green' : 'black';
             return color;
