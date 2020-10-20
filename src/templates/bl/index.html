@@ -64,7 +64,14 @@
               <template>
                     <v-card>
                       <v-card-title>
-                        Container Details
+                        Container Details 
+                        <v-chip
+                        class="ma-2"
+                        :color="terminal_color(terminal)"
+                        v-if="terminal"
+                        >
+                          [[terminal]]
+                        </v-chip>
                         <v-spacer></v-spacer>
                         <v-text-field
                           v-model="search"
@@ -300,6 +307,7 @@
     data: {
             // to_day : new Date(),
             bl_number : bl_input,
+            terminal : '',
             loading : false,
             containers :[],
             selected :[],
@@ -350,6 +358,10 @@
     },//end computed
     
     methods: {
+      terminal_color(terminal) {
+            let color = terminal=='LCB1' ? 'primary':'red';
+            return color;
+      },
       container_link(url,bl) {
             let link = url + '/' + container;
             return link;
@@ -522,6 +534,11 @@
                 }
               }//end delivery==null
 
+              // Added on Oct 20,2020 -- To update Terminal
+              if (arrayItem.discharge != null) {
+                this.terminal = arrayItem.discharge.terminal
+              }
+
               arrayItem.on_yard   = this.dWell(arrayItem.delivery.datetime_out,arrayItem.discharge.datetime_in)
               arrayItem.lolo      = this.lolo(arrayItem.discharge.size);
               arrayItem.relo      = this.relo(arrayItem.discharge.size,arrayItem.on_yard);
@@ -558,7 +575,7 @@
       },
       bl_number (){
         this.containers = []
-        
+        this.terminal=''
       }
     },
     
