@@ -1,0 +1,634 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+   const tax_rate = {{tax.tax}};
+  const wht_rate = {{tax.wht}};
+  var people = '{{ items_json|safe }}';
+  const export_url = '{{export_booking_url}}';
+  var address_items = '{{addresses_items|safe}}';
+  const import_url = '{{import_url}}';
+  const bl_input = '{{ object.name }}'
+</script>
+
+<div id="app">
+  <v-app>
+    <div class="containeer">
+  <div class="row wrapper">
+
+    <div class="col-sm-12 col-md-12">
+      <div class="row">	
+        
+        <div class="col-12 mb-1">
+          <div class="content">
+          	<div class="card">
+  		        <div class="card-body">
+                <h4>Bill of Ladding : [[bl_number]] <a href="{% url 'bl:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a></h4>
+                
+                <button type="button" class="btn btn-success mb-2" v-on:click="get_data(bl_number)">Get Container</button>
+                
+                <div class="text-center">
+                  <v-progress-circular
+                    :size="50"
+                    color="primary"
+                    indeterminate
+                    v-if="loading"
+                  ></v-progress-circular>
+                </div>
+                
+                <div v-if="containers">
+                <template>
+                  <v-row>         
+                    <v-col v-if="containers.length > 0" cols="12" sm="6" md="4">
+                      <v-menu
+                        v-model="menu2"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="date"
+                            label="Select delivery date"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker v-model="date" @input="menu2 = false" :min="nowDate"></v-date-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-spacer></v-spacer>
+                  </v-row>
+                </template>
+
+              <template>
+                    <v-card>
+                      <v-card-title>
+                        Container Details 
+                        <v-chip
+                        class="ma-2"
+                        :color="terminal_color(terminal)"
+                        v-if="terminal"
+                        >
+                          [[terminal]]
+                        </v-chip>
+                        <v-spacer></v-spacer>
+                        <v-text-field
+                          v-model="search"
+                          append-icon="mdi-magnify"
+                          label="Search"
+                          single-line
+                          hide-details
+                        ></v-text-field>
+                      </v-card-title>
+                    </v-card>
+                    <v-data-table
+                    :items-per-page="50"
+                    class="elevation-1"
+                    v-model="selected"
+                    :headers="headers"
+                    :items="containers"
+                    :search="search"
+                    item-key="container"
+                    show-select
+                    show-expand
+                    class="elevation-1"
+                    dense
+                    :loading="loading"
+                    loading-text="Loading... Please wait"
+                  >
+                    <template v-slot:item.on_yard="{ item }">
+                        <div v-if="item.delivery">
+                            <v-chip v-if="item.delivery.out_by" color="gray" dark>
+                              [[dWell(item.delivery.datetime_out,item.discharge.datetime_in)]]
+                            </v-chip>
+                            <!-- Still in yard -->
+                            <v-chip v-else color="green" dark>
+                              [[dWell(item.delivery.datetime_out,item.discharge.datetime_in)]]
+                            </v-chip>
+                        </div>
+                        <div v-else>
+                          <v-chip color="green" dark>
+                            On Yard
+                        </v-chip>
+                        </div>
+                    </template>
+                    
+                    <template v-slot:item.total="{ item }">
+                          [[item.total.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                        
+                   </template>
+
+                    <template v-slot:item.delivery.datetime_out="{ item }">
+                        <div v-if="item.delivery">
+                          <div v-if="item.delivery.out_by">
+                            [[item.delivery.datetime_out]]
+                          </div>
+                        </div>
+                    </template>
+
+                    <template v-slot:expanded-item="{ headers, item }">
+                      <td :colspan="8">
+                          <v-chip class="ma-1" color="green" text-color="white">
+                            Lift On : [[item.lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                            </v-chip>
+                          <v-chip v-if="item.relo" class="ma-1" color="green" text-color="white">
+                            Relocation : [[item.relo.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
+                          <v-chip v-if="item.rate1" class="ma-1" color="green" text-color="white">
+                            Storage (1-7 days) : [[item.rate1.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
+                          <v-chip v-if="item.rate2" class="ma-1" color="green" text-color="white">
+                            Storage (8-14 days) : [[item.rate2.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
+                          <v-chip v-if="item.rate3" class="ma-1" color="green" text-color="white">
+                            Storage (15 days over) : [[item.rate3.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
+                        </td  >
+                    </template>
+
+                  </template>
+              </div> <!--  End of Container-->
+              <div v-else>
+                  <!-- Not Found BL -->
+                  
+                  <v-alert
+                      color="red lighten-2"
+                      dark
+                    >
+                    Not found BL number [[bl_number]]
+                    </v-alert>
+              </div>
+              
+            </div>
+            </div>
+          </div>
+        </div>
+        </div><!-- End row -->
+
+        <!-- Start Summary -->
+        <div v-if="selected.length > 0">
+
+          <template>
+            <v-card
+              cols="12"
+              class="mt-2"
+              v-if="selected"
+            >
+                  <v-card-title>
+                    Charge Summary
+                  </v-card-title>
+                  <v-card-subtitle>
+                    [[selected.length]] container(s)
+                  </v-card-subtitle>
+                  
+           
+           <v-row no-gutters>
+
+            <v-col
+              cols="6"
+               md="3"
+            >
+                <v-card
+                  class="pa-2 ma-2"
+                  outlined
+                >
+                  <v-card-title>
+                      Lift On
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Total charge
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p class="display-1 text--primary">
+                        [[total_lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </p>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+            
+            <v-col
+              cols="6"
+               md="3"
+            >
+                <v-card
+                  class="pa-2 ma-2"
+                  outlined
+                >
+                  <v-card-title>
+                      Relocation
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Total charge
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p class="display-1 text--primary">
+                        [[total_relo.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </p>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+
+            <v-col
+              cols="6"
+               md="3"
+            >
+              <v-card
+                  class="pa-2 ma-2"
+                  outlined
+                >
+                    <v-card-title>
+                      Storage
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Total Charge
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p class="display-1 text--primary">
+                        [[total_storage.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </p>
+                    </v-tacard-text>
+                </v-card>
+            </v-col>
+
+            <v-col
+              cols="6"
+               md="3"
+            >
+              <v-card
+                  class="pa-2 ma-2 bg-info"
+                  outlined
+                >
+                  <v-card-title>
+                      Grand Total
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Not include Tax
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p class="display-1 text--primary font-weight-black">
+                        [[total_grand.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </p>
+                    </v-card-text>
+                </v-card>
+          </v-col>
+          </v-row>
+          </template>
+          
+        </div> <!-- vif -->
+        <!-- End Summary -->
+
+      </div> <!-- End col-sm-12 col-md-12 -->
+
+    </div><!-- End row wrapper -->
+  </div><!-- End container -->
+  </v-app>
+</div> <!-- End App -->
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+
+  .charge {
+    font-size: 50px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 800;
+    text-align:center
+  }
+
+  .subtotal {
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+    text-align:center
+  }
+
+
+  @media screen and (min-width: 576px) {
+      .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 768px) {
+    .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 992px) {
+
+  }
+
+
+@media screen and (min-width: 1200px) {
+
+}
+
+</style>
+{% endblock style %}
+
+
+{% block script %}
+  <script>
+
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    vuetify: new Vuetify(),
+    data: {
+            // to_day : new Date(),
+            bl_number : bl_input,
+            terminal : '',
+            loading : false,
+            containers :[],
+            selected :[],
+            search:'',
+            delivery:'',
+            total_lolo:0,
+            total_relo:0,
+            total_storage:0,
+            total_grand:0,
+            headers: [
+                {
+                  text: 'Container',
+                  align: 'start',
+                  sortable: true,
+                  value: 'container'
+                },
+                { text: 'Size', value: 'discharge.size' },
+                { text: 'Item Price', value: 'total' },
+                { text: 'On Yard(days)', value: 'on_yard' },
+                { text: 'Discharge', value: 'discharge.datetime_in' },
+                { text: 'Delivery', value: 'delivery.datetime_out' },
+                
+                
+              ],
+              date: new Date().toISOString().substr(0, 10),
+              nowDate: new Date().toISOString().substr(0, 10),
+              menu: false,
+              modal: false,
+              menu2: false,
+          },
+          created: function () {
+            // `this` points to the vm instance
+            console.log('Created' + this.bl_number)
+          },
+          mounted: function () {
+            this.$nextTick(function () {
+              // Code that will run only after the
+              // entire view has been rendered
+              
+              // if (this.bl_number != ''){
+              //   console.log('Pulling data of :' + this.bl_number)
+              //   this.get_data(this.bl_number)
+              // }
+            })
+          },
+    computed:{
+      
+    },//end computed
+    
+    methods: {
+      terminal_color(terminal) {
+            let color = terminal=='LCB1' ? 'primary':'red';
+            return color;
+      },
+      container_link(url,bl) {
+            let link = url + '/' + container;
+            return link;
+      },
+        get_data: function(bl_name) {
+              this.loading = true;
+              this.containers = [];
+              this.selected =[];
+              // console.log('Hello from ' + bl_name + '!');
+              // console.log(import_url + this.bl_number)
+              this.date = new Date().toISOString().substr(0, 10)
+              axios
+              // .get('http://127.0.0.1:8000/order/booking/'+ this.booking)
+              .get(import_url + this.bl_number.toUpperCase())
+              .then(
+                  response => {
+                    console.log(response.data)
+                    this.containers = response.data
+                    this.loading = false;
+                    this.update_delivery(this.date);
+                  })
+              .catch(error =>{
+                    this.loading = false;
+                })
+              
+          },
+          dWell:function(date_in,date_out){
+            var starts = moment(date_in);
+            var new_starts = starts.hour(0);
+            new_starts = new_starts.minute(0);
+            new_starts = new_starts.second(0);
+            new_starts = new_starts.milliseconds(0);
+            // Free first day
+            // new_starts = new_starts.add(1,"day")
+
+            var ends = moment(date_out);
+            var new_ends = ends.hour(0);
+            new_ends = new_ends.minute(0);
+            new_ends = new_ends.second(0);
+            new_ends = new_ends.milliseconds(0);
+
+            
+            var duration = moment.duration(new_starts.diff(new_ends));
+            return duration.asDays()
+        },
+        add_day:function(today,n){
+          // console.log(n)
+          
+          var newdate = new Date();
+          newdate.setDate(today.getDate()+n);
+          // console.log(newdate)
+          return moment(newdate).format("MMM D")
+            // return date.setDate(date.getDate()+n)
+        },
+        moment: function () {
+          return moment();
+        },
+        
+        lolo:function(container_size){
+          // console.log('LoLo function')
+          var cost = 0;
+          if (container_size == 20){ cost=670}
+          if (container_size == 40){ cost=1000}
+          if (container_size == 45){ cost=1070}
+          // // this.total_LoLo = cost;
+          // // this.container.lolo = cost;
+          // // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // // this.container.total = this.grand_total;
+          console.log('LOLO :' + cost);
+          return cost
+        },
+        relo:function(container_size,dWell){
+            // console.log('Relo function' + container_size + dWell)
+            var cost = 0;
+            if (dWell <= 7){return 0}
+            if (container_size == 20){ cost=300}
+            if (container_size == 40){ cost=510}
+            if (container_size == 45){ cost=600}
+            // this.total_Relo = cost
+            // this.container.relo = cost;
+            // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+            // this.container.total = this.grand_total;
+            return cost
+        },
+        rate1_day:function(dWell){
+            var day = 0;
+            var day_after_3day = dWell - 3;
+            if (day_after_3day <= 0){
+                return 0;}
+            if (day_after_3day > 7) {
+                return 7;}
+            return day_after_3day
+            },
+        rate2_day:function(dWell){
+          var day = 0;
+          var day_after_rate2 = dWell -10 ;
+          if (day_after_rate2 <= 0 ){
+              return 0;}
+          if (day_after_rate2 <= 7 ){
+              return day_after_rate2;}
+          if (day_after_rate2 > 7) {
+              return 7;}
+          },
+        rate3_day:function(dWell){
+          // console.log('rate3_day' + dWell);
+          var day = 0;
+          var day_after_rate3 = dWell -17 ;
+          // console.log('rate3_day' + day_after_rate3);
+          if (day_after_rate3 <= 0 ){
+              // console.log('rate3_day : return 0' );
+              return 0;
+              }
+          return day_after_rate3
+          },
+        rate1:function(container_size,dWell){
+          var cost = 0;
+          var day = 0;
+          day = this.rate1_day(dWell)
+          if (container_size == 20){ cost=125*day}
+          if (container_size == 40){ cost=250*day}
+          if (container_size == 45){ cost=310*day}
+          // this.total_rate1 = cost;
+          // this.container.rate1 = cost;
+          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // this.container.total = this.grand_total;
+          return cost
+          },
+          //.toLocaleString(undefined, {maximumFractionDigits:2})
+        rate2:function(container_size,dWell){
+          var cost = 0;
+          var day = 0;
+          day = this.rate2_day(dWell)
+          if (container_size == 20){ cost=250*day}
+          if (container_size == 40){ cost=500*day}
+          if (container_size == 45){ cost=620*day}
+          // this.total_rate2 = cost;
+          // this.container.rate2 = cost;
+          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // this.container.total = this.grand_total;
+          return cost
+          },
+        rate3:function(container_size,dWell){
+          // console.log('rate3 -' + dWell);
+          var cost = 0;
+          var day = 0;
+          day = this.rate3_day(dWell)
+          // console.log('rate3:Day -' + day);
+          if (container_size == 20){ cost=400*day}
+          if (container_size == 40){ cost=800*day}
+          if (container_size == 45){ cost=990*day}
+          // this.total_rate3 = cost;
+          // this.container.rate3 = cost;
+          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // this.container.total = this.grand_total;
+          return cost
+          },
+        update_delivery:function(delivery_date){
+          console.log('Delivery date :' + delivery_date )
+          this.containers.forEach(function (arrayItem) {
+          // this.containers.forEach((arrayItem) => {
+              if (arrayItem.delivery == null) {
+                arrayItem.delivery = {'datetime_out': delivery_date};
+                console.log('No delivery');
+              }
+              else{
+                console.log('With delivery');
+                console.log('Total:' + arrayItem.total);
+                // Update datetime_out (**if out_by exist)
+                if (arrayItem.delivery.out_by == null) {
+                  arrayItem.delivery.datetime_out = delivery_date;
+                }
+              }//end delivery==null
+
+              // Added on Oct 20,2020 -- To update Terminal
+              if (arrayItem.discharge != null) {
+                this.terminal = arrayItem.discharge.terminal
+              }
+
+              arrayItem.on_yard   = this.dWell(arrayItem.delivery.datetime_out,arrayItem.discharge.datetime_in)
+              arrayItem.lolo      = this.lolo(arrayItem.discharge.size);
+              arrayItem.relo      = this.relo(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate1     = this.rate1(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate2     = this.rate2(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate3     = this.rate3(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.total     = Number(arrayItem.lolo)+Number(arrayItem.relo)+Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
+
+          }.bind(this));//forEach
+        },//End update_delivery
+        update_charge:function(){
+          console.log('Update Charge :')
+          this.total_lolo=0;
+          this.total_relo=0;
+          this.total_storage=0;
+          this.total_grand=0;
+          this.selected.forEach(function (arrayItem) {
+              // console.log(arrayItem)
+              this.total_lolo=this.total_lolo + arrayItem.lolo;
+              this.total_relo=this.total_relo + arrayItem.relo;
+              this.total_storage= this.total_storage + (arrayItem.rate1+arrayItem.rate2+arrayItem.rate3);
+              this.total_grand=this.total_grand + arrayItem.total;
+          }.bind(this));//forEach
+        },//End update_charge
+      },//End Method
+    watch: {
+      date () {
+        this.update_delivery(this.date);
+        this.update_charge();
+      },
+      selected () {
+        //this.selected_json = JSON.stringify(this.selected)
+        this.update_charge();
+      },
+      bl_number (){
+        this.containers = []
+        this.terminal=''
+        this.selected =[]
+      }
+    },
+    
+  })
+  </script>
+{% endblock %}

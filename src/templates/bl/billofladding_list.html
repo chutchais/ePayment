@@ -1,0 +1,104 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="app">
+
+  {% if not user.profile.approved %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>This user is not approved yet</strong> Please waitting for LCB1 approval.
+    then you can Create new Bill of Ladding and Order.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+{% endif %}
+
+<div class="containeer">
+
+<div class="row wrapper">
+
+  <div class="col-sm-12 col-md-12">
+    <div class="row">
+    	
+      <div class="col-12">
+        <div class="content">
+        	
+        	<div class="card">
+		        <div class="card-body">
+		          <h4>Bill of Ladding List</h4>
+              
+              <a href="{% url 'bl:create' %}"><button type="button" class="btn btn-info"
+                {% if not user.profile.approved %}disabled{% endif%}>Create New BL</button></a>
+              <br>
+		          รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทั้งหมด {{ page_obj.paginator.count }} รายการ <br>
+     {% if is_paginated %}
+                  <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                      <li><a href="?q={{ request.GET.q}}&page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                      <li class="disabled"><span>&laquo;</span></li>
+                    {% endif %}
+                    {% for i in paginator.page_range %}
+                      {% if page_obj.number == i %}
+                        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                      {% else %}
+                        <li><a href="?q={{ request.GET.q}}&page={{ i }}">{{ i }}</a></li>
+                      {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                      <li><a href="?q={{ request.GET.q}}&page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                    {% else %}
+                      <li class="disabled"><span>&raquo;</span></li>
+                    {% endif %}
+                  </ul>
+      {% endif %}
+            <div class="table-responsive-md">
+		          <table class="table table-striped">
+					  <thead>
+					    <tr>
+					      <th scope="col">Bill of Ladding</th>
+                <th scope="col">Terminal</th>
+					      <th scope="col">Created</th>
+                <th scope="col">User</th>
+					      
+					    </tr>
+					  </thead>
+					  <tbody>
+  		          {% for object in object_list %}
+  					    <tr>
+                  <td><a href="{{object.get_absolute_url}}">{{object.name}}</a></td>
+                  <td>{{object.terminal|default_if_none:""}}</td>
+  					      <td>{{object.created}}</td>
+  					      <td>{{object.user}}</td>
+  					    </tr>
+  					    
+  		          {% endfor %}
+		          </tbody>
+					</table>
+        </div> <!-- table-responsive-->
+		        </div>
+		      </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+	
+</div>
+</div>
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}
+

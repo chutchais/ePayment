@@ -3,10 +3,76 @@ import urllib3
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 
+from django.core.exceptions import ValidationError
+from django.views.generic import DetailView,CreateView,UpdateView,DeleteView,ListView
+from django.views.generic.base import TemplateView
+from django.db.models import Q,F
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.conf import settings
+
+from .models import BillofLadding
+from user_profile.models import Address
+from tax.models import Tax
+import json
+
+class BillofLaddingListView(LoginRequiredMixin,ListView):
+	model = BillofLadding
+	paginate_by = 30
+	def get_queryset(self):
+		query = self.request.GET.get('q')
+		if query :
+			return BillofLadding.objects.filter(Q(name__icontains=query),
+									user__username=self.request.user ).select_related('user').order_by('-updated')
+		return BillofLadding.objects.filter(
+				user__username=self.request.user).select_related('user').order_by('-updated')
+	
+	def get_context_data(self,**kwargs):
+		context = super(BillofLaddingListView,self).get_context_data(**kwargs)
+		context['addresses'] = Address.objects.filter(user__username=self.request.user)
+		# context['export_booking_url'] = settings.EXPORT_BOOKING_ENDPOINT_URL.strip()
+		return context
+
+class BillofLaddingDetailView(LoginRequiredMixin,DetailView):
+	model = BillofLadding
+	def get_context_data(self,**kwargs):
+		context = super(BillofLaddingDetailView,self).get_context_data(**kwargs)
+		context['tax'] = Tax.objects.get(name='Default')
+		# context['addresses'] = Address.objects.filter(user__username=self.request.user)
+		context['addresses_items'] = json.dumps(list(Address.objects.filter(
+									user__username=self.request.user
+									).order_by('company').values('pk', 'company','address','tax'))).replace('\\r\\n',' ')
+		# http://192.168.10.16:5001/booking/
+		bl_url = f"{reverse_lazy('bl:list')}"
+		# print (f"{reverse_lazy('order:list')}booking/")
+		context['import_url'] = f'{bl_url}api/bl/'#settings.EXPORT_BOOKING_ENDPOINT_URL
+		return context
+
+class BillofLaddingCreateView(LoginRequiredMixin,CreateView):
+	model = BillofLadding
+	# fields = ['name','terminal']
+	fields = ['name']
+	success_url = reverse_lazy('bl:list')
+
+	def form_valid(self, form):
+		form.instance.user = self.request.user
+		try:
+			# Added on Aug 25,2020 -- To convert to capital char.
+			form.instance.name = form.instance.name.upper()
+			form.save()  # should raise an exception if unique_together constrain fails
+		except :
+			form.add_error('name', 'BL already Exist!')  # add custom error to form
+			return self.form_invalid(form)  # return the invalid form
+		return super(BillofLaddingCreateView, self).form_valid(form)
+
+class BillofLaddingDeleteView(DeleteView):
+	model = BillofLadding
+	success_url = reverse_lazy('bl:list')
+
+
 # Create your views here.
 def index(request,bl=''):
 	context = {}
-	bl_url = f"{reverse_lazy('bl:home')}"
+	bl_url = f"{reverse_lazy('bl:list')}"
 	# print(bl_url)
 		# print (f"{reverse_lazy('order:list')}booking/")
 	context['import_bl_url'] = f'{bl_url}api/bl/'
@@ -15,7 +81,7 @@ def index(request,bl=''):
 
 def container(request):
 	context = {}
-	bl_url = f"{reverse_lazy('bl:home')}"
+	bl_url = f"{reverse_lazy('bl:list')}"
 	# print(bl_url)
 		# print (f"{reverse_lazy('order:list')}booking/")
 	context['import_container_url'] = f'{bl_url}api/container/'
