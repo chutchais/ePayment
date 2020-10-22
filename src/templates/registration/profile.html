@@ -65,6 +65,22 @@
   </div>
   </div>
 
+  <h2>Contact Settings</h2>
+  <div class="row">
+    <div class="col-sm-6 col-md-4">
+      <div class="card">
+        <div class="card-body">
+           
+            <form method="post" enctype="multipart/form-data" novalidate>
+              {% csrf_token %}
+              {{ formcontact|crispy }}
+              <button type="submit" class="btn btn-primary">Change Contact</button>
+            </form>
+        </div> 
+      </div><!-- End ID Card-->
+  </div>
+  </div>
+
   <h2>Address Settings</h2>
   <a href="{% url 'profile:add' %}">Add New Address</a>
     <div class="row">

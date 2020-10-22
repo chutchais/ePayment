@@ -15,7 +15,7 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from .forms import (SignUpForm,ProfileSettingForm,
 					ProfileAvartarForm,ProfileIDcardForm,
-					ProfileSigForm,AddressForm)
+					ProfileSigForm,AddressForm,ContactForm)
 from .models import Profile,Address
 
 from .tokens import account_activation_token
@@ -40,11 +40,13 @@ def profileSetting(request):
 		formidcard      = ProfileIDcardForm()
 		formsignature   = ProfileSigForm()
 		formaddress     = AddressForm()
+		formcontact		= ContactForm()
 		profile = Profile.objects.get(user=request.user)
 	return render(request, 'registration/profile.html', {'formavatar':fromAvatar,
 													'formidcard':formidcard,
 													'formsignature':formsignature,
 													'formaddress':formaddress,
+													'formcontact':formcontact,
 													'profile': profile})
 
 def signup(request):

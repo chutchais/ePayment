@@ -38,3 +38,8 @@ class AddressForm(forms.ModelForm):
     class Meta:
         model = Address
         fields = ['company','address','branch','tax']
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['lineid','phone']

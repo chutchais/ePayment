@@ -17,6 +17,8 @@ class Profile(models.Model):
     lineid              = models.CharField(max_length=100,blank=True, null=True)
     approved 			= models.BooleanField(default=False)
     approved_date		= models.DateTimeField(blank=True, null=True)
+    # Added on Oct 22,2020 -- Add Telephone number
+    phone               = models.CharField(max_length=100,blank=True, null=True)
 
 
 @receiver(post_save, sender=User)

@@ -302,7 +302,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        {% for container in object.containers.all %}
+                        {% for container in object.containers.all|dictsort:"container" %}
                         <tr>
                           <th scope="row">{{ forloop.counter }}</th>
                           <td>{{container.container}}</td>
