@@ -48,11 +48,11 @@ def post_container(request):
             # ----------------------------
 
             # Create Order
-            ref = datetime.now().strftime("%H%M%S")
-            # order_name = f'{booking}-{ref}'
-            # Modify on Aug 13,2020
-            # To change order name to be Booking+Ref1 (same as QRid)
-            # order_name = f'{booking}{ref}'
+            # ref = datetime.now().strftime("%H%M%S")
+            # Modify on Oct 22,2020 -- To Change Ref1 to E%M%S format 
+            ref =   datetime.now().strftime("%M%S")
+            ref =   f'E{ref}'
+
             # Mofigy on Aug 17,2020
             # To limit Order name to be 15 digits (last 15 digits) , without DLCB or DLCM
             order_name = f'{booking}{ref}'[-15:]
