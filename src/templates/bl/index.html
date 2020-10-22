@@ -369,6 +369,7 @@
         get_data: function(bl_name) {
               this.loading = true;
               this.containers = [];
+              this.selected =[];
               // console.log('Hello from ' + bl_name + '!');
               // console.log(import_url + this.bl_number)
               this.date = new Date().toISOString().substr(0, 10)
@@ -576,6 +577,7 @@
       bl_number (){
         this.containers = []
         this.terminal=''
+        this.selected =[]
       }
     },
     
