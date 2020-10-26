@@ -57,7 +57,8 @@
 		          <table class="table table-striped">
 					  <thead>
 					    <tr>
-					      <th scope="col">Bill of Ladding</th>
+                <th scope="col">Bill of Ladding</th>
+                <th scope="col">เลขที่ใบขน</th>
                 <th scope="col">Terminal</th>
 					      <th scope="col">Created</th>
                 <th scope="col">User</th>
@@ -68,6 +69,7 @@
   		          {% for object in object_list %}
   					    <tr>
                   <td><a href="{{object.get_absolute_url}}">{{object.name}}</a></td>
+                  <td>{{object.declaration}}</td>
                   <td>{{object.terminal|default_if_none:""}}</td>
   					      <td>{{object.created}}</td>
   					      <td>{{object.user}}</td>

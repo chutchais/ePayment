@@ -15,6 +15,8 @@ from user_profile.models import Address
 from tax.models import Tax
 import json
 
+from .forms import BillofLaddingForm
+
 class BillofLaddingListView(LoginRequiredMixin,ListView):
 	model = BillofLadding
 	paginate_by = 30
@@ -48,9 +50,10 @@ class BillofLaddingDetailView(LoginRequiredMixin,DetailView):
 		return context
 
 class BillofLaddingCreateView(LoginRequiredMixin,CreateView):
-	model = BillofLadding
-	# fields = ['name','terminal']
-	fields = ['name']
+	# model = BillofLadding
+	# fields = ['name','declaration']
+	template_name = 'bl/billofladding_form.html'
+	form_class = BillofLaddingForm
 	success_url = reverse_lazy('bl:list')
 
 	def form_valid(self, form):
