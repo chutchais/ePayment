@@ -574,6 +574,10 @@
               this.total_relo=this.container.relo;
               this.total_storage= this.container.rate1+this.container.rate2+this.container.rate3;
               this.total_grand=this.container.total;
+              if (this.container.delivery.out_by != null) {
+                this.total_grand=0
+                this.container.total=0
+              }
         //   }.bind(this));//forEach
         },//End update_delivery
         update_charge:function(){
@@ -588,6 +592,10 @@
               this.total_relo=this.container.relo;
               this.total_storage= this.container.rate1+this.container.rate2+this.container.rate3;
               this.total_grand=this.container.total;
+              if (this.container.delivery.out_by != null) {
+                this.total_grand=0
+                this.container.total=0
+              }
         //   }.bind(this));//forEach
         },//End update_charge
       },//End Method

@@ -76,7 +76,9 @@ src/bl/__pycache__/forms.cpython-38.pyc
 src/bl/migrations/__pycache__/0001_initial.cpython-38.pyc
 src/bl/migrations/__pycache__/0002_billofladding_declaration.cpython-38.pyc
 src/bl/migrations/__pycache__/0003_auto_20201026_1325.cpython-38.pyc
+src/orderimport/__pycache__/*.pyc
 src/orderimport/__pycache__/__init__.cpython-38.pyc
 src/orderimport/__pycache__/admin.cpython-38.pyc
 src/orderimport/__pycache__/models.cpython-38.pyc
+src/orderimport/migrations/__pycache__/*.pyc
 src/orderimport/migrations/__pycache__/__init__.cpython-38.pyc

@@ -129,7 +129,7 @@
 
                     <template v-slot:expanded-item="{ headers, item }">
                       <td :colspan="8">
-                          <v-chip class="ma-1" color="green" text-color="white">
+                          <v-chip v-if="item.lolo" class="ma-1" color="green" text-color="white">
                             Lift On : [[item.lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
                             </v-chip>
                           <v-chip v-if="item.relo" class="ma-1" color="green" text-color="white">
@@ -549,7 +549,14 @@
               arrayItem.rate2     = this.rate2(arrayItem.discharge.size,arrayItem.on_yard);
               arrayItem.rate3     = this.rate3(arrayItem.discharge.size,arrayItem.on_yard);
               arrayItem.total     = Number(arrayItem.lolo)+Number(arrayItem.relo)+Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
-
+              if (arrayItem.delivery.out_by != null) {
+                arrayItem.lolo = 0;
+                arrayItem.relo = 0;
+                arrayItem.rate1 = 0;
+                arrayItem.rate2 = 0;
+                arrayItem.rate3 = 0;
+                arrayItem.total = 0;
+              }
           }.bind(this));//forEach
         },//End update_delivery
         update_charge:function(){

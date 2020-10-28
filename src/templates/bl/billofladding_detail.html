@@ -25,7 +25,15 @@
   		        <div class="card-body">
                 <h4>Bill of Ladding : [[bl_number]] <a href="{% url 'bl:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a></h4>
                 
-                <div>เลขที่ใบขน : {{object.declaration}}</div>
+                <div>เลขที่ใบขน : {{object.declaration}}
+                  <v-chip
+                  class="ma-2"
+                  color="primary"
+                  >
+                  {{object.declaration_status|default_if_none:"ไม่ทราบสถานะ"}}
+                  </v-chip>
+
+                </div>
                 <button type="button" class="btn btn-success mb-2" v-on:click="get_data(bl_number)">Get Container</button>
                 
                 <div class="text-center">
@@ -144,7 +152,7 @@
 
                     <template v-slot:expanded-item="{ headers, item }">
                       <td :colspan="8">
-                          <v-chip v-if="item.total" class="ma-1" color="green" text-color="white">
+                          <v-chip v-if="item.lolo" class="ma-1" color="green" text-color="white">
                             Lift On : [[item.lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
                             </v-chip>
                           <v-chip v-if="item.relo" class="ma-1" color="green" text-color="white">
@@ -799,14 +807,14 @@
               arrayItem.rate3     = this.rate3(arrayItem.discharge.size,arrayItem.on_yard);
               arrayItem.total     = Number(arrayItem.lolo)+Number(arrayItem.relo)+Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
               // if Delivery , total = 0
-              // if (arrayItem.delivery.out_by != null) {
-              //   arrayItem.lolo = 0;
-              //   arrayItem.relo = 0;
-              //   arrayItem.rate1 = 0;
-              //   arrayItem.rate2 = 0;
-              //   arrayItem.rate3 = 0;
-              //   arrayItem.total = 0;
-              // }
+              if (arrayItem.delivery.out_by != null) {
+                arrayItem.lolo = 0;
+                arrayItem.relo = 0;
+                arrayItem.rate1 = 0;
+                arrayItem.rate2 = 0;
+                arrayItem.rate3 = 0;
+                arrayItem.total = 0;
+              }
           }.bind(this));//forEach
         },//End update_delivery
         update_charge:function(){

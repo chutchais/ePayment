@@ -21,6 +21,7 @@ class BillofLadding(models.Model):
                                 ),
                             ])
     declaration         = models.CharField(max_length=20,blank=True,null=True)
+    declaration_status  = models.CharField(max_length=50,blank=True,null=True)
     terminal            = models.CharField(max_length=10,blank=True,null=True
                             ,choices=TERMINAL_CHOICES)
     created             = models.DateTimeField(auto_now_add=True)
