@@ -6,7 +6,7 @@ from .models import Order,Container
 
 class ContainerInline(admin.TabularInline):
 	model = Container
-	fields = ('container','cont_size','total')
+	fields = ('container','cont_size','lifton','relocation','storage','total')
 	readonly_fields = ('created','updated','user')
 	extra = 0 # how many rows to show
 

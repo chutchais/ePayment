@@ -537,7 +537,9 @@
 
               // Added on Oct 20,2020 -- To update Terminal
               if (arrayItem.discharge != null) {
+                if (this.terminal == ''){
                 this.terminal = arrayItem.discharge.terminal
+                }
               }
 
               arrayItem.on_yard   = this.dWell(arrayItem.delivery.datetime_out,arrayItem.discharge.datetime_in)

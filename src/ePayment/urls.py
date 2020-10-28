@@ -32,6 +32,7 @@ urlpatterns = [
     path('booking/',include(('booking.urls','booking'), namespace='booking')),
     path('user_profile/', include('user_profile.urls',namespace='user_profile')),
     path('order/',include(('order.urls','order'), namespace='order')),
+    path('orderimport/',include(('orderimport.urls','orderimport'), namespace='orderimport')),
     # Sign-up pattern
     path('signup/', views.signup, name='signup'),
     path('auth/profile_setting/', views.profileSetting, name='profile_setting'),

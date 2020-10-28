@@ -62,6 +62,16 @@
                       </v-menu>
                     </v-col>
                     <v-spacer></v-spacer>
+
+                   
+
+                  </v-row>
+                  <v-row v-if="containers.length > 0">
+                      <v-checkbox v-model="isRent" 
+                      class="ml-2" 
+                      label="ต่อ Rent"
+                      color="success">
+                    </v-checkbox>
                   </v-row>
                 </template>
 
@@ -361,8 +371,10 @@
                 <input type="hidden" name="wht_rate" :value="tax.wht">
                 <input type="hidden" name="wht" :value="isWht">
                 <input type="hidden" name="containers" :value="selected_json">
+                <input type="hidden" name="paid_until" :value="date">
                 <input v-if ="selected_address" type="hidden" name="address" :value="selected_address.pk">
 
+            
               <div class="form-group">
                 <label for="exampleInputEmail1">Company Address</label>
                  <v-autocomplete
@@ -541,6 +553,7 @@
                 wht: wht_rate
               },
               isWht: false,
+              isRent: false,
             isSeperateBill : false,
             address_list: JSON.parse(address_items),
             selected_address : null, //JSON.parse(address_items)[0],
@@ -773,7 +786,9 @@
 
               // Added on Oct 20,2020 -- To update Terminal
               if (arrayItem.discharge != null) {
-                this.terminal = arrayItem.discharge.terminal
+                if (this.terminal == ''){
+                  this.terminal = arrayItem.discharge.terminal
+                }
               }
 
               arrayItem.on_yard   = this.dWell(arrayItem.delivery.datetime_out,arrayItem.discharge.datetime_in)

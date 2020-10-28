@@ -1,0 +1,524 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<script>
+  const bl ='{{ object.bl.name }}';
+  const terminal = '{{object.bl.terminal}}'
+  const order ='{{ object.name }}';
+  const ref1 = '{{object.ref}}';
+  const total = '{{object.grand_total}}';
+  const company = '{{object.address.company}}';
+  const tax = '{{object.address.tax}}';
+  const qr_url = '{{qr_url}}';
+  const slip_verify_url = '{{slip_verify_url}}';
+  const rent = '{{object.rent}}';
+</script>
+
+<div id="app">
+  <v-app>
+<div class="containeer">
+
+<div class="row wrapper">
+
+  <div class="col-sm-12 col-md-12">
+    <div class="row">
+    	
+      <div class="col-12 mb-2">
+        <div class="content">
+        	
+        	<div class="card">
+		        <div class="card-body">
+		          <h2>[[order]]
+
+
+
+                {% if order.paid %}
+                      {% if not order.payment_slip %}
+                        <a href="{% url 'order:payslip' order.id %}">
+                            <span class="badge badge-danger">Need pay slip</span>
+                        </a>
+                      {% else %}
+                        {% if order.execute_job %}
+                          
+                            <span class="badge badge-success">Order Completed</span>
+                          
+                        {% else %}
+                          {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          <a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
+                          {% else %}
+                            <span class="badge badge-warning">Waiting for Execution</span>
+                          {% endif %}
+                        {% endif %}
+                      {% endif %}
+
+                    {% else %}
+                      <span class="badge badge-secondary">UnPaid</span>
+                      <a href="{% url 'order:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
+                    {% endif %}
+
+                    <span v-if="rent" class="badge badge-primary">ต่อRent</span>
+              </h2>
+              <span>Created on : {{object.created}} ({{object.created|naturaltime}})</span>
+
+              
+
+              {% if object.paid %}
+                <div class="alert alert-info" role="alert">
+                  Payment Confirmed on : {{object.payment_date}} (BankRef : {{object.payment_ref}})
+                   Verified by {{object.payment_inspector|default_if_none:"AutoPayment"}}
+                   {% if object.payment_slip %}
+                      <a href="{% url 'order:payslip' object.id %}">See pay slip picture</a>
+                  {% endif %}
+                </div>
+
+                {% if not object.payment_slip %}
+                    <div class="alert alert-danger" role="alert">
+                      To continue in next process,Please upload Bank Payslip picture.
+                    <a href="{% url 'order:payslip' object.id %}">Upload Payslip</a>
+                  </div>
+                {% else %}
+                  {% if perms.order.verify_payment or perms.order.execute_job  %}
+                  <div class="row">
+                    <div class="col-md-4">
+                      <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
+                    </div>
+                    </div>
+                    
+                  {% endif %}
+                {% endif %}
+
+              {% else %}
+                <!-- Show QR Code -->
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
+                          <div id="qrcode" class="card ">
+                            <img class="card-img-top" 
+                            :src="[[qr]]" alt="Card image cap">
+                            <div class="card-body">
+                              <h5 class="card-title">[[bl]]</h5>
+                              <p class="card-text">
+                                <div>Terminal  : {{object.bl.terminal}}</div>
+                                <div>Ref1  : [[ref1]]</div>
+                                <div>Total : [[total]] Baht</div>
+                                <div>Paid Until : {{object.paid_until|date:"N d"}}</div>
+                                <div>Address : [[company]] [[tax]]</div>
+
+                                <v-chip v-if="rent"
+                                  class="ma-2"
+                                  color="primary"
+                                >
+                                ต่อRent
+                                </v-chip>
+
+                                <div><u>Details</u> :</div>
+                                {% for s in summary %}
+                                  {{s.cont_size}}"x{{s.count}} = {{s.total_ex_vat}}<br>
+                                {% endfor %}
+                                {% if not object.payment_slip %}
+                                
+                                  <a href="{% url 'order:payslip' object.id %}">
+                                    <button type="button" class="btn btn-success" >
+                                    Upload Pay Slip</button>
+                                  </a>
+                                
+                                {% endif %}
+                              </p>
+
+<!--                               <v-fab-transition>
+                                <v-btn
+                                  color="green"
+                                  dark
+                                  absolute
+                                  bottom
+                                  right
+                                  fab
+                                  v-on:click='capture()'
+                                >
+                                  <v-icon>fas fa-camera</v-icon>
+                                </v-btn>
+                              </v-fab-transition>
+ -->
+                            </div>
+                          </div>
+
+
+
+                        </div>
+
+                        {% if object.payment_slip %}
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
+                          <div class="card ">
+                            <img class="card-img-top" 
+                            src="{{object.payment_slip.url}}" alt="Card image cap">
+                            <div class="card-body">
+                              <h5 class="card-title">Update Pay Slip <a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
+                              <p class="card-text">      
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Payment Confirmation -->
+                        {% if perms.order.verify_payment %}
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-1">
+                          <div class="card ">
+                            <div class="card-body">
+                              <h5 class="card-title">Payment Confirmation</h5>
+                              <p class="card-text">
+                                {% if object.paid %}
+                                  <div>Paid</div>
+                                  <div>On : {{object.payment_date}} </div>
+                                {% else %}
+                                  Waiting for Payment confirmation
+                                    {% if user.is_staff %}
+                                     
+                                      <div class="alert alert-info" role="alert" v-if="paid">
+                                        Payment Confirmed on : [[notify.TransDate]][[notify.transDate]]
+                                        Amount : [[notify.Amount]][[notify.amount]]
+                                        QRid : [[notify.QRId]][[notify.qRId]]
+                                        Ref1 : [[notify.Ref1]][[notify.ref1]] 
+                                        BankRef : [[notify.BankRef]][[notify.bankRef]]<br>
+
+                                        
+                                        <a href="{% url 'order:payment-confirm' object.id %}">
+                                        <button type="button" class="btn btn-info" {% if not  perms.order.update_payment %}disabled{% endif %}>Update</button>
+                                        </a>
+                                        
+                                        </div>
+                                      </div>
+                                      <div class="alert alert-danger" role="alert" v-if="payment_status">
+                                        [[payment_status]]
+                                      </div>
+
+                                    <button type="button" class="btn btn-warning mb-2" v-on:click="check_payment_local()" :disabled="paid"  >Check on Local</button>
+                                    
+
+
+                                    <button type="button" class="btn btn-danger" v-on:click="check_payment()">VerifySlip</button>
+                                    {% endif %}
+                                {% endif %}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %} <!-- End permission -->
+                        <!-- End Payment confirmation -->
+
+                    </div>
+                
+              {% endif %}
+
+
+              <div class="containeer">
+                 <div class="col-12 mb-1">
+                  <div class="row justify-content-center">
+                    
+                    <div class="col-sm-6 col-md-6 col-lg-3 mb-1 ml-0 mr-0">
+                      <div class="card">
+                        <div class="card-body">
+                          <h5 class="card-title">Charge</h5>
+                          <h6 class="card-subtitle mb-1 text-muted">Total Charge</h6>
+                          <span class="charge">{{object.charge}}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-6 col-lg-3 mb-1 ml-0 mr-0">
+                      <div class="card">
+                        <div class="card-body">
+                          <h5 class="card-title">Tax Rate 
+                            <span class="badge badge-success">{{object.vat_rate}}%</span></h5>
+                          <h6 class="card-subtitle mb-1 text-muted">Tax rate</h6>
+                          <span class="charge">{{object.vat_total}}</span>
+                          
+                        </div>
+                      </div>
+                    </div>
+
+                  <div class="col-sm-6 col-md-6 col-lg-3 mb-1 ml-0 mr-0">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">WHT Rate
+                        <span class="badge badge-warning">{{object.wht_rate}}%</span></h5>
+                        <h6 class="card-subtitle mb-1 text-muted">WithHolding Tax rate</h6>
+                        <span class="charge">
+                        {% if object.wht %}
+                          {{object.wht_total}}
+                        {% else %}
+                          0
+                        {% endif %}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6 col-md-6 col-lg-3 mb-1 ml-0 mr-0">
+                    <div class="card bg-info">
+                      <div class="card-body">
+                        <h5 class="card-title">Grand Total {% if object.wht %}<span class="badge badge-warning">WTH</span>{% endif %} 
+                         
+                        </h5>
+                        <h6 class="card-subtitle mb-1 text-muted">Grand Total</h6>
+                        <span class="charge">{{object.grand_total}}</span>
+                        
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div> <!-- end row -->
+              </div> <!-- end col12-->
+              </div> <!-- end container -->
+
+
+              <div class="containeer">
+                <div class="col-12">
+                <div class="row">
+                  <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
+                    <h4>Bill of Ladding : {{object.bl}}</h4>
+                    <h4>Paid Until : {{object.paid_until|date:"N d"}}</h4>
+                    <h4>Address Detail</h4>
+                    <span>{{object.address}}</span><br>
+                    Address : {{object.address.address}}<br>
+                    Tax : {{object.address.tax}}<br>
+                    Branch :{{object.address.branch|default_if_none:""}}<br>
+                  </div>
+                </div><!--end tow-->
+
+                <div class="row">
+                  <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
+                    <!-- <div class="content"> -->
+                      <h4>Container List</h4>
+                      <div class="table-responsive-md">
+                      <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Container</th>
+                          <th scope="col">Size</th>
+                          <th scope="col">Lift-On</th>
+                          <th scope="col">Relocation</th>
+                          <th scope="col">Storage</th>
+                          <th scope="col">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for container in object.containers.all|dictsort:"container" %}
+                        <tr>
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{container.container}}</td>
+                          <td>{{container.cont_size}}</td>
+                          <td>{{container.lifton}}</td>
+                          <td>{{container.relocation}}</td>
+                          <td>{{container.storage}}</td>
+                          <td class="subtotal">{{container.total}}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div> <!-- table-responsive-md -->
+                    </div>
+                  </div>
+                </div><!-- end row -->
+                {% if perms.order.verify_payment or perms.order.execute_job  %}
+                  <a href="{% url 'order:execute' order.id %}"><button type="button" class="btn btn-info">Execute Job</button></a>
+                {% endif %}
+
+              </div>
+
+              
+
+
+
+		        </div>
+		      </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+	
+</div>
+</v-app>
+</div>
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+
+  .charge {
+    font-size: 40px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 500;
+    text-align:center
+  }
+
+  .subtotal {
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+    text-align:center
+  }
+
+/*
+  @media screen and (min-width: 576px) {
+      .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 768px) {
+    .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 992px) {
+
+  }
+
+
+@media screen and (min-width: 1200px) {
+
+}*/
+
+</style>
+{% endblock style %}
+
+
+{% block script %}
+  <script>
+
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    vuetify: new Vuetify(),
+    data: {
+      bl: bl,
+      order : order,
+      terminal : terminal,
+      ref1 : ref1,
+      total: total,
+      company:company,
+      tax:tax,
+      paid: false,
+      notify:[],
+      payment_status:'',
+      rent:(rent === 'True') ? true : false
+    },
+    computed: {
+      qr () {
+        // console.log(qr_url)
+        // return qr_url + 'qr?tax=&ref1=' +
+        //   this.ref1 + '&ref2=&amount=' + (Number(this.total)) +
+        //   '&terminal=' + this.terminal + '&qrid=' + this.bl
+        // Modify by Chutchai on Aug 13,2020
+        // To change QRid to bl+Ref1
+        var bookid = this.bl + this.ref1;
+        bookid = bookid.substring(bookid.length - 15);
+        console.log(bookid)
+        return qr_url + 'qr?tax=&ref1=' +
+          this.ref1 + '&ref2=&amount=' + (Number(this.total)) +
+          '&terminal=' + this.terminal + '&qrid=' + bookid
+      }
+    },
+    methods: {
+          check_payment_local: function() {
+              var currentDate = new Date();
+              this.loading = true;
+              this.paid = false;
+              this.payment_status = '';
+              // console.log('Hello from ' + name + '!');
+              axios
+              .get( slip_verify_url + 'verifyslip-local/?qrid=' + this.bl + '&ref1=' + this.ref1)//Only internal use.
+              .then(
+                  response => {
+                    // this.paid = true;
+                    this.loading = false;
+                    this.paid = (response.data.count > 0) ? true : false; 
+                    if (this.paid) {
+                      this.notify = response.data.results[0]
+                    }
+                    else {
+                      this.payment_status = 'Not found payment of bl:' + this.bl + ' Ref1: ' + this.ref1;
+                    }
+                    console.log(response.data.results[0])
+                  })
+              .catch(error =>{
+                    this.loading = false;
+                })
+              
+          },//End check_payment_local
+          check_payment: function() {
+              var currentDate = new Date();
+              this.loading = true;
+              this.paid = false;
+              this.payment_status = '';
+              // console.log('Hello from ' + name + '!');
+              // var qrid = 'D' + (this.terminal=='LCB1' ? 'LCB' : 'LCM') + this.bl
+              // Modify by Chutchai on Aug 13,2020
+              // To change QRid to bl + Ref1
+              var bookid = this.bl + this.ref1;
+              bookid = bookid.substring(bookid.length - 15);
+              console.log(bookid)
+              var qrid = 'D' + (this.terminal=='LCB1' ? 'LCB' : 'LCM') + bookid;
+
+              var billerid = this.terminal=='LCB1' ? '010553811088480' : '011554701016180'
+              // console.log(qrid,billerid)
+              // console.log(slip_verify_url + 'verifyslip/?QRid=' + qrid + '&billerid=' + billerid)
+              axios
+              .get( slip_verify_url + 'verifyslip/?QRid=' + qrid + '&billerid=' + billerid)//Only internal use.
+              .then(
+                  response => {
+                    // this.paid = true;
+                    this.loading = false;
+                    this.paid = (response.data.resultCode == '000') ? true : false; 
+                    // Added by Chutchai on Aug 13,2020
+                    // To verify ref1 data must be match. 
+                    if (this.paid) {
+                      if (response.data.ref1 != this.ref1){
+                        this.paid = false
+                        this.payment_status = 'Not found payment of bl:' + this.bl + ' Ref1: ' + this.ref1;
+                      }else{
+                        this.notify = response.data
+                      }
+                    }
+                    else {
+                      this.payment_status = 'Not found payment of bl:' + this.bl + ' Ref1: ' + this.ref1;
+                    }
+                    console.log(response.data)
+                  })
+              .catch(error =>{
+                    this.loading = false;
+                })
+              
+          },//End check_payment
+          // capture: function() {
+          //   html2canvas(document.querySelector("#qrcode")).then(canvas => {
+          //           document.body.appendChild(canvas)
+          //       });
+          //   console.log('Capture')
+          // }, //End capture
+      },
+  })
+  </script>
+{% endblock %}
