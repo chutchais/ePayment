@@ -17,13 +17,13 @@ class ContainerInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-	search_fields = ['name','qrid']
+	search_fields = ['name','booking__name','qrid']
 	list_filter = ['paid','execute_job']
-	list_display = ('name','ref','booking','container_count','charge','vat_rate','grand_total','paid',
+	list_display = ('name','ref','booking','container_count','charge','vat_rate','wht','grand_total','paid',
 					'seperate_bill','created','user')
 	# list_editable = ('color','move_performa')
 	# autocomplete_fields = ['parent']
-	readonly_fields = ('created','updated','user','vat_rate','wht_rate','wht')
+	readonly_fields = ('created','updated','user','vat_rate','wht_rate')
 # 'lower_stock','higher_stock',
 	save_as = True
 	save_as_continue = True
@@ -35,9 +35,10 @@ class OrderAdmin(admin.ModelAdmin):
 		('Basic Information',{'fields': ['name','ref','booking','qrid','status']}),
 		('Charge(s)',{'fields': ['charge',('vat_rate','wht_rate'),
 								('wht','grand_total'),'seperate_bill']}),
+		('WHT Slip',{'fields': ['wht_slip']}),
 		('Payment',{'fields': ['address','paid','payment_date','payment_ref','payment_inspector']}),
 		('Pay Slip',{'fields': ['payment_slip']}),
-		('Execute job',{'fields': ['execute_job','execute_date']}),
+		('Execute job',{'fields': ['execute_job','execute_date','execute_by']}),
 		('System Information',{'fields':[('user','created'),'updated']})
 	]
 	inlines =[ContainerInline]

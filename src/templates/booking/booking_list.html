@@ -4,17 +4,19 @@
 {% block content %}
 <div id="app">
 
+
+
+<div class="containeer">
   {% if not user.profile.approved %}
   <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <strong>This user is not approved yet</strong> Please waitting for LCB1 approval.
-    then you can Create new Booking and Order.
+    <strong>ท่านยังไม่ได้รับการอนุมัติในการใช้ระบบ</strong> กรุณายื่นเอกสารบัตรประชาชน และรูปภาพลายเซ็นต์ และรอการยืนยันจากเจ้าหน้าที่อีกครั้ง
+    
+    <a href="{% url 'profile_setting' %}">คลิ้กเพื่ออัพโหลดเอกสาร</a>
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
 {% endif %}
-
-<div class="containeer">
 
 <div class="row wrapper">
 

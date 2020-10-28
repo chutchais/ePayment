@@ -35,22 +35,30 @@
 
                 {% if order.paid %}
                       {% if not order.payment_slip %}
-                        <a href="{% url 'order:payslip' order.id %}">
-                            <span class="badge badge-danger">Need pay slip</span>
-                        </a>
+                          <a href="{% url 'order:payslip' order.id %}">
+                              <span class="badge badge-danger">Need pay slip</span>
+                          </a>
                       {% else %}
-                        {% if order.execute_job %}
-                          
-                            <span class="badge badge-success">Order Completed</span>
-                          
-                        {% else %}
-                          {% if perms.order.verify_payment or perms.order.execute_job  %}
-                          <a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
+                          {% if order.execute_job %}
+                            
+                              <span class="badge badge-success">Order Completed</span>
+                            
                           {% else %}
-                            <span class="badge badge-warning">Waiting for Execution</span>
+                            {% if perms.order.verify_payment or perms.order.execute_job  %}
+                            <a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
+                            {% else %}
+                                <!-- Added on Oct 28,2020 To support WHT -->
+                                  {% if order.wht and not order.wht_slip %}
+                                  <span class="badge badge-danger">Need WHT</span>
+                                {% else %}
+                                <!-- End WHT -->
+                                  <span class="badge badge-warning">Waiting for Execution</span>
+                                {% endif %}
+                            {% endif %}
                           {% endif %}
-                        {% endif %}
                       {% endif %}
+
+                      
 
                     {% else %}
                       <span class="badge badge-secondary">UnPaid</span>
@@ -68,25 +76,44 @@
                   Payment Confirmed on : {{object.payment_date}} (BankRef : {{object.payment_ref}})
                    Verified by {{object.payment_inspector|default_if_none:"AutoPayment"}}
                    {% if object.payment_slip %}
-                      <a href="{% url 'order:payslip' object.id %}">See pay slip picture</a>
+                      <a href="{% url 'order:payslip' object.id %}">[Pay slip picture]</a>
+                  {% endif %}
+
+                  {% if object.wht  and object.wht_slip %}
+                      <a href="{% url 'order:whtslip' object.id %}">[WHT slip picture]</a>
                   {% endif %}
                 </div>
 
                 {% if not object.payment_slip %}
-                    <div class="alert alert-danger" role="alert">
-                      To continue in next process,Please upload Bank Payslip picture.
+                  <div class="alert alert-danger" role="alert">
+                      *** Need Pay slip : ขั้นตอนการชำระยังไม่เสร็จสิ้น เพื่อดำเนินการต่อ กรุณาอัพโหลดเอกสารยืนยันการชำระเงิน(Payslip)
                     <a href="{% url 'order:payslip' object.id %}">Upload Payslip</a>
                   </div>
-                {% else %}
+                {% endif %}
+
+                {% if object.wht and not object.wht_slip %}
+                    <div class="alert alert-danger" role="alert">
+                      *** Need WHT: ขั้นตอนการชำระยังไม่เสร็จสิ้น เพื่อดำเนินการต่อ กรุณาอัพโหลดเอกสาร WHT
+                    <a href="{% url 'order:whtslip' object.id %}">Upload WHT</a>
+                  </div>
+                {% endif %}
+
                   {% if perms.order.verify_payment or perms.order.execute_job  %}
                   <div class="row">
-                    <div class="col-md-4">
-                      <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
-                    </div>
+                    {% if object.payment_slip %}
+                      <div class="col-md-4">
+                        <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
+                      </div>
+                    {% endif %}
+                    {% if object.wht_slip %}
+                      <div class="col-md-4">
+                        <img src="{{object.wht_slip.url}}" alt="payslip" class="img-thumbnail">
+                      </div>
+                    {% endif %}
+
                     </div>
                     
                   {% endif %}
-                {% endif %}
 
               {% else %}
                 <!-- Show QR Code -->
@@ -124,20 +151,6 @@
                                 {% endif %}
                               </p>
 
-<!--                               <v-fab-transition>
-                                <v-btn
-                                  color="green"
-                                  dark
-                                  absolute
-                                  bottom
-                                  right
-                                  fab
-                                  v-on:click='capture()'
-                                >
-                                  <v-icon>fas fa-camera</v-icon>
-                                </v-btn>
-                              </v-fab-transition>
- -->
                             </div>
                           </div>
 
@@ -158,6 +171,8 @@
                           </div>
                         </div>
                         {% endif %}
+
+
 
                         <!-- Payment Confirmation -->
                         {% if perms.order.verify_payment %}

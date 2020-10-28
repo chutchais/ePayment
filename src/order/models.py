@@ -69,6 +69,10 @@ class Order(models.Model):
                             blank=True,null=True,related_name = 'orders')
     qrid                = models.CharField(max_length=30,blank=True, null=True)
     seperate_bill       = models.BooleanField(default=False)#Added on Oct 8,2020
+    wht_slip            = models.ImageField(upload_to=image_file_name,blank=True, null=True)#Added on Oct 28,2020
+    execute_by          = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            on_delete=models.SET_NULL,
+                            blank=True,null=True,related_name = 'execute_orders')
 
     def __str__(self):  # __unicode__ for Python 2
         return self.name
