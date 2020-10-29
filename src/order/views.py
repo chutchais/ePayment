@@ -209,7 +209,9 @@ class OrderUpdatePaid(LoginRequiredMixin,UpdateView):
 
     def form_valid(self, form):
         form.instance.payment_inspector = self.request.user
-        form.instance.payment_date = datetime.now()
+        import datetime, pytz
+        tz = pytz.timezone('Asia/Bangkok')
+        form.instance.payment_date = datetime.datetime.now(tz=tz)#datetime.now()
         return super(OrderUpdatePaid, self).form_valid(form)
 
 class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
@@ -218,7 +220,11 @@ class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
     template_name_suffix = '_update_executejob_form'
 
     def form_valid(self, form):
-        form.instance.execute_date = datetime.now()
+        import datetime, pytz
+        tz = pytz.timezone('Asia/Bangkok')
+        form.instance.execute_date = datetime.datetime.now(tz=tz)#datetime.now()
+        # Added on Oct 29,2020 -- To save executor
+        form.instance.execute_by = self.request.user
         return super(OrderUpdateExecuteJob, self).form_valid(form)
 
 class OrderDeleteView(DeleteView):
