@@ -69,12 +69,12 @@
               </a>
               <div class="dropdown-menu dropdown-menu-left"  aria-labelledby="navbarDropdown">
                 {% if user.is_authenticated %}
-                  <a class="dropdown-item" href="{% url 'booking:list' %}">Create Booking</a>
+                  <a class="dropdown-item" href="{% url 'booking:list' %}">Booking</a>
                   <a class="dropdown-item" href="{% url 'order:list' %}">Order</a>
                   <a class="dropdown-item" href="{% url 'order:container-list' %}">Container</a>
                   <div class="dropdown-divider"></div>
                 {% endif %}
-                <a class="dropdown-item" href="{% url 'booking:report' %}">Report</a>
+                <a class="dropdown-item" href="{% url 'booking:report' %}">Search by Booking</a>
               </div>
             </li>
 
