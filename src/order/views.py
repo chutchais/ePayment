@@ -50,7 +50,11 @@ def post_container(request):
             # Create Order
             # ref = datetime.now().strftime("%H%M%S")
             # Modify on Oct 22,2020 -- To Change Ref1 to E%M%S format 
-            ref =   datetime.now().strftime("%M%S")
+            # ref =   datetime.now().strftime("%M%S")
+            # Modify on Oct 29,2020 -- To support Timezone
+            import datetime, pytz
+            tz = pytz.timezone('Asia/Bangkok')
+            ref =   datetime.datetime.now(tz=tz).strftime("%M%S")
             ref =   f'E{ref}'
 
             # Mofigy on Aug 17,2020
