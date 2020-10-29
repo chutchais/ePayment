@@ -48,8 +48,10 @@
                             <a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
                             {% else %}
                                 <!-- Added on Oct 28,2020 To support WHT -->
-                                  {% if order.wht and not order.wht_slip %}
-                                  <span class="badge badge-danger">Need WHT</span>
+                                {% if order.wht and not order.wht_slip %}
+                                  <a href="{% url 'order:whtslip' order.id %}">
+                                    <span class="badge badge-danger">Need WHT</span>
+                                  </a>
                                 {% else %}
                                 <!-- End WHT -->
                                   <span class="badge badge-warning">Waiting for Execution</span>
