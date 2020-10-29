@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
-{% load humanize %}
 
 {% block content %}
-
 <script>
-  const import_url = '{{import_bl_url}}';
-  const bl_input = '{{bl}}'
+   const tax_rate = {{tax.tax}};
+  const wht_rate = {{tax.wht}};
+  var people = '{{ items_json|safe }}';
+  const export_url = '{{export_booking_url}}';
+  var address_items = '{{addresses_items|safe}}';
+  const import_url = '{{import_url}}';
+  const bl_input = '{{ object.name }}'
 </script>
 
 <div id="app">
@@ -20,8 +23,17 @@
           <div class="content">
           	<div class="card">
   		        <div class="card-body">
-                <h4>Bill of Lading Report</h4>
-                <input type="text" class="form-control mb-2" v-model="bl_number" placeholder="BL number">
+                <h4>Bill of Ladding : [[bl_number]] <a href="{% url 'bl:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a></h4>
+                
+                <div>เลขที่ใบขน : {{object.declaration}}
+                  <v-chip
+                  class="ma-2"
+                  color="primary"
+                  >
+                  {{object.declaration_status|default_if_none:"ไม่ทราบสถานะ"}}
+                  </v-chip>
+
+                </div>
                 <button type="button" class="btn btn-success mb-2" v-on:click="get_data(bl_number)">Get Container</button>
                 
                 <div class="text-center">
@@ -58,6 +70,16 @@
                       </v-menu>
                     </v-col>
                     <v-spacer></v-spacer>
+
+                   
+
+                  </v-row>
+                  <v-row v-if="containers.length > 0">
+                      <v-checkbox v-model="isRent" 
+                      class="ml-2" 
+                      label="ต่อ Rent"
+                      color="success">
+                    </v-checkbox>
                   </v-row>
                 </template>
 
@@ -115,6 +137,7 @@
                     </template>
                     
                     <template v-slot:item.total="{ item }">
+
                           [[item.total.toLocaleString(undefined, {maximumFractionDigits:2})]]
                         
                    </template>
@@ -256,6 +279,75 @@
                md="3"
             >
               <v-card
+                  class="pa-2 ma-2"
+                  outlined
+                >
+                    <v-card-title>
+                      Total
+                    </v-card-title>
+                    <v-card-subtitle>
+                      Tariff Charge(s) - exclude VAT
+                    </v-card-subtitle>
+                    <v-card-text>
+                      <p class="display-1 text--primary">
+                        [[total_grand.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                      </p>
+                    </v-tacard-text>
+                </v-card>
+            </v-col>
+
+            <v-col
+                      cols="6"
+                       md="3"
+                    >
+                        <v-card
+                          class="pa-2 ma-2"
+                          outlined
+                        >
+                          <v-card-title>
+                              Vat
+                            </v-card-title>
+                            <v-card-subtitle>
+                              [[tax.tax]]%
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary">
+                                [[vat_text]]
+                              </p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+
+                    <v-col
+                      cols="6"
+                       md="3"
+                    >
+                      <v-card
+                          class="pa-2 ma-2"
+                          outlined
+                        >
+                            <v-card-title>
+                              WHT
+                            </v-card-title>
+                            <v-card-subtitle>
+                              [[tax.wht]]%
+                            </v-card-subtitle>
+                            <v-card-text>
+                              <p class="display-1 text--primary">
+                                [[wht_text]]
+                              </p>
+                            </v-tacard-text>
+                        </v-card>
+                    </v-col>
+
+            
+
+
+            <v-col
+              cols="6"
+               md="3"
+            >
+              <v-card
                   class="pa-2 ma-2 bg-info"
                   outlined
                 >
@@ -263,17 +355,98 @@
                       Grand Total
                     </v-card-title>
                     <v-card-subtitle>
-                      Not include Tax
+                      Final total
                     </v-card-subtitle>
                     <v-card-text>
                       <p class="display-1 text--primary font-weight-black">
-                        [[total_grand.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                        [[net_text]]
                       </p>
                     </v-card-text>
                 </v-card>
           </v-col>
+
           </v-row>
+
+          <!-- Start Form -->
+          <form action="" method="post">
+            <div class="col-sm-12 col-md-10">
+            {% csrf_token %}
+
+                <input type="hidden" name="bl" :value="bl_number">
+                <input type="hidden" name="charge" :value="total">
+                <input type="hidden" name="grand_total" :value="net">
+                <input type="hidden" name="vat_rate" :value="tax.tax">
+                <input type="hidden" name="wht_rate" :value="tax.wht">
+                <input type="hidden" name="wht" :value="isWht">
+                <input type="hidden" name="containers" :value="selected_json">
+                <input type="hidden" name="paid_until" :value="date">
+                <input v-if ="selected_address" type="hidden" name="address" :value="selected_address.pk">
+
+            
+              <div class="form-group">
+                <label for="exampleInputEmail1">Company Address</label>
+                 <v-autocomplete
+                  item-text="company"
+                  item-value="pk"
+                  :items="address_list"
+                  v-model ="selected_address"
+                  no-data-text="Not found address"
+                  return-object
+                >
+                  <template slot='item' slot-scope='data'>
+                    [[data.item.company]] - [[data.item.address]]
+                  </template>
+                </v-autocomplete>
+
+
+                <v-list-item 
+                  three-line 
+                  v-if="selected_address" 
+                  outlined
+                  color="light-blue lighten-4">
+                  <v-list-item-content>
+                    <v-list-item-title>Name</v-list-item-title>
+                    <v-list-item-subtitle>
+                      [[selected_address.company]]
+                    </v-list-item-subtitle>
+
+                    <v-list-item-title>Address</v-list-item-title>
+                    <v-list-item-subtitle>
+                      [[selected_address.address]]
+                    </v-list-item-subtitle>
+
+                    <v-list-item-title>Tax</v-list-item-title>
+                    <v-list-item-subtitle>
+                      [[selected_address.tax]]
+                    </v-list-item-subtitle>
+
+                  </v-list-item-content>
+                </v-list-item>
+                
+
+                <!-- <select class="form-control" id="address" name="address">
+                      {% for address in addresses %}
+                        <option value="{{address.pk}}">{{address.company}}</option>
+                      {% endfor %}
+                    </select>
+                <small id="emailHelp" class="form-text text-muted">This address will be printed on receipt</small> -->
+              </div>
+
+              <v-checkbox v-model="isWht" 
+                  class="ml-2" 
+                  label="Withholding Tax"
+                  color="success">
+              </v-checkbox>
+              <button type="submit" class="btn btn-primary" :disabled="net == 0 || selected_address == null">Continue Payment ([[net_text]] Baht)</button>
+            </div>
+
+            
+          </form>
+          <!-- End form -->
+
           </template>
+
+          
           
         </div> <!-- vif -->
         <!-- End Summary -->
@@ -293,6 +466,51 @@
         text-decoration: none;
         color: black;
       }
+
+  .charge {
+    font-size: 50px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 800;
+    text-align:center
+  }
+
+  .subtotal {
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+    text-align:center
+  }
+
+
+  @media screen and (min-width: 576px) {
+      .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 768px) {
+    .charge {
+      font-size: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 600;
+      text-align:center
+    }
+  }
+
+
+  @media screen and (min-width: 992px) {
+
+  }
+
+
+@media screen and (min-width: 1200px) {
+
+}
+
 </style>
 {% endblock style %}
 
@@ -311,6 +529,7 @@
             loading : false,
             containers :[],
             selected :[],
+            selected_json:'',
             search:'',
             delivery:'',
             total_lolo:0,
@@ -337,6 +556,15 @@
               menu: false,
               modal: false,
               menu2: false,
+              tax: {
+                tax: tax_rate,
+                wht: wht_rate
+              },
+              isWht: false,
+              isRent: false,
+            isSeperateBill : false,
+            address_list: JSON.parse(address_items),
+            selected_address : null, //JSON.parse(address_items)[0],
           },
           created: function () {
             // `this` points to the vm instance
@@ -347,13 +575,42 @@
               // Code that will run only after the
               // entire view has been rendered
               
-              if (this.bl_number != ''){
-                console.log('Pulling data of :' + this.bl_number)
-                this.get_data(this.bl_number)
-              }
+              // if (this.bl_number != ''){
+              //   console.log('Pulling data of :' + this.bl_number)
+              //   this.get_data(this.bl_number)
+              // }
             })
           },
     computed:{
+        total () {
+          return this.selected.reduce(function (sum, item) {
+            return sum + item.total
+          }, 0)
+        },
+        vat () {
+          // return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+          return (this.total * (this.tax.tax / 100))
+        },
+        vat_text () {
+          return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+        },
+        wht_text () {
+          return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+        },
+        wht () {
+          // return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+          return (this.total * (this.tax.wht / 100))
+        },
+        net () {
+          let wht = 0
+          if (this.isWht) {
+            wht = Number(this.wht)
+          }
+          return (Number(this.total) + Number(this.vat)) - wht
+        },
+        net_text(){
+          return this.net.toLocaleString(undefined, {maximumFractionDigits:2})
+        },
       
     },//end computed
     
@@ -538,7 +795,7 @@
               // Added on Oct 20,2020 -- To update Terminal
               if (arrayItem.discharge != null) {
                 if (this.terminal == ''){
-                this.terminal = arrayItem.discharge.terminal
+                  this.terminal = arrayItem.discharge.terminal
                 }
               }
 
@@ -549,6 +806,7 @@
               arrayItem.rate2     = this.rate2(arrayItem.discharge.size,arrayItem.on_yard);
               arrayItem.rate3     = this.rate3(arrayItem.discharge.size,arrayItem.on_yard);
               arrayItem.total     = Number(arrayItem.lolo)+Number(arrayItem.relo)+Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
+              // if Delivery , total = 0
               if (arrayItem.delivery.out_by != null) {
                 arrayItem.lolo = 0;
                 arrayItem.relo = 0;
@@ -580,7 +838,7 @@
         this.update_charge();
       },
       selected () {
-        //this.selected_json = JSON.stringify(this.selected)
+        this.selected_json = JSON.stringify(this.selected)
         this.update_charge();
       },
       bl_number (){
@@ -593,4 +851,3 @@
   })
   </script>
 {% endblock %}
-

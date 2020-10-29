@@ -6,7 +6,7 @@ from .models import Order,Container
 
 class ContainerInline(admin.TabularInline):
 	model = Container
-	fields = ('container','cont_size','is_oog','total')
+	fields = ('container','cont_size','lifton','relocation','storage','total')
 	readonly_fields = ('created','updated','user')
 	extra = 0 # how many rows to show
 
@@ -17,13 +17,13 @@ class ContainerInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-	search_fields = ['name','booking__name','qrid']
+	search_fields = ['name','qrid']
 	list_filter = ['paid','execute_job']
-	list_display = ('name','ref','booking','container_count','charge','vat_rate','wht','grand_total','paid',
-					'seperate_bill','created','user')
+	list_display = ('name','ref','bl','paid_until','charge','vat_rate','grand_total','paid','rent',
+					'created','user')
 	# list_editable = ('color','move_performa')
 	# autocomplete_fields = ['parent']
-	readonly_fields = ('created','updated','user','vat_rate','wht_rate')
+	readonly_fields = ('created','updated','user','vat_rate','wht_rate','wht')
 # 'lower_stock','higher_stock',
 	save_as = True
 	save_as_continue = True
@@ -32,13 +32,13 @@ class OrderAdmin(admin.ModelAdmin):
 	# filter_horizontal = ('childs',)
 
 	fieldsets = [
-		('Basic Information',{'fields': ['name','ref','booking','qrid','status']}),
-		('Charge(s)',{'fields': ['charge',('vat_rate','wht_rate'),
-								('wht','grand_total'),'seperate_bill']}),
-		('WHT Slip',{'fields': ['wht_slip']}),
+		('Basic Information',{'fields': ['name','ref','bl','qrid','status']}),
+		('Charge(s)',{'fields': ['paid_until',('vat_rate','wht_rate'),
+								'wht',('charge','grand_total'),'rent']}),
 		('Payment',{'fields': ['address','paid','payment_date','payment_ref','payment_inspector']}),
 		('Pay Slip',{'fields': ['payment_slip']}),
-		('Execute job',{'fields': ['execute_job','execute_date','execute_by']}),
+        ('Documents',{'fields': ['doc_approved']}),
+		('Execute job',{'fields': ['execute_job','execute_date']}),
 		('System Information',{'fields':[('user','created'),'updated']})
 	]
 	inlines =[ContainerInline]
@@ -49,12 +49,12 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(Container)
 class ContainerAdmin(admin.ModelAdmin):
 	search_fields = ['container','order__name']
-	list_filter = ['cont_size','is_oog']
-	list_display = ('container','order','cont_size','iso','is_oog','total',
+	list_filter = ['cont_size']
+	list_display = ('container','order','cont_size','iso','total',
 					'created','user')
 	# list_editable = ('color','move_performa')
 	# autocomplete_fields = ['parent']
-	readonly_fields = ('created','updated','user','tariff')
+	readonly_fields = ('created','updated','user')
 # 'lower_stock','higher_stock',
 	save_as = True
 	save_as_continue = True
@@ -63,7 +63,8 @@ class ContainerAdmin(admin.ModelAdmin):
 	# filter_horizontal = ('childs',)
 
 	fieldsets = [
-		('Basic Information',{'fields': ['container','order','cont_size','iso','is_oog']}),
-		('Charge(s)',{'fields': [('tariff','total')]}),
+		('Basic Information',{'fields': ['container','order','cont_size','iso']}),
+		('Charge(s)',{'fields': [('total')]}),
 		('System Information',{'fields':[('user','created'),'updated']})
 	]
+

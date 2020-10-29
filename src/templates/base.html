@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    {% block meta %}
+    {% endblock meta %}
+    
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
@@ -81,6 +84,8 @@
               </a>
               <div class="dropdown-menu dropdown-menu-left"  aria-labelledby="navbarDropdown">
                 {% if user.is_authenticated %}
+                <a class="dropdown-item" href="{% url 'bl:list' %}">Bill of Ladding(BL)</a>
+                <a class="dropdown-item" href="{% url 'orderimport:list' %}">Order</a>
                   <div class="dropdown-divider"></div>
                 {% endif %}
                 <a class="dropdown-item" href="{% url 'bl:report' %}">Search by BL</a>

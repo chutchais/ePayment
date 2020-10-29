@@ -4,19 +4,17 @@
 {% block content %}
 <div id="app">
 
-
-
-<div class="containeer">
   {% if not user.profile.approved %}
   <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <strong>ท่านยังไม่ได้รับการอนุมัติในการใช้ระบบ</strong> กรุณายื่นเอกสารบัตรประชาชน และรูปภาพลายเซ็นต์ และรอการยืนยันจากเจ้าหน้าที่อีกครั้ง
-    
-    <a href="{% url 'profile_setting' %}">คลิ้กเพื่ออัพโหลดเอกสาร</a>
+    <strong>This user is not approved yet</strong> Please waitting for LCB1 approval.
+    then you can Create new Bill of Ladding and Order.
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
 {% endif %}
+
+<div class="containeer">
 
 <div class="row wrapper">
 
@@ -28,10 +26,10 @@
         	
         	<div class="card">
 		        <div class="card-body">
-		          <h4>Booking List</h4>
+		          <h4>Bill of Ladding List</h4>
               
-              <a href="{% url 'booking:create' %}"><button type="button" class="btn btn-info"
-                {% if not user.profile.approved %}disabled{% endif%}>Create New Booking</button></a>
+              <a href="{% url 'bl:create' %}"><button type="button" class="btn btn-info"
+                {% if not user.profile.approved %}disabled{% endif%}>Create New BL</button></a>
               <br>
 		          รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทั้งหมด {{ page_obj.paginator.count }} รายการ <br>
      {% if is_paginated %}
@@ -59,7 +57,9 @@
 		          <table class="table table-striped">
 					  <thead>
 					    <tr>
-					      <th scope="col">Booking</th>
+                <th scope="col">Bill of Ladding</th>
+                <th scope="col">เลขที่ใบขน</th>
+                <th scope="col">สถานะใบขน</th>
                 <th scope="col">Terminal</th>
 					      <th scope="col">Created</th>
                 <th scope="col">User</th>
@@ -70,6 +70,8 @@
   		          {% for object in object_list %}
   					    <tr>
                   <td><a href="{{object.get_absolute_url}}">{{object.name}}</a></td>
+                  <td>{{object.declaration}}</td>
+                  <td>{{object.declaration_status|default_if_none:"ไม่ทราบสถานะ"}}</td>
                   <td>{{object.terminal|default_if_none:""}}</td>
   					      <td>{{object.created}}</td>
   					      <td>{{object.user}}</td>
@@ -84,19 +86,6 @@
         </div>
       </div>
 
-  <!--     <div class="col-12 mb-2" >
-        <div class="content">
-        	<div class="card">
-		        <div class="card-body">
-		          <h4>Success Booking</h4>
-		          <ul>
-		          	<li>#1</li>
-		          	<li>#2</li>
-		          </ul>
-		        </div>
-		      </div>
-        </div>
-      </div> -->
     </div>
 
   </div>

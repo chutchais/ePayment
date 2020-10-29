@@ -4,7 +4,9 @@
 
 {% if not user.profile.approved %}
   <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <strong>This user is not approved yet</strong> Please wait LCB1 approve this user.
+    <strong>ท่านยังไม่ได้รับการอนุมัติในการใช้ระบบ</strong> กรุณายื่นเอกสารบัตรประชาชน และรูปภาพลายเซ็นต์ และรอการยืนยันจากเจ้าหน้าที่อีกครั้ง
+    
+    
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -24,7 +26,7 @@
             <form method="post" enctype="multipart/form-data" novalidate>
               {% csrf_token %}
               {{ formavatar|crispy }}
-              <button type="submit" class="btn btn-primary" >Change Avatar</button>
+              <button type="submit" class="btn btn-primary" >Save Avatar</button>
             </form>
         </div> 
       </div><!-- End Avatar-->
@@ -42,7 +44,7 @@
             <form method="post" enctype="multipart/form-data" novalidate>
               {% csrf_token %}
               {{ formidcard|crispy }}
-              <button type="submit" class="btn btn-primary" {% if user.profile.approved %}disabled{% endif %}>Change ID Card</button>
+              <button type="submit" class="btn btn-primary" {% if user.profile.approved %}disabled{% endif %}>Save ID Card</button>
             </form>
         </div> 
       </div><!-- End ID Card-->
@@ -58,7 +60,7 @@
             <form method="post" enctype="multipart/form-data" novalidate>
               {% csrf_token %}
               {{ formsignature|crispy }}
-              <button type="submit" class="btn btn-primary" {% if user.profile.approved %}disabled{% endif %}>Change ID Card</button>
+              <button type="submit" class="btn btn-primary" {% if user.profile.approved %}disabled{% endif %}>Save ID Card</button>
             </form>
         </div> 
       </div><!-- End ID Card-->

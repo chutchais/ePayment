@@ -1,33 +1,16 @@
 from django.db              import models
-from django.conf 	        import settings
+from django.conf            import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.urls            import reverse
 import json
-
-from booking.models import Booking
-from user_profile.models import Address
+from user_profile.models    import Address
 # Create your models here.
-# class Booking(models.Model):
-#     name                = models.CharField(max_length=100,
-#                             validators=[
-#                                 RegexValidator(
-#                                     regex='^[\w-]+$',
-#                                     message='Name does not allow special charecters',
-#                                 ),
-#                             ])
-#     created             = models.DateTimeField(auto_now_add=True)
-#     updated             = models.DateTimeField(blank=True, null=True,auto_now=True)
-#     status              = models.BooleanField(default=True)
-#     user 			    = models.ForeignKey(settings.AUTH_USER_MODEL,
-#                             on_delete=models.SET_NULL,
-#                             blank=True,null=True)
 
-#     def __str__(self):  # __unicode__ for Python 2
-#         return self.name
+from bl.models import BillofLadding
 
 def image_file_name(instance, filename):
-    return 'images/order/%s/%s/%s' % (instance.booking,instance.ref, filename)
+    return 'images/bl/%s/%s/%s' % (instance.bl,instance.ref, filename)
 
 class Order(models.Model):
     name                = models.CharField(max_length=50,
@@ -37,15 +20,15 @@ class Order(models.Model):
                                     message='Name does not allow special charecters',
                                 ),
                             ])
-    ref                 = models.CharField(max_length=6) #keep time stamp  'hhmmss'
-    booking             = models.ForeignKey(Booking,
+    ref                 = models.CharField(max_length=6) #keep time stamp  I'mmss'
+    bl                  = models.ForeignKey(BillofLadding,
                             on_delete=models.CASCADE,
                             blank=True, null=True,
                             related_name = 'orders')
     address             = models.ForeignKey(Address,
                             on_delete=models.SET_NULL,
                             blank=True, null=True,
-                            related_name = 'orders')
+                            related_name = 'import_orders')
     container_count     = models.IntegerField(default=0)
     charge              = models.FloatField(default=0)
     vat_rate            = models.IntegerField(default=7)
@@ -58,7 +41,7 @@ class Order(models.Model):
     payment_slip        = models.ImageField(upload_to=image_file_name,blank=True, null=True)
     payment_inspector   = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.SET_NULL,
-                            blank=True,null=True,related_name = 'inspect_orders')
+                            blank=True,null=True,related_name = 'inport_orders')
     execute_job         = models.BooleanField(default=False)
     execute_date        = models.DateTimeField(blank=True, null=True)
     created             = models.DateTimeField(auto_now_add=True)
@@ -66,13 +49,13 @@ class Order(models.Model):
     status              = models.BooleanField(default=True)
     user 			    = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.CASCADE,
-                            blank=True,null=True,related_name = 'orders')
+                            blank=True,null=True,related_name = 'importorders')
     qrid                = models.CharField(max_length=30,blank=True, null=True)
-    seperate_bill       = models.BooleanField(default=False)#Added on Oct 8,2020
-    wht_slip            = models.ImageField(upload_to=image_file_name,blank=True, null=True)#Added on Oct 28,2020
-    execute_by          = models.ForeignKey(settings.AUTH_USER_MODEL,
-                            on_delete=models.SET_NULL,
-                            blank=True,null=True,related_name = 'execute_orders')
+    # New for
+    doc_approved        = models.BooleanField(default=False)#For Staff to verify and approve
+    paid_until          = models.DateTimeField(blank=True, null=True)
+    rent                = models.BooleanField(default=False) #if extend rent -->True
+    
 
     def __str__(self):  # __unicode__ for Python 2
         return self.name
@@ -81,15 +64,16 @@ class Order(models.Model):
         permissions = [
             ('verify_payment', 'Can verify payment'),
             ('update_payment', 'Can update payment'),
+            ('approve_documemt', 'Can approve document'),
             ('execute_job', 'Can execute job')
         ]
         indexes = [
-            models.Index(fields=['name'],name='idx_order_order_name'),
-            models.Index(fields=['qrid'],name='idx_order_qrid')
+            models.Index(fields=['name'],name='idx_bl_order_name'),
+            models.Index(fields=['qrid'],name='idx_bl_order_qrid')
         ]
 
     def get_absolute_url(self):
-        return reverse('order:detail', kwargs={'pk': self.pk})
+        return reverse('orderimport:detail', kwargs={'pk': self.pk})
 
     # @property
     # def slip_image_url(self):
@@ -123,31 +107,34 @@ class Container(models.Model):
                             related_name = 'containers')
     cont_size           = models.IntegerField(default=40)
     iso                 = models.CharField(max_length=10,default='22G1')
-    is_oog              = models.BooleanField(default=False)
-    tariff              = models.TextField(max_length=300,null=True,blank=True)
+    # is_oog              = models.BooleanField(default=False)
+    # tariff              = models.TextField(max_length=300,null=True,blank=True)
+    lifton              = models.FloatField(default=0)
+    relocation          = models.FloatField(default=0)
+    storage             = models.FloatField(default=0)
     total               = models.FloatField(default=0)
     created             = models.DateTimeField(auto_now_add=True)
     updated             = models.DateTimeField(blank=True, null=True,auto_now=True)
     status              = models.BooleanField(default=True)
     user 			    = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.CASCADE,
-                            blank=True,null=True)
+                            blank=True,null=True,related_name = 'importcontainers')
 
     def __str__(self):  # __unicode__ for Python 2
         return self.container
 
     def get_absolute_url(self):
-        return reverse('order:container-detail', kwargs={'pk': self.pk})
+        return reverse('orderimport:container-detail', kwargs={'pk': self.pk})
 
-    @property
-    def tariff_json(self):
-        import ast
-        # print(self.tariff)
-        if self.tariff :
-            return ast.literal_eval(self.tariff)
-        return {}
+    # @property
+    # def tariff_json(self):
+    #     import ast
+    #     # print(self.tariff)
+    #     if self.tariff :
+    #         return ast.literal_eval(self.tariff)
+    #     return {}
     
     class Meta:
         indexes = [
-            models.Index(fields=['container'],name='idx_order_container_container'),
+            models.Index(fields=['container'],name='idx_bl_container_container'),
         ]

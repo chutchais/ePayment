@@ -1,28 +1,10 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-
-{% block meta %}
-    <meta http-equiv="refresh" content="180">
-{% endblock meta %}
-
 {% block content %}
 <div id="app">
 
- 
-
 <div class="containeer">
-
-  {% if not user.profile.approved %}
-  <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <strong>ท่านยังไม่ได้รับการอนุมัติในการใช้ระบบ</strong> กรุณายื่นเอกสารบัตรประชาชน และรูปภาพลายเซ็นต์ และรอการยืนยันจากเจ้าหน้าที่อีกครั้ง
-    
-    <a href="{% url 'profile_setting' %}">คลิ้กเพื่ออัพโหลดเอกสาร</a>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-{% endif %}
 
 <div class="row wrapper">
 
@@ -34,12 +16,12 @@
         	
         	<div class="card">
 		        <div class="card-body">
-              <h4>Export Order List</h4>
+              <h4>Import Order List</h4>
 
               <div>
-              <a href="{% url 'booking:list' %}">
+              <a href="{% url 'bl:list' %}">
                 <button type="button" class="btn btn-primary"
-                {% if not user.profile.approved %}disabled{% endif%}>Booking List</button>
+                {% if not user.profile.approved %}disabled{% endif%}>Bill of Ladding List</button>
               </a>
               <a href="{% url 'profile_setting' %}">
                 <button type="button" class="btn btn-primary"
@@ -74,12 +56,14 @@
 					  <thead>
 					    <tr>
                 <th scope="col">Status</th>
-                <th scope="col">Booking</th>
+                <th scope="col">BL</th>
                 <!-- <th scope="col">Order</th> -->
 					      <!-- <th scope="col">booking</th>
                 <th scope="col">Ref</th> -->
                 <th class="text-center" scope="col">#Container</th>
                 <th class="text-right" scope="col">Total Charge</th>
+                <th class="text-right" scope="col">Rent</th>
+                <th class="text-right" scope="col">Paid Until</th>
                 
                 <th class="text-center" scope="col">Created</th>
 
@@ -112,14 +96,7 @@
                           {% if perms.order.verify_payment or perms.order.execute_job  %}
                           <a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
                           {% else %}
-                                <!-- Added on Oct 28,2020 To support WHT -->
-                                {% if order.wht and not order.wht_slip %}
-                                <span class="badge badge-danger">Need WHT</span>
-                              {% else %}
-                              <!-- End WHT -->
-                                <span class="badge badge-warning">Waiting for Execution</span>
-                              {% endif %}
-                            
+                            <span class="badge badge-warning">Waiting for Execution</span>
                           {% endif %}
                         {% endif %}
                       {% endif %}
@@ -128,10 +105,18 @@
                       <span class="badge badge-secondary">UnPaid</span>
                     {% endif %}
                   </td>
-                <td><a href="{{order.get_absolute_url}}">{{order.booking.name}}</a></td>
+                <td><a href="{{order.get_absolute_url}}">{{order.bl.name}}</a></td>
                 <td class="text-center">{{order.container_count}}</td>
                  <td class="text-right">{{order.grand_total|floatformat:2|intcomma}}</td>
-					      <td class="text-right">{{order.created}}</td>
+                 <td class="text-right">
+                    {% if order.rent %}
+                        <span style="font-size: 1em; color:green;">
+                            <i class="fas fa-check-square"></i>
+                        </span>
+                    {% endif %}
+                    </td>
+                 <td class="text-right">{{order.paid_until|date:"N d"}}</td>
+                 <td class="text-right">{{order.created}}</td>
 
                 {% if perms.order.verify_payment or perms.order.execute_job  %}
                     <td>{{order.user}}</td>

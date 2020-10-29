@@ -6,7 +6,8 @@ from .views import (OrderListView,OrderDetailView,
                     OrderUpdateSlip,OrderDeleteView,
                     OrderCreateView,get_booking_info,post_container,OrderUpdatePaid,
                     OrderUpdateExecuteJob,
-                    ContainerListView,ContainerDetailView)
+                    ContainerListView,ContainerDetailView,
+                    OrderUpdateWHT)
 
 from .api.views import update_payment
 
@@ -24,6 +25,7 @@ urlpatterns = [
     path('qr', billing_qr_image, name='qr'),
     path('<pk>',OrderDetailView.as_view(),name='detail'),
     path('<pk>/payslip/',OrderUpdateSlip.as_view(),name='payslip'),
+    path('<pk>/whtslip/',OrderUpdateWHT.as_view(),name='whtslip'),
     path('<pk>/paid/',OrderUpdatePaid.as_view(),name='payment-confirm'),
     path('<pk>/execute/',OrderUpdateExecuteJob.as_view(),name='execute'),
     path('<pk>/delete/',OrderDeleteView.as_view(),name='delete'),

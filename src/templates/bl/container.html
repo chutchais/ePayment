@@ -101,7 +101,13 @@
                                 </div>
                                 <div v-if="container.discharge.datetime_in">
                                   @[[container.discharge.datetime_in]] <br>
-                                    [[container.discharge.terminal]] : 
+                                    <v-chip
+                                    class="ma-2"
+                                    :color="terminal_color(container.discharge.terminal)"
+                                    >
+                                    [[container.discharge.terminal]]
+                                    </v-chip>
+                                    :
                                     [[container.discharge.vessel_name]]
                                     ([[container.discharge.voy_in]])
                                   </div>
@@ -372,6 +378,10 @@
 
     },//end computed
     methods: {
+      terminal_color(terminal) {
+            let color = terminal=='LCB1' ? 'primary':'red';
+            return color;
+      },
       bl_link(url,bl) {
             let link = url + '/' + bl;
             return link;
@@ -564,6 +574,10 @@
               this.total_relo=this.container.relo;
               this.total_storage= this.container.rate1+this.container.rate2+this.container.rate3;
               this.total_grand=this.container.total;
+              if (this.container.delivery.out_by != null) {
+                this.total_grand=0
+                this.container.total=0
+              }
         //   }.bind(this));//forEach
         },//End update_delivery
         update_charge:function(){
@@ -578,6 +592,10 @@
               this.total_relo=this.container.relo;
               this.total_storage= this.container.rate1+this.container.rate2+this.container.rate3;
               this.total_grand=this.container.total;
+              if (this.container.delivery.out_by != null) {
+                this.total_grand=0
+                this.container.total=0
+              }
         //   }.bind(this));//forEach
         },//End update_charge
       },//End Method

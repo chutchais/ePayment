@@ -196,6 +196,12 @@ class OrderUpdateSlip(LoginRequiredMixin,UpdateView):
     fields = ['payment_slip']
     template_name_suffix = '_update_payslip_form'
 
+# Added on Oct 28,2020 -- To support WHT slip upload
+class OrderUpdateWHT(LoginRequiredMixin,UpdateView):
+    model = Order
+    fields = ['wht_slip']
+    template_name_suffix = '_update_whtslip_form'
+
 class OrderUpdatePaid(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['paid','payment_ref']
