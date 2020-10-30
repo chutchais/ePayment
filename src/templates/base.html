@@ -84,8 +84,8 @@
               </a>
               <div class="dropdown-menu dropdown-menu-left"  aria-labelledby="navbarDropdown">
                 {% if user.is_authenticated %}
-                <a class="dropdown-item" href="{% url 'bl:list' %}">Bill of Ladding(BL)</a>
-                <a class="dropdown-item" href="{% url 'orderimport:list' %}">Order</a>
+                <!-- <a class="dropdown-item" href="{% url 'bl:list' %}">Bill of Ladding(BL)</a>
+                <a class="dropdown-item" href="{% url 'orderimport:list' %}">Order</a> -->
                   <div class="dropdown-divider"></div>
                 {% endif %}
                 <a class="dropdown-item" href="{% url 'bl:report' %}">Search by BL</a>
