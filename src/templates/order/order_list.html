@@ -90,6 +90,7 @@
                 {% if perms.order.verify_payment or perms.order.execute_job %}
                   <th scope="col">User</th>
                   <th scope="col">Terminal</th>
+                  <th scope="col">Execute by</th>
                 {% endif %}
 					      
 					    </tr>
@@ -151,6 +152,7 @@
                 {% if perms.order.verify_payment or perms.order.execute_job  %}
                     <td>{{order.user}}</td>
                     <td>{{order.booking.terminal}}</td>
+                    <td>{{order.execute_by|default_if_none:""}}</td>
                 {% endif %}
 					      
 					    </tr>
