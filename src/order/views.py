@@ -77,16 +77,20 @@ def post_container(request):
                         wht=wht,user=user,seperate_bill=seperate_bill)
                 order.save()
                 # save containers
+                container_count =0
                 for container in containers:
                     # print(container['container'])
-                    c = Container(order=order,container=container['container'],
-                        cont_size=container['size'],
-                        iso=container['iso'],
-                        is_oog=True if container['iso']=='yes' else False,
-                        tariff=container['tariff'],
-                        total =container['tariff_sum_total'],
-                        user=user)
-                    c.save()
+                    # Added on Oct 30,2020 -- To skip if total=0
+                    if container['tariff_sum_total'] > 0:
+                        c = Container(order=order,container=container['container'],
+                            cont_size=container['size'],
+                            iso=container['iso'],
+                            is_oog=True if container['iso']=='yes' else False,
+                            tariff=container['tariff'],
+                            total =container['tariff_sum_total'],
+                            user=user)
+                        c.save()
+                        container_count = container_count+1
 
                 # Update Booking Terminal
                 # Added on July 22,2020 by Chutchai
@@ -98,6 +102,8 @@ def post_container(request):
                 # Added on Aug 17,2020 -- to update QRid to Order
                 terminal_prefix = 'LCB' if terminal=='LCB1' else 'LCM'
                 order.qrid = f'D{terminal_prefix}{order_name}'
+                # Added on Oct 30,2020 -- To refresh Container count
+                order.container_count =  container_count
                 order.save()
 
             # redirect to a new URL:
