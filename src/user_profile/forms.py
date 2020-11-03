@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Profile,Address
 
-
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
@@ -43,3 +42,8 @@ class ContactForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['lineid','phone']
+    
+    def get_form_kwargs(self):
+        kwargs = super(ContactForm, self).get_form_kwargs()
+        kwargs['initial'] = {'lineid':'tuk','phone':'0999999'}  # your initial data here
+        return kwargs
