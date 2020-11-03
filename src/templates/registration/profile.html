@@ -72,7 +72,7 @@
     <div class="col-sm-6 col-md-4">
       <div class="card">
         <div class="card-body">
-           
+           Line : {{profile.lineid}} , Telepone : {{profile.phone}} 
             <form method="post" enctype="multipart/form-data" novalidate>
               {% csrf_token %}
               {{ formcontact|crispy }}

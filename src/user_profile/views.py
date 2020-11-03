@@ -33,6 +33,8 @@ def profileSetting(request):
 			if 'signature' in request.FILES :
 				profile.signature = request.FILES['signature']
 			profile.save()
+		# Added on Nov 2,2020 -- To save LindId and Telephone number
+		
 			return redirect('profile_setting')
 	else:
 		# form            = ProfileSettingForm()
