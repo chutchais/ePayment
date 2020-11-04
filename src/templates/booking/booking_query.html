@@ -481,7 +481,7 @@
       },
       vat () {
         // return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
-        return (this.total * (this.tax.tax / 100))
+        return (this.total * (this.tax.tax / 100)).toFixed(2)
       },
       vat_text () {
         return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
@@ -491,7 +491,7 @@
       },
       wht () {
         // return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
-        return (this.total * (this.tax.wht / 100))
+        return (this.total * (this.tax.wht / 100)).toFixed(2)
       },
       net () {
         let wht = 0
@@ -501,7 +501,7 @@
         // console.log(Number(this.total))
         // console.log(Number(this.vat))
         // console.log(wht)
-        return (Number(this.total) + Number(this.vat)) - wht
+        return ((Number(this.total) + Number(this.vat)) - wht).toFixed(2)
       },
       net_text(){
         return this.net.toLocaleString(undefined, {maximumFractionDigits:2})

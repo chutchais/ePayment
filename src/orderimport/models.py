@@ -55,7 +55,13 @@ class Order(models.Model):
     doc_approved        = models.BooleanField(default=False)#For Staff to verify and approve
     paid_until          = models.DateTimeField(blank=True, null=True)
     rent                = models.BooleanField(default=False) #if extend rent -->True
-    
+    # Added on Nov 4,2020
+    wht_slip            = models.ImageField(upload_to=image_file_name,blank=True, null=True)#Added on Oct 28,2020
+    execute_by          = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            on_delete=models.SET_NULL,
+                            blank=True,null=True,
+                            related_name = 'execute_importorders')
+    seperate_bill       = models.BooleanField(default=False)
 
     def __str__(self):  # __unicode__ for Python 2
         return self.name

@@ -35,10 +35,11 @@ class OrderAdmin(admin.ModelAdmin):
 		('Basic Information',{'fields': ['name','ref','bl','qrid','status']}),
 		('Charge(s)',{'fields': ['paid_until',('vat_rate','wht_rate'),
 								'wht',('charge','grand_total'),'rent']}),
+		('WHT Slip',{'fields': ['wht_slip']}),
 		('Payment',{'fields': ['address','paid','payment_date','payment_ref','payment_inspector']}),
 		('Pay Slip',{'fields': ['payment_slip']}),
         ('Documents',{'fields': ['doc_approved']}),
-		('Execute job',{'fields': ['execute_job','execute_date']}),
+		('Execute job',{'fields': ['execute_job','execute_date','execute_by']}),
 		('System Information',{'fields':[('user','created'),'updated']})
 	]
 	inlines =[ContainerInline]
