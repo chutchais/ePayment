@@ -60,7 +60,7 @@
             <form method="post" enctype="multipart/form-data" novalidate>
               {% csrf_token %}
               {{ formsignature|crispy }}
-              <button type="submit" class="btn btn-primary" {% if user.profile.approved %}disabled{% endif %}>Save ID Card</button>
+              <button type="submit" class="btn btn-primary" {% if user.profile.approved %}disabled{% endif %}>Save ID Signature</button>
             </form>
         </div> 
       </div><!-- End ID Card-->
@@ -73,11 +73,18 @@
       <div class="card">
         <div class="card-body">
            
-            <form method="post" enctype="multipart/form-data" novalidate>
+            
+           <div class="alert alert-primary" role="alert">
+            Line : {{profile.lineid|default_if_none:'ยังไม่ระบุ'}} <br>
+            Telepone : {{profile.phone|default_if_none:'ยังไม่ระบุ'}} 
+          </div>
+
+           <form method="post" enctype="multipart/form-data" novalidate>
               {% csrf_token %}
               {{ formcontact|crispy }}
               <button type="submit" class="btn btn-primary">Change Contact</button>
             </form>
+
         </div> 
       </div><!-- End ID Card-->
   </div>

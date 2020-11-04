@@ -24,7 +24,6 @@ def profileSetting(request):
 	if request.method == 'POST':
 		formavatar = ProfileSettingForm(request.POST, request.FILES)
 		if formavatar.is_valid():
-			print(formavatar)
 			profile = Profile.objects.get(user=request.user)
 			if 'avartar' in request.FILES :
 				profile.avartar = request.FILES['avartar']
@@ -32,7 +31,18 @@ def profileSetting(request):
 				profile.idcard = request.FILES['idcard']
 			if 'signature' in request.FILES :
 				profile.signature = request.FILES['signature']
+			
+			if 'lineid' in request.POST :
+				if request.POST['lineid']:
+					profile.lineid = request.POST['lineid']
+			
+			if 'phone' in request.POST :
+				if request.POST['phone']:
+					profile.phone = request.POST['phone']
+			
 			profile.save()
+		# Added on Nov 2,2020 -- To save LindId and Telephone number
+		
 			return redirect('profile_setting')
 	else:
 		# form            = ProfileSettingForm()
@@ -40,13 +50,13 @@ def profileSetting(request):
 		formidcard      = ProfileIDcardForm()
 		formsignature   = ProfileSigForm()
 		formaddress     = AddressForm()
-		formcontact		= ContactForm()
+		formContact		= ContactForm()
 		profile = Profile.objects.get(user=request.user)
 	return render(request, 'registration/profile.html', {'formavatar':fromAvatar,
 													'formidcard':formidcard,
 													'formsignature':formsignature,
 													'formaddress':formaddress,
-													'formcontact':formcontact,
+													'formcontact':formContact,
 													'profile': profile})
 
 def signup(request):
