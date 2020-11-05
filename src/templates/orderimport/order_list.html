@@ -57,6 +57,7 @@
 					    <tr>
                 <th scope="col">Status</th>
                 <th scope="col">BL</th>
+                <th scope="col">Ref</th>
                 <!-- <th scope="col">Order</th> -->
 					      <!-- <th scope="col">booking</th>
                 <th scope="col">Ref</th> -->
@@ -84,7 +85,7 @@
                 <td>
                     {% if order.paid %}
                       {% if not order.payment_slip %}
-                        <a href="{% url 'order:payslip' order.id %}">
+                        <a href="{% url 'orderimport:payslip' order.id %}">
                             <span class="badge badge-danger">Need pay slip</span>
                         </a>
                       {% else %}
@@ -94,7 +95,7 @@
                           
                         {% else %}
                           {% if perms.order.verify_payment or perms.order.execute_job  %}
-                          <a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
+                          <a href="{% url 'orderimport:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
                           {% else %}
                             <span class="badge badge-warning">Waiting for Execution</span>
                           {% endif %}
@@ -106,6 +107,7 @@
                     {% endif %}
                   </td>
                 <td><a href="{{order.get_absolute_url}}">{{order.bl.name}}</a></td>
+                <td class="text-center">{{order.ref}}</td>
                 <td class="text-center">{{order.container_count}}</td>
                  <td class="text-right">{{order.grand_total|floatformat:2|intcomma}}</td>
                  <td class="text-right">
@@ -115,12 +117,12 @@
                         </span>
                     {% endif %}
                     </td>
-                 <td class="text-right">{{order.paid_until|date:"N d"}}</td>
+                 <td class="text-right"><span class="badge badge-warning">{{order.paid_until|date:"N d"}}</span></td>
                  <td class="text-right">{{order.created}}</td>
 
                 {% if perms.order.verify_payment or perms.order.execute_job  %}
                     <td>{{order.user}}</td>
-                    <td>{{order.booking.terminal}}</td>
+                    <td>{{order.bl.terminal}}</td>
                 {% endif %}
 					      
 					    </tr>

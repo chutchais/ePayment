@@ -54,7 +54,7 @@ def post_container(request):
             # Modify on Oct 29,2020 -- To support Timezone
             import datetime, pytz
             tz = pytz.timezone('Asia/Bangkok')
-            ref =   datetime.datetime.now(tz=tz).strftime("%M%S")
+            ref =   datetime.datetime.now(tz=tz).strftime("%H%M")
             ref =   f'E{ref}'
 
             # Mofigy on Aug 17,2020
@@ -156,14 +156,18 @@ class OrderListView(LoginRequiredMixin,ListView):
         # over_stock = self.request.GET.get('over')
         print('Verify payment :',self.request.user.has_perm('order.verify_payment'))
         if query :
-            return Order.objects.filter(Q(name__icontains=query) |
-                                    Q(booking__name__icontains=query) ,
-                                    user__username=self.request.user ).select_related('booking').order_by('-updated')
+            if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
+                return Order.objects.filter(Q(name__icontains=query) |
+                                        Q(booking__name__icontains=query)).select_related('booking').order_by('-updated')
+            else:
+                return Order.objects.filter(Q(name__icontains=query) |
+                                        Q(booking__name__icontains=query) ,
+                                        user__username=self.request.user ).select_related('booking').order_by('-updated')
 
         if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
-            return Order.objects.all().select_related('booking').order_by('-updated')
+            return Order.objects.all().select_related('booking').order_by('-updated')[:200]
 
-        return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')
+        return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:200]
     
     def get_context_data(self,**kwargs):
         context = super(OrderListView,self).get_context_data(**kwargs)

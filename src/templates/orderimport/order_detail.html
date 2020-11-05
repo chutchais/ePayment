@@ -35,7 +35,7 @@
 
                 {% if order.paid %}
                       {% if not order.payment_slip %}
-                        <a href="{% url 'order:payslip' order.id %}">
+                        <a href="{% url 'orderimport:payslip' order.id %}">
                             <span class="badge badge-danger">Need pay slip</span>
                         </a>
                       {% else %}
@@ -45,7 +45,7 @@
                           
                         {% else %}
                           {% if perms.order.verify_payment or perms.order.execute_job  %}
-                          <a href="{% url 'order:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
+                          <a href="{% url 'orderimport:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
                           {% else %}
                             <span class="badge badge-warning">Waiting for Execution</span>
                           {% endif %}
@@ -81,7 +81,7 @@
                   {% if perms.order.verify_payment or perms.order.execute_job  %}
                   <div class="row">
                     <div class="col-md-4">
-                      <img src="{{objectimport.payment_slip.url}}" alt="payslip" class="img-thumbnail">
+                      <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
                     </div>
                     </div>
                     
@@ -101,7 +101,7 @@
                                 <div>Terminal  : {{object.bl.terminal}}</div>
                                 <div>Ref1  : [[ref1]]</div>
                                 <div>Total : [[total]] Baht</div>
-                                <div>Paid Until : {{object.paid_until|date:"N d"}}</div>
+                                <div>Paid Until :  <span class="badge badge-warning">{{object.paid_until|date:"N d"}}</span></div>
                                 <div>Address : [[company]] [[tax]]</div>
 
                                 <v-chip v-if="rent"
@@ -278,7 +278,7 @@
                 <div class="row">
                   <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
                     <h4>Bill of Ladding : {{object.bl}}</h4>
-                    <h4>Paid Until : {{object.paid_until|date:"N d"}}</h4>
+                    <h4>Paid Until : <span class="badge badge-warning">{{object.paid_until|date:"N d"}}</span></h4>
                     <h4>Address Detail</h4>
                     <span>{{object.address}}</span><br>
                     Address : {{object.address.address}}<br>
@@ -323,7 +323,7 @@
                   </div>
                 </div><!-- end row -->
                 {% if perms.order.verify_payment or perms.order.execute_job  %}
-                  <a href="{% url 'order:execute' order.id %}"><button type="button" class="btn btn-info">Execute Job</button></a>
+                  <a href="{% url 'orderimport:execute' order.id %}"><button type="button" class="btn btn-info">Execute Job</button></a>
                 {% endif %}
 
               </div>

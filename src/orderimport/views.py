@@ -96,8 +96,8 @@ def post_container(request):
             # Modify on Oct 29,2020 -- To support Timezone
             import datetime, pytz
             tz = pytz.timezone('Asia/Bangkok')
-            ref =   datetime.datetime.now(tz=tz).strftime("%M%S")
-            ref =   f'E{ref}'
+            ref =   datetime.datetime.now(tz=tz).strftime("%H%M")
+            ref =   f'I{ref}'
 
             # Mofigy on Aug 17,2020
             # To limit Order name to be 15 digits (last 15 digits) , without DLCB or DLCM
@@ -175,3 +175,17 @@ class OrderUpdateWHT(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['wht_slip']
     template_name_suffix = '_update_whtslip_form'
+
+
+class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
+    model = Order
+    fields = ['execute_job']
+    template_name_suffix = '_update_executejob_form'
+
+    def form_valid(self, form):
+        import datetime, pytz
+        tz = pytz.timezone('Asia/Bangkok')
+        form.instance.execute_date = datetime.datetime.now(tz=tz)#datetime.now()
+        # Added on Oct 29,2020 -- To save executor
+        form.instance.execute_by = self.request.user
+        return super(OrderUpdateExecuteJob, self).form_valid(form)
