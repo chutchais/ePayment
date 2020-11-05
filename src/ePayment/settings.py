@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'order',
     'bl',
     'orderimport',
+    'import_export'
 
 ]
 
