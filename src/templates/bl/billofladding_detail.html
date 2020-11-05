@@ -368,7 +368,7 @@
           </v-row>
 
           <!-- Start Form -->
-          <form action="" method="post">
+          <form action="{% url 'orderimport:post_order' %}" method="post">
             <div class="col-sm-12 col-md-10">
             {% csrf_token %}
 
@@ -378,8 +378,10 @@
                 <input type="hidden" name="vat_rate" :value="tax.tax">
                 <input type="hidden" name="wht_rate" :value="tax.wht">
                 <input type="hidden" name="wht" :value="isWht">
+                <input type="hidden" name="rent" :value="isRent">
                 <input type="hidden" name="containers" :value="selected_json">
                 <input type="hidden" name="paid_until" :value="date">
+                <input type="hidden" name="seperatebill" :value="isSeperateBill">
                 <input v-if ="selected_address" type="hidden" name="address" :value="selected_address.pk">
 
             
@@ -394,7 +396,7 @@
                   return-object
                 >
                   <template slot='item' slot-scope='data'>
-                    [[data.item.company]] - [[data.item.address]]
+                    [[data.item.company]]
                   </template>
                 </v-autocomplete>
 
@@ -437,6 +439,13 @@
                   label="Withholding Tax"
                   color="success">
               </v-checkbox>
+
+              <v-checkbox v-model="isSeperateBill" 
+                          class="ml-2" 
+                          label="แยกใบเสร็จ"
+                          color="success">
+                      </v-checkbox>
+
               <button type="submit" class="btn btn-primary" :disabled="net == 0 || selected_address == null">Continue Payment ([[net_text]] Baht)</button>
             </div>
 
@@ -589,7 +598,7 @@
         },
         vat () {
           // return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
-          return (this.total * (this.tax.tax / 100))
+          return (this.total * (this.tax.tax / 100)).toFixed(2)
         },
         vat_text () {
           return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
@@ -599,14 +608,14 @@
         },
         wht () {
           // return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
-          return (this.total * (this.tax.wht / 100))
+          return (this.total * (this.tax.wht / 100)).toFixed(2)
         },
         net () {
           let wht = 0
           if (this.isWht) {
             wht = Number(this.wht)
           }
-          return (Number(this.total) + Number(this.vat)) - wht
+          return ((Number(this.total) + Number(this.vat)) - wht).toFixed(2)
         },
         net_text(){
           return this.net.toLocaleString(undefined, {maximumFractionDigits:2})
@@ -828,13 +837,14 @@
               this.total_lolo=this.total_lolo + arrayItem.lolo;
               this.total_relo=this.total_relo + arrayItem.relo;
               this.total_storage= this.total_storage + (arrayItem.rate1+arrayItem.rate2+arrayItem.rate3);
-              this.total_grand=this.total_grand + arrayItem.total;
+              this.total_grand=(this.total_grand + arrayItem.total).toFixed(2);
           }.bind(this));//forEach
         },//End update_charge
       },//End Method
     watch: {
       date () {
         this.update_delivery(this.date);
+        this.selected_json = JSON.stringify(this.selected)
         this.update_charge();
       },
       selected () {

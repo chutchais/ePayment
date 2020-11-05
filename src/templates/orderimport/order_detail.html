@@ -54,7 +54,7 @@
 
                     {% else %}
                       <span class="badge badge-secondary">UnPaid</span>
-                      <a href="{% url 'order:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
+                      <a href="{% url 'orderimport:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
                     {% endif %}
 
                     <span v-if="rent" class="badge badge-primary">ต่อRent</span>
@@ -68,20 +68,20 @@
                   Payment Confirmed on : {{object.payment_date}} (BankRef : {{object.payment_ref}})
                    Verified by {{object.payment_inspector|default_if_none:"AutoPayment"}}
                    {% if object.payment_slip %}
-                      <a href="{% url 'order:payslip' object.id %}">See pay slip picture</a>
+                      <a href="{% url 'orderimport:payslip' object.id %}">See pay slip picture</a>
                   {% endif %}
                 </div>
 
                 {% if not object.payment_slip %}
                     <div class="alert alert-danger" role="alert">
                       To continue in next process,Please upload Bank Payslip picture.
-                    <a href="{% url 'order:payslip' object.id %}">Upload Payslip</a>
+                    <a href="{% url 'orderimport:payslip' object.id %}">Upload Payslip</a>
                   </div>
                 {% else %}
                   {% if perms.order.verify_payment or perms.order.execute_job  %}
                   <div class="row">
                     <div class="col-md-4">
-                      <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
+                      <img src="{{objectimport.payment_slip.url}}" alt="payslip" class="img-thumbnail">
                     </div>
                     </div>
                     
@@ -117,7 +117,7 @@
                                 {% endfor %}
                                 {% if not object.payment_slip %}
                                 
-                                  <a href="{% url 'order:payslip' object.id %}">
+                                  <a href="{% url 'orderimport:payslip' object.id %}">
                                     <button type="button" class="btn btn-success" >
                                     Upload Pay Slip</button>
                                   </a>
@@ -152,7 +152,7 @@
                             <img class="card-img-top" 
                             src="{{object.payment_slip.url}}" alt="Card image cap">
                             <div class="card-body">
-                              <h5 class="card-title">Update Pay Slip <a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
+                              <h5 class="card-title">Update Pay Slip <a href="{% url 'orderimport:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
                               <p class="card-text">      
                               </p>
                             </div>

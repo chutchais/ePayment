@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+ {% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-body">
+          <h2>Update Pay Slip</h2>
+          <a href="{% url 'orderimport:detail' object.id %}">Back</a>
+          
+              {% if object.payment_slip %}
+                <div class="alert alert-info" role="alert">
+                  Payment Confirmed on : {{object.payment_date}} (BankRef : {{object.payment_ref}})
+                   Verified by {{object.payment_inspector}}
+                </div>
+                <img src="{{object.payment_slip.url}}" class="card-img-top" alt="...">
+              {% endif %}
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" value="Update" class="btn btn-primary" 
+            {% if object.execute_job %}disabled{% endif %}>Update PaySlip</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}

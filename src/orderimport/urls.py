@@ -1,5 +1,7 @@
 from django.urls import path, include
-from .views import (OrderListView,OrderDetailView)
+from .views import (OrderListView,OrderDetailView,
+                    OrderDeleteView,post_container,
+                    OrderUpdateSlip,OrderUpdateWHT)
 
 urlpatterns = [
     # Guess access
@@ -10,9 +12,13 @@ urlpatterns = [
     # Member access
     path('', OrderListView.as_view(), name='list'),
     # path('create',BillofLaddingCreateView.as_view(),name='create'),
+    path('post_order',post_container,name='post_order'),
     path('<pk>',OrderDetailView.as_view(),name='detail'),
-    # path('<pk>/delete/',BillofLaddingDeleteView.as_view(),name='delete'),
+    path('<pk>/payslip/',OrderUpdateSlip.as_view(),name='payslip'),
+    path('<pk>/whtslip/',OrderUpdateWHT.as_view(),name='whtslip'),
+    path('<pk>/delete/',OrderDeleteView.as_view(),name='delete'),
 
+     
     
     # path('api/bl/<bl>',get_bl_info,name='bl'),
     # path('api/container/<container>',get_container_info,name='container'),
