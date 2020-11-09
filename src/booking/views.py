@@ -13,6 +13,8 @@ from user_profile.models import Address
 from tax.models import Tax
 import json
 
+from order.models import Order,Container
+
 class BookingListView(LoginRequiredMixin,ListView):
 	model = Booking
 	paginate_by = 30
@@ -47,6 +49,13 @@ class BookingDetailView(LoginRequiredMixin,DetailView):
 		booking_url = f"{reverse_lazy('order:list')}booking/"
 		# print (f"{reverse_lazy('order:list')}booking/")
 		context['export_booking_url'] = booking_url#settings.EXPORT_BOOKING_ENDPOINT_URL
+		
+		# Added on Nov 9,2020 -- To prevent choose Container that are under processing.
+		booking 					= context['object']
+		orders 						= Order.objects.filter(booking=booking,paid=False)
+		containers 					= Container.objects.filter(order__in = orders)
+		context['onprogressing'] 	= json.dumps(list(containers.values_list('container',flat=True)))
+
 		return context
 
 

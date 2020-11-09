@@ -8,6 +8,7 @@
   var people = '{{ items_json|safe }}';
   const export_url = '{{export_booking_url}}';
   var address_items = '{{addresses_items|safe}}';
+  var on_progress = '{{onprogressing|safe}}';
 </script>
 
 <div id="app">
@@ -29,8 +30,14 @@
                           v-if="loading"
                         ></v-progress-circular>
                       </div>
+                       
                       
+
                       <div v-if="containers">
+                        <div v-if ="onprogress_list.length > 0" class="alert alert-danger" role="alert">
+                          โปรดระวัง!!! มีบางตู้ได้อยู่ระหว่างดำเนินการชำระเงินอยู่ การเลือกตู้เดิมซ้ำอีกครั้ง อาจจะทำให้ระบบมีปัญหาได้
+                          รายชื่อตู้ที่อยู่ระหว่างดำเนินการ คือ [[onprogress_list]]
+                        </div>
                       <template>
 
                         <v-card>
@@ -441,6 +448,7 @@
       isWht: false,
       isSeperateBill : false,
       address_list: JSON.parse(address_items),
+      onprogress_list : JSON.parse(on_progress),
       selected_address : null, //JSON.parse(address_items)[0],
     },
     watch: {
