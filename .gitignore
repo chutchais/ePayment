@@ -83,3 +83,6 @@ src/orderimport/__pycache__/admin.cpython-38.pyc
 src/orderimport/__pycache__/models.cpython-38.pyc
 src/orderimport/migrations/__pycache__/*.pyc
 src/orderimport/migrations/__pycache__/__init__.cpython-38.pyc
+src/shorepass/migrations/__pycache__/*.pyc
+src/shorepass/__pycache__/*.pyc
+src/shorepass/api/__pycache__/*.pyc
