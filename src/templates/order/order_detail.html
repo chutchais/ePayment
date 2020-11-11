@@ -352,6 +352,11 @@
                   <a href="{% url 'order:execute' order.id %}"><button type="button" class="btn btn-info">Execute Job</button></a>
                 {% endif %}
 
+                {% if object.execute_job %}
+                  <hr>
+                  Executed by : {{object.execute_by}} on {{object.execute_date}}
+                {% endif %}
+
               </div>
 
               

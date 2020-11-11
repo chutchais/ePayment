@@ -37,7 +37,8 @@ class Order(models.Model):
                                     message='Name does not allow special charecters',
                                 ),
                             ])
-    ref                 = models.CharField(max_length=6) #keep time stamp  'hhmmss'
+    # Modify on Nov 11,2020 -- To extend ref to 20 (from 6 digits),follow TMB standard
+    ref                 = models.CharField(max_length=20) #keep time stamp  'Ehhmmss'
     booking             = models.ForeignKey(Booking,
                             on_delete=models.CASCADE,
                             blank=True, null=True,
@@ -78,6 +79,8 @@ class Order(models.Model):
         return self.name
 
     class Meta:
+        # Added on Nov 11,2020 -- To protect duplicated Order from same user
+        unique_together = [['name', 'user']]
         permissions = [
             ('verify_payment', 'Can verify payment'),
             ('update_payment', 'Can update payment'),

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.db import IntegrityError
 # Create your views here.
 import urllib3
 from django.contrib.auth.models import User
@@ -33,81 +34,86 @@ def post_container(request):
         form = CreateOrderForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required
-            booking = form.cleaned_data['booking']
-            wht = form.cleaned_data['wht']
-            charge = form.cleaned_data['charge']
-            vat_rate = form.cleaned_data['vat_rate']
-            wht_rate = form.cleaned_data['wht_rate']
-            grand_total = form.cleaned_data['grand_total']
-            containers_json = form.cleaned_data['containers']
-            address = form.cleaned_data['address']
-            containers = json.loads(containers_json)
-            # Added on Oct 8,2020 
-            seperate_bill = form.cleaned_data['seperatebill']
-            # ----------------------------
+            try:
+                # process the data in form.cleaned_data as required
+                booking = form.cleaned_data['booking']
+                wht = form.cleaned_data['wht']
+                charge = form.cleaned_data['charge']
+                vat_rate = form.cleaned_data['vat_rate']
+                wht_rate = form.cleaned_data['wht_rate']
+                grand_total = form.cleaned_data['grand_total']
+                containers_json = form.cleaned_data['containers']
+                address = form.cleaned_data['address']
+                containers = json.loads(containers_json)
+                # Added on Oct 8,2020 
+                seperate_bill = form.cleaned_data['seperatebill']
+                # ----------------------------
 
-            # Create Order
-            # ref = datetime.now().strftime("%H%M%S")
-            # Modify on Oct 22,2020 -- To Change Ref1 to E%M%S format 
-            # ref =   datetime.now().strftime("%M%S")
-            # Modify on Oct 29,2020 -- To support Timezone
-            import datetime, pytz
-            tz = pytz.timezone('Asia/Bangkok')
-            ref =   datetime.datetime.now(tz=tz).strftime("%H%M")
-            ref =   f'E{ref}'
+                # Create Order
+                # ref = datetime.now().strftime("%H%M%S")
+                # Modify on Oct 22,2020 -- To Change Ref1 to E%M%S format 
+                # ref =   datetime.now().strftime("%M%S")
+                # Modify on Oct 29,2020 -- To support Timezone
+                import datetime, pytz
+                tz = pytz.timezone('Asia/Bangkok')
+                # ref =   datetime.datetime.now(tz=tz).strftime("%H%M")
+                # Modify on Nov 11,2020 -- To change ref to E%H%M%S format (7 digits)
+                ref =   datetime.datetime.now(tz=tz).strftime("%H%M%S")
+                ref =   f'E{ref}'
 
-            # Mofigy on Aug 17,2020
-            # To limit Order name to be 15 digits (last 15 digits) , without DLCB or DLCM
-            order_name = f'{booking}{ref}'[-15:]
+                # Mofigy on Aug 17,2020
+                # To limit Order name to be 15 digits (last 15 digits) , without DLCB or DLCM
+                order_name = f'{booking}{ref}'[-15:]
 
-            user = User.objects.get(username=request.user)
-            booking_obj = Booking.objects.get(name=booking,user=user)
-            address_obj = Address.objects.get(pk=address)
-            
-            # print(booking,ref,order_name,booking_obj,user)
-            if len(containers) > 0:
-            #     booking_obj = Booking.objects.get(name=booking)
-                order = Order(name=order_name,ref=ref,
-                        booking=booking_obj,
-                        address=address_obj,
-                        charge=charge,grand_total=grand_total,
-                        vat_rate = vat_rate, wht_rate=wht_rate,
-                        container_count=len(containers),
-                        wht=wht,user=user,seperate_bill=seperate_bill)
-                order.save()
-                # save containers
-                container_count =0
-                for container in containers:
-                    # print(container['container'])
-                    # Added on Oct 30,2020 -- To skip if total=0
-                    if container['tariff_sum_total'] > 0:
-                        c = Container(order=order,container=container['container'],
-                            cont_size=container['size'],
-                            iso=container['iso'],
-                            is_oog=True if container['iso']=='yes' else False,
-                            tariff=container['tariff'],
-                            total =container['tariff_sum_total'],
-                            user=user)
-                        c.save()
-                        container_count = container_count+1
-
-                # Update Booking Terminal
-                # Added on July 22,2020 by Chutchai
-                terminal = container['terminal']
-                if not booking_obj.terminal :
-                    booking_obj.terminal = terminal
-                    booking_obj.save()
+                user = User.objects.get(username=request.user)
+                booking_obj = Booking.objects.get(name=booking,user=user)
+                address_obj = Address.objects.get(pk=address)
                 
-                # Added on Aug 17,2020 -- to update QRid to Order
-                terminal_prefix = 'LCB' if terminal=='LCB1' else 'LCM'
-                order.qrid = f'D{terminal_prefix}{order_name}'
-                # Added on Oct 30,2020 -- To refresh Container count
-                order.container_count =  container_count
-                order.save()
+                # print(booking,ref,order_name,booking_obj,user)
+                if len(containers) > 0:
 
-            # redirect to a new URL:
-            return HttpResponseRedirect(reverse_lazy('order:detail',kwargs={'pk': order.id}))
+                    order = Order(name=order_name,ref=ref,
+                            booking=booking_obj,
+                            address=address_obj,
+                            charge=charge,grand_total=grand_total,
+                            vat_rate = vat_rate, wht_rate=wht_rate,
+                            container_count=len(containers),
+                            wht=wht,user=user,seperate_bill=seperate_bill)
+                    order.save()
+                    # save containers
+                    container_count =0
+                    for container in containers:
+                        # print(container['container'])
+                        # Added on Oct 30,2020 -- To skip if total=0
+                        if container['tariff_sum_total'] > 0:
+                            c = Container(order=order,container=container['container'],
+                                cont_size=container['size'],
+                                iso=container['iso'],
+                                is_oog=True if container['iso']=='yes' else False,
+                                tariff=container['tariff'],
+                                total =container['tariff_sum_total'],
+                                user=user)
+                            c.save()
+                            container_count = container_count+1
+
+                    # Update Booking Terminal
+                    # Added on July 22,2020 by Chutchai
+                    terminal = container['terminal']
+                    if not booking_obj.terminal :
+                        booking_obj.terminal = terminal
+                        booking_obj.save()
+                    
+                    # Added on Aug 17,2020 -- to update QRid to Order
+                    terminal_prefix = 'LCB' if terminal=='LCB1' else 'LCM'
+                    order.qrid = f'D{terminal_prefix}{order_name}'
+                    # Added on Oct 30,2020 -- To refresh Container count
+                    order.container_count =  container_count
+                    order.save()
+
+                # redirect to a new URL:
+                return HttpResponseRedirect(reverse_lazy('order:detail',kwargs={'pk': order.id}))
+            except IntegrityError as e:
+                return render(request,'order/error.html', {'message': e.__cause__})
 
     # if a GET (or any other method) we'll create a blank form
     else:
