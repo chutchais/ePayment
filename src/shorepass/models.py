@@ -80,6 +80,7 @@ class Shore(models.Model):
     pod                 = models.ForeignKey(Pod,
                             on_delete=models.CASCADE,
                             blank=True,null=True,related_name='shores')
+    # pod             = models.CharField(max_length=100)
     agent               = models.ForeignKey(Agent,
                             on_delete=models.CASCADE,
                             blank=True,null=True,related_name='shores')
