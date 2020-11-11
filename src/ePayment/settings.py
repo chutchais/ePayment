@@ -59,7 +59,9 @@ INSTALLED_APPS = [
     'order',
     'bl',
     'orderimport',
-    'import_export'
+    'import_export',
+    'shorepass',
+    'rest_framework'
 
 ]
 
