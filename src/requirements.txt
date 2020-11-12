@@ -17,3 +17,5 @@ PyQRCode==1.2.1
 pypng==0.0.20
 crcmod==1.7
 ##################
+django-q
+redis

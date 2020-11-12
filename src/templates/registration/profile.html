@@ -19,7 +19,7 @@
     <div class="col-sm-6 col-md-4">
       <div class="card">
         <div class="card-body">
-            <h3>Avatar</h3>
+            <h3>รูปโปรไฟล์</h3>
             {% if profile.avartar %}
               <img class="card-img-top" alt="Card image cap" src="{{ profile.avartar.url }}">
             {% endif %}
@@ -35,7 +35,7 @@
     <div class="col-sm-6 col-md-4">
       <div class="card">
         <div class="card-body">
-            <h3>ID Card</h3>
+            <h3>รูปบัตรประชาชน</h3>
 
             {% if profile.idcard %}
               <img class="card-img-top" alt="Card image cap" src="{{ profile.idcard.url }}">
@@ -53,7 +53,7 @@
     <div class="col-sm-6 col-md-4">
       <div class="card">
         <div class="card-body">
-            <h3>Signature</h3>
+            <h3>รูปลายเซ็นต์</h3>
             {% if profile.signature %}
               <img class="card-img-top" alt="Card image cap" src="{{ profile.signature.url }}">
             {% endif %}

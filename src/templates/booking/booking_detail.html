@@ -19,7 +19,15 @@
                  <div class="row">
                   <div class="col-12 mb-2">
                     <div class="content">
-                      <h4>Booking : [[booking]] <a href="{% url 'booking:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a></h4>
+                      <h4>Booking : [[booking]] 
+                        <a href="{% url 'booking:delete' object.id %}">
+                          {% if object.order_count > 0 %}
+                            <button type="button" class="btn btn-danger" disabled >Delete</button>
+                          {% else %}
+                            <button type="button" class="btn btn-danger" >Delete</button>
+                          {% endif %}
+                        </a> 
+                      </h4>
                       <button type="button" class="btn btn-success mb-2" v-on:click="greet(booking)">Get Container</button>
                       
                       <div class="text-center">

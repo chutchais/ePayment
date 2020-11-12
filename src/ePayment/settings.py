@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'orderimport',
     'import_export',
     'shorepass',
-    'rest_framework'
+    'rest_framework',
+    'django_q'
 
 ]
 
@@ -246,3 +247,20 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # SECURE_PROXY_SSL_HEADER = ('X-Forwarded-Proto', 'https')
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE =True
+
+
+Q_CLUSTER = {
+    'name': 'django_q_django',
+    'workers': 8,
+    'recycle': 500,
+    'timeout': 60,
+    'compress': True,
+    'save_limit': 250,
+    'queue_limit': 500,
+    'cpu_affinity': 1,
+    'label': 'Django Q',
+    'redis': {
+        'host': 'redis',
+        'port': 6379,
+        'db': 1, }
+}

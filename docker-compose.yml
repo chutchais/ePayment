@@ -3,6 +3,16 @@
 version: '3'
 
 services:
+  redis:
+    container_name: epayment-redis
+    image: redis:5.0.6-alpine
+    networks:
+        - main
+    volumes:
+        - redis_data:/data
+    ports:
+        - 6379:6379
+
   db-server:
     restart: always
     image: postgres:latest
@@ -40,6 +50,23 @@ services:
     #External ,Removed on July 24,2020
     ports:
       - 80:8000
+  
+  qcluster:
+      build:
+          context: ./src
+      networks:
+          - main
+      # links:
+      #   - payment-redis:payment-redis
+      #   - postgres:postgres
+      volumes:
+          - web-static:/staticfiles
+      command: python manage.py qcluster
+      container_name: epayment-qcluster
+      depends_on:
+          - web-server
+      environment:
+          - REDIS_URL=redis://redis:6379/0
 
   # nginx:
   #   container_name: nginx
@@ -76,6 +103,7 @@ volumes:
   web-media:
   web-static:
   pgdata:
+  redis_data:
 
 networks:
   main:
