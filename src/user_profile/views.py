@@ -11,6 +11,8 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.generic import DetailView,CreateView,UpdateView,DeleteView,ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
+from django.urls import reverse_lazy
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from .forms import (SignUpForm,ProfileSettingForm,
@@ -126,7 +128,8 @@ def add_address(request):
 			profile.save()
 			return redirect('profile_setting')
 		else:
-			return HttpResponse("""your form is wrong, reload on <a href = "{{ url : 'index'}}">reload</a>""")
+			# return HttpResponse("""your form is wrong, reload on <a href = "{{ url : 'index'}}">reload</a>""")
+			return render(request, 'profile/address.html', {'address_form':upload})
 	else:
 		return render(request, 'profile/address.html', {'address_form':upload})
 
@@ -144,15 +147,28 @@ def update_address(request, address_id):
 	   return redirect('profile_setting')
 	return render(request, 'profile/address.html', {'address_form':address_form})
 
-@login_required
-def delete_address(request, address_id):
-	address_id = int(address_id)
-	try:
-		address_sel = Address.objects.get(id = address_id,user__username= request.user)
-	except Address.DoesNotExist:
-		return redirect('/home')
-	address_sel.delete()
-	return redirect('profile_setting')
+
+class AddressDeleteView(LoginRequiredMixin,DeleteView):
+	model = Address
+	success_url = reverse_lazy('profile_setting')
+	
+	def delete(self, request, *args, **kwargs):
+		self.object = self.get_object()
+		if (self.object.user == request.user) or request.user.is_superuser or request.user.is_staff :
+			self.object.delete()
+			return redirect(self.get_success_url())
+		else:
+			raise Http404("Not allow to delete") #or return HttpResponse('404_url')
+
+# @login_required
+# def delete_address(request, address_id):
+# 	address_id = int(address_id)
+# 	try:
+# 		address_sel = Address.objects.get(id = address_id,user__username= request.user)
+# 	except Address.DoesNotExist:
+# 		return redirect('/home')
+# 	address_sel.delete()
+# 	return redirect('profile_setting')
 
 
 

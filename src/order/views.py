@@ -17,6 +17,7 @@ from order.models import Order,Container
 from order.forms import OrderPaySlipForm,CreateOrderForm,OrderPaymentForm
 from oog.models import Oog
 from booking.models import Booking
+from django.http import Http404
 
 @login_required
 def index(request):
@@ -247,9 +248,17 @@ class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
         form.instance.execute_by = self.request.user
         return super(OrderUpdateExecuteJob, self).form_valid(form)
 
-class OrderDeleteView(DeleteView):
+class OrderDeleteView(LoginRequiredMixin,DeleteView):
     model = Order
     success_url = reverse_lazy('order:list')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if (self.object.user == request.user) or request.user.is_superuser or request.user.is_staff :
+            self.object.delete()
+            return redirect(self.get_success_url())
+        else:
+            raise Http404("Not allow to delete") #or return HttpResponse('404_url')
 
 
 

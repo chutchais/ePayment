@@ -14,6 +14,7 @@ from tax.models import Tax
 import json
 
 from order.models import Order,Container
+from django.http import Http404
 
 class BookingListView(LoginRequiredMixin,ListView):
 	model = Booking
@@ -89,3 +90,11 @@ class BookingCreateView(LoginRequiredMixin,CreateView):
 class BookingDeleteView(DeleteView):
 	model = Booking
 	success_url = reverse_lazy('booking:list')
+
+	def delete(self, request, *args, **kwargs):
+		self.object = self.get_object()
+		if (self.object.user == request.user) or request.user.is_superuser or request.user.is_staff :
+			self.object.delete()
+			return redirect(self.get_success_url())
+		else:
+			raise Http404("Not allow to delete") #or return HttpResponse('404_url')

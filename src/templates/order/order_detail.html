@@ -107,10 +107,12 @@
                         <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
 
                         <!-- Added on Nov 13,2020 , to allow staff to delete invalid payslip -->
-                        <a href="{% url 'order:payslip' object.id %}">
-                          <button type="button" class="btn btn-danger" >
-                          Delete Pay Slip</button>
-                        </a>
+                        {% if not object.execute_job %}
+                          <a href="{% url 'order:payslip' object.id %}">
+                            <button type="button" class="btn btn-danger" >
+                            Delete Pay Slip</button>
+                          </a>
+                        {% endif %}
                         <!--End delete pay slip  -->
                       </div>
                     {% endif %}

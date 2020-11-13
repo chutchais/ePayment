@@ -37,6 +37,26 @@ class AddressForm(forms.ModelForm):
     class Meta:
         model = Address
         fields = ['company','address','branch','tax']
+    
+    def clean_company(self):
+        company = self.cleaned_data['company']
+        company = company.translate({ord(c): None for c in "'"})
+        return company
+
+    def clean_address(self):
+        address = self.cleaned_data['address']
+        address = address.translate({ord(c): None for c in "'!@#$"})
+        return address
+    
+    def clean_branch(self):
+        branch = self.cleaned_data['branch']
+        branch = branch.translate({ord(c): None for c in "'!@#$"})
+        return branch
+
+    def clean_tax(self):
+        tax = self.cleaned_data['tax']
+        tax = tax.translate({ord(c): None for c in "'!@#$"})
+        return tax
 
 class ContactForm(forms.ModelForm):
     class Meta:
@@ -45,5 +65,5 @@ class ContactForm(forms.ModelForm):
     
     def get_form_kwargs(self):
         kwargs = super(ContactForm, self).get_form_kwargs()
-        kwargs['initial'] = {'lineid':'tuk','phone':'0999999'}  # your initial data here
+        # kwargs['initial'] = {'lineid':'tuk','phone':'0999999'}  # your initial data here
         return kwargs

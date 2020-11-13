@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
+
 def image_file_name(instance, filename):
     return 'images/profiles/%s/%s' % (instance.user.username, filename)
 
