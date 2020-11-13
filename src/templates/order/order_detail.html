@@ -105,6 +105,13 @@
                     {% if object.payment_slip %}
                       <div class="col-md-4">
                         <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
+
+                        <!-- Added on Nov 13,2020 , to allow staff to delete invalid payslip -->
+                        <a href="{% url 'order:payslip' object.id %}">
+                          <button type="button" class="btn btn-danger" >
+                          Delete Pay Slip</button>
+                        </a>
+                        <!--End delete pay slip  -->
                       </div>
                     {% endif %}
                     {% if object.wht_slip %}
@@ -149,6 +156,8 @@
                                     <button type="button" class="btn btn-success" >
                                     Upload Pay Slip</button>
                                   </a>
+
+                                  
                                 
                                 {% endif %}
                               </p>
@@ -167,8 +176,12 @@
                             src="{{object.payment_slip.url}}" alt="Card image cap">
                             <div class="card-body">
                               <h5 class="card-title">Update Pay Slip <a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
-                              <p class="card-text">      
+                              <p class="card-text">
+                                
+                                
                               </p>
+
+
                             </div>
                           </div>
                         </div>
@@ -209,9 +222,6 @@
                                       </div>
 
                                     <button type="button" class="btn btn-warning mb-2" v-on:click="check_payment_local()" :disabled="paid"  >Check on Local</button>
-                                    
-
-
                                     <button type="button" class="btn btn-danger" v-on:click="check_payment()">VerifySlip</button>
                                     {% endif %}
                                 {% endif %}
