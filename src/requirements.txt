@@ -19,3 +19,4 @@ crcmod==1.7
 ##################
 django-q
 redis
+requests

@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.db import IntegrityError
+from django.shortcuts import redirect
 # Create your views here.
 import urllib3
 from django.contrib.auth.models import User
@@ -252,13 +253,13 @@ class OrderDeleteView(LoginRequiredMixin,DeleteView):
     model = Order
     success_url = reverse_lazy('order:list')
 
-    # def delete(self, request, *args, **kwargs):
-    #     self.object = self.get_object()
-    #     if (self.object.user == request.user) or request.user.is_superuser or request.user.is_staff :
-    #         self.object.delete()
-    #         return redirect(self.get_success_url())
-    #     else:
-    #         raise Http404("Not allow to delete") #or return HttpResponse('404_url')
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if (self.object.user == request.user) or request.user.is_superuser or request.user.is_staff :
+            self.object.delete()
+            return redirect(self.get_success_url())
+        else:
+            raise Http404("Not allow to delete") #or return HttpResponse('404_url')
 
 
 
