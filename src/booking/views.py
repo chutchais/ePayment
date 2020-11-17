@@ -58,6 +58,9 @@ class BookingDetailView(LoginRequiredMixin,DetailView):
 		containers 					= Container.objects.filter(order__in = orders)
 		context['onprogressing'] 	= json.dumps(list(containers.values_list('container',flat=True)))
 
+		# Added on Nov 17,2020 -- To provide Vessel Name url (on shorepass app)
+		vessel_url 					= f"{reverse_lazy('shoreapi:index')}vessel/"
+		context['vessel_url'] 		= vessel_url
 		return context
 
 
@@ -69,6 +72,9 @@ class BookingDetailQueryView(TemplateView):
 		context['tax'] = Tax.objects.get(name='Default')
 		booking_url = f"{reverse_lazy('order:list')}booking/"
 		context['export_booking_url'] = booking_url
+		# Added on Nov 17,2020 -- To provide Vessel Name url (on shorepass app)
+		vessel_url 					= f"{reverse_lazy('shoreapi:index')}vessel/"
+		context['vessel_url'] 		= vessel_url
 		return context
 
 class BookingCreateView(LoginRequiredMixin,CreateView):

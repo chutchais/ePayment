@@ -9,6 +9,7 @@
   const export_url = '{{export_booking_url}}';
   var address_items = '{{addresses_items|safe}}';
   var on_progress = '{{onprogressing|safe}}';
+  var vessel_url = '{{vessel_url}}'
 </script>
 
 <div id="app">
@@ -42,9 +43,35 @@
                       
 
                       <div v-if="containers">
-                        <div v-if ="onprogress_list.length > 0" class="alert alert-danger" role="alert">
-                          โปรดระวัง!!! มีบางตู้ได้อยู่ระหว่างดำเนินการชำระเงินอยู่ การเลือกตู้เดิมซ้ำอีกครั้ง อาจจะทำให้ระบบมีปัญหาได้
-                          รายชื่อตู้ที่อยู่ระหว่างดำเนินการ คือ [[onprogress_list]]
+                        <div v-if ="onprogress_list.length > 0" >
+                          
+                          <v-alert
+                            v-model="booking"
+                            color="yellow"
+                            border="left"
+                            elevation="2"
+                            colored-border
+                            icon="mdi-alert"
+                            >
+                            โปรดระวัง!!! มีบางตู้ได้อยู่ระหว่างดำเนินการชำระเงินอยู่ การเลือกตู้เดิมซ้ำอีกครั้ง อาจจะทำให้ระบบมีปัญหาได้
+                            รายชื่อตู้ที่อยู่ระหว่างดำเนินการ คือ [[onprogress_list]]
+                          </v-alert>
+
+                        </div>
+
+                        <div v-if ="containers.length > 0">
+                          <v-alert
+                            v-model="vessel_name"
+                            color="cyan"
+                            border="left"
+                            elevation="2"
+                            colored-border
+                            icon="mdi-ferry"
+                          >
+                          Vessel : <strong>[[vessel_name]]</strong> ([[vessel_code]]) . Voy : <strong>[[voy]]</strong> 
+                            . Pod : <strong>[[pod]]</strong>
+                          </v-alert>
+                    
                         </div>
                       <template>
 
@@ -98,14 +125,14 @@
                         </template>
 
                         <template v-slot:expanded-item="{ headers, item }">
-                          <td :colspan="4">
+                          <td :colspan="8">
                             <h3>Port of Discharge</h3>
-                            Vessel Code: [[item.vessel_code ]] / [[ item.voy ]] <br>
-                            [[ item.pod.country ]] -->[[ item.pod.port ]] --> [[ item.pod.port_name ]]<br>
+                            Vessel : [[vessel_name]]([[item.vessel_code ]]) ,Voy : [[ item.voy ]] <br>
+                            POD : [[ item.pod.country ]] -->[[ item.pod.port ]] --> [[ item.pod.port_name ]]<br>
                             Line : [[item.line ]] , Agent : [[item.agent ]]<br>
                             Terminal : [[item.terminal ]]
                           </td>
-                          <td :colspan="4">
+                          <td :colspan="3">
                             <h3>Tariff Charge(s)</h3>
                             <span v-for="(value, key) in item.tariff" :key="key.id">
                               [[key]] : [[value]] Baht<br>
@@ -249,7 +276,7 @@
 
                   </v-card-actions>
 
-
+                {% if user.is_authenticated %}
                   <form action="{% url 'order:post_order' %}" method="post">
                     <div class="col-sm-12 col-md-10">
                     {% csrf_token %}
@@ -303,14 +330,6 @@
 
                           </v-list-item-content>
                         </v-list-item>
-                        
-
-                        <!-- <select class="form-control" id="address" name="address">
-                              {% for address in addresses %}
-                                <option value="{{address.pk}}">{{address.company}}</option>
-                              {% endfor %}
-                            </select>
-                        <small id="emailHelp" class="form-text text-muted">This address will be printed on receipt</small> -->
                       </div>
 
                       <v-checkbox v-model="isWht" 
@@ -330,6 +349,7 @@
 
                     
                   </form>
+                  {% endif %}
 
                  
 
@@ -458,6 +478,12 @@
       address_list: JSON.parse(address_items),
       onprogress_list : JSON.parse(on_progress),
       selected_address : null, //JSON.parse(address_items)[0],
+      vessel_code : '',
+      vessel_name : '',
+      line :'',
+      agent :'',
+      voy :'',
+      pod :'',
     },
     watch: {
       selected () {
@@ -517,13 +543,36 @@
                   response => {
                     this.containers = response.data
                     this.loading = false;
+                    this.update_vessel();
                   })
               .catch(error =>{
                     this.loading = false;
                 })
               
-          }
-      }
+          },//End greet function
+          update_vessel:function(){
+              if (this.containers.length > 0){
+                this.line  = this.containers[0].line;
+                this.agent = this.containers[0].agent;
+                this.voy = this.containers[0].voy;
+                this.pod = this.containers[0].pod.port_name;
+
+                console.log('Update Vessel :' + this.containers[0].container)
+                axios
+                .get(vessel_url + this.containers[0].vessel_code)
+                .then(
+                    response => {
+                        this.vessel_code = response.data.code;
+                        this.vessel_name = response.data.name;
+                    })
+                .catch(error =>{
+                        this.vessel_code = this.containers[0].vessel_code;
+                        this.vessel_name = '';
+                  })//End Get
+             
+              } //End if
+            },//End update_charge
+      }//End method
   })
   </script>
 {% endblock %}

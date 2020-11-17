@@ -2,5 +2,5 @@
 from django.urls import path, include
 
 urlpatterns = [
-    path('api/',include(('shorepass.api.urls','shore-api'), namespace='shore-api') ),
+    # path('api/',include(('shorepass.api.urls','shoreapi'), namespace='shoreapi') ),
 ]
