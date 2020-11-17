@@ -15,7 +15,7 @@ def get_berth_info_by_terminal(terminal,weeks=2):
 	import datetime, pytz
 	tz      = pytz.timezone('Asia/Bangkok')
 	now_tz  = datetime.datetime.now(tz=tz)
-	start_date = now_tz - datetime.timedelta(now_tz.weekday())
+	start_date = now_tz #- datetime.timedelta(now_tz.weekday())
 	end_date = start_date + datetime.timedelta(7*weeks)
 
 	start_date_str 	= start_date.strftime("%Y-%m-%d")

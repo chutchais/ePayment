@@ -77,19 +77,19 @@
                 <div class="alert alert-info" role="alert">
                   Payment Confirmed on : {{object.payment_date}} (BankRef : {{object.payment_ref}})
                    Verified by {{object.payment_inspector|default_if_none:"AutoPayment"}}
-                   {% if object.payment_slip %}
+                   <!-- {% if object.payment_slip %}
                       <a href="{% url 'order:payslip' object.id %}">[Pay slip picture]</a>
-                  {% endif %}
+                   {% endif %} -->
 
-                  {% if object.wht  and object.wht_slip %}
+                  <!-- {% if object.wht  and object.wht_slip %}
                       <a href="{% url 'order:whtslip' object.id %}">[WHT slip picture]</a>
-                  {% endif %}
+                  {% endif %} -->
                 </div>
 
                 {% if not object.payment_slip %}
                   <div class="alert alert-danger" role="alert">
                       *** Need Pay slip : ขั้นตอนการชำระยังไม่เสร็จสิ้น เพื่อดำเนินการต่อ กรุณาอัพโหลดเอกสารยืนยันการชำระเงิน(Payslip)
-                    <a href="{% url 'order:payslip' object.id %}">Upload Payslip</a>
+                    <a href="{% url 'order:payslip' object.id %}">แนบสลิป</a>
                   </div>
                 {% endif %}
 
@@ -100,31 +100,38 @@
                   </div>
                 {% endif %}
 
-                  {% if perms.order.verify_payment or perms.order.execute_job  %}
-                  <div class="row">
-                    {% if object.payment_slip %}
-                      <div class="col-md-4">
-                        <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
 
-                        <!-- Added on Nov 13,2020 , to allow staff to delete invalid payslip -->
-                        {% if not object.execute_job %}
-                          <a href="{% url 'order:payslip' object.id %}">
-                            <button type="button" class="btn btn-danger" >
-                            Delete Pay Slip</button>
-                          </a>
-                        {% endif %}
-                        <!--End delete pay slip  -->
-                      </div>
-                    {% endif %}
-                    {% if object.wht_slip %}
-                      <div class="col-md-4">
-                        <img src="{{object.wht_slip.url}}" alt="payslip" class="img-thumbnail">
-                      </div>
-                    {% endif %}
+                    <div class="row">
+                      {% if object.payment_slip %}
+                        <div class="col-md-4">
+                          <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
 
-                    </div>
-                    
-                  {% endif %}
+                          <!-- Added on Nov 13,2020 , to allow staff to delete invalid payslip -->
+                          {% if not object.execute_job %}
+                            {% if perms.order.verify_payment or perms.order.execute_job  %}
+                              <a href="{% url 'order:payslip' object.id %}">
+                                <button type="button" class="btn btn-danger" >
+                                ลบสลิป</button>
+                              </a>
+                            {% else %}
+                              <a href="{% url 'order:payslip' object.id %}">
+                                <button type="button" class="btn btn-success" >
+                                เปลี่ยนสลิป</button>
+                              </a>
+                            {% endif %}
+                          {% endif %}
+                          <!--End delete pay slip  -->
+                        </div>
+                      {% endif %} <!-- end payment slip-->
+
+                      {% if object.wht_slip %}
+                        <div class="col-md-4">
+                          <img src="{{object.wht_slip.url}}" alt="payslip" class="img-thumbnail">
+                        </div>
+                      {% endif %}
+
+                      </div> <!-- end row -->
+
 
               {% else %}
                 <!-- Show QR Code -->
@@ -156,11 +163,8 @@
                                 
                                   <a href="{% url 'order:payslip' object.id %}">
                                     <button type="button" class="btn btn-success" >
-                                    Upload Pay Slip</button>
+                                    แนบสลิป</button>
                                   </a>
-
-                                  
-                                
                                 {% endif %}
                               </p>
 
@@ -177,7 +181,7 @@
                             <img class="card-img-top" 
                             src="{{object.payment_slip.url}}" alt="Card image cap">
                             <div class="card-body">
-                              <h5 class="card-title">Update Pay Slip <a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
+                              <h5 class="card-title">แนบสลิป<a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
                               <p class="card-text">
                                 
                                 
