@@ -43,10 +43,10 @@ class BookingDetailView(LoginRequiredMixin,DetailView):
 	def get_context_data(self,**kwargs):
 		context = super(BookingDetailView,self).get_context_data(**kwargs)
 		context['tax'] = Tax.objects.get(name='Default')
-		# context['addresses'] = Address.objects.filter(user__username=self.request.user)
-		context['addresses_items'] = json.dumps(list(Address.objects.filter(
-									user__username=self.request.user
-									).order_by('company').values('pk', 'company','address','tax'))).replace('\\r\\n',' ')
+
+		# context['addresses_items'] = json.dumps(list(Address.objects.filter(
+		# 							user__username=self.request.user
+		# 							).order_by('company').values('pk', 'company','address','tax'))).replace('\\r\\n',' ')
 		# http://192.168.10.16:5001/booking/
 		booking_url = f"{reverse_lazy('order:list')}booking/"
 		# print (f"{reverse_lazy('order:list')}booking/")
@@ -61,6 +61,10 @@ class BookingDetailView(LoginRequiredMixin,DetailView):
 		# Added on Nov 17,2020 -- To provide Vessel Name url (on shorepass app)
 		vessel_url 					= f"{reverse_lazy('shoreapi:index')}vessel/"
 		context['vessel_url'] 		= vessel_url
+
+		# Added on Nov 17,2020 -- To provide Address url (on user_profile)
+		address_url 				= f"{reverse_lazy('profileapi:index')}address/"
+		context['address_url'] 		= address_url
 		return context
 
 
@@ -75,6 +79,9 @@ class BookingDetailQueryView(TemplateView):
 		# Added on Nov 17,2020 -- To provide Vessel Name url (on shorepass app)
 		vessel_url 					= f"{reverse_lazy('shoreapi:index')}vessel/"
 		context['vessel_url'] 		= vessel_url
+		# Added on Nov 17,2020 -- To provide Address url (on user_profile)
+		address_url 				= f"{reverse_lazy('profileapi:index')}address/"
+		context['address_url'] 		= address_url
 		return context
 
 class BookingCreateView(LoginRequiredMixin,CreateView):

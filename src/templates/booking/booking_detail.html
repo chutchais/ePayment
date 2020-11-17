@@ -7,9 +7,10 @@
   const wht_rate = {{tax.wht}};
   var people = '{{ items_json|safe }}';
   const export_url = '{{export_booking_url}}';
-  var address_items = '{{addresses_items|safe}}';
+  // var address_items = '{{addresses_items|safe}}';
   var on_progress = '{{onprogressing|safe}}';
-  var vessel_url = '{{vessel_url}}'
+  var vessel_url = '{{vessel_url}}';
+  var address_url = '{{address_url}}';
 </script>
 
 <div id="app">
@@ -475,7 +476,7 @@
       },
       isWht: false,
       isSeperateBill : false,
-      address_list: JSON.parse(address_items),
+      address_list: [],//JSON.parse(address_items),
       onprogress_list : JSON.parse(on_progress),
       selected_address : null, //JSON.parse(address_items)[0],
       vessel_code : '',
@@ -544,6 +545,7 @@
                     this.containers = response.data
                     this.loading = false;
                     this.update_vessel();
+                    this.get_address();
                   })
               .catch(error =>{
                     this.loading = false;
@@ -572,6 +574,20 @@
              
               } //End if
             },//End update_charge
+          get_address:function(){
+            if (this.containers.length > 0){
+              axios
+                .get(address_url)
+                .then(
+                    response => {
+                        this.address_list = response.data;
+                        console.log(this.address_list)
+                    })
+                .catch(error =>{
+                        this.address_list = [];
+                  })//End Get
+            }
+          },//End get_address function
       }//End method
   })
   </script>

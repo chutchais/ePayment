@@ -70,6 +70,7 @@ urlpatterns = [
     # path('home/', TemplateView.as_view(template_name='home.html'),name='home'),
     path('', include(('order.urls','order'), namespace='home') ,name='home'),
     path('api/shorepass/',include(('shorepass.api.urls','shoreapi'), namespace='shoreapi')),
+    path('api/user_profile/',include(('user_profile.api.urls','profileapi'), namespace='profileapi')),
 
 ]
 # + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
