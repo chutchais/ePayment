@@ -243,11 +243,11 @@
               {% endif %}
 
 
-              <div class="containeer">
-                 <div class="col-12 mb-1">
+              <!-- <div class="containeer"> -->
+                 <!-- <div class="col-12"> -->
                   <div class="row justify-content-center">
                     
-                    <div class="col-sm-6 col-md-6 col-lg-3 mb-1 ml-0 mr-0">
+                    <div class="col-sm-6 col-md-6 col-lg-3 mb-0 ml-0 mr-0">
                       <div class="card">
                         <div class="card-body">
                           <h5 class="card-title">Charge</h5>
@@ -257,7 +257,7 @@
                       </div>
                     </div>
 
-                    <div class="col-sm-6 col-md-6 col-lg-3 mb-1 ml-0 mr-0">
+                    <div class="col-sm-6 col-md-6 col-lg-3 mb-0 ml-0 mr-0">
                       <div class="card">
                         <div class="card-body">
                           <h5 class="card-title">Tax Rate 
@@ -269,7 +269,7 @@
                       </div>
                     </div>
 
-                  <div class="col-sm-6 col-md-6 col-lg-3 mb-1 ml-0 mr-0">
+                  <div class="col-sm-6 col-md-6 col-lg-3 mb-0 ml-0 mr-0">
                     <div class="card">
                       <div class="card-body">
                         <h5 class="card-title">WHT Rate
@@ -286,7 +286,7 @@
                     </div>
                   </div>
 
-                  <div class="col-sm-6 col-md-6 col-lg-3 mb-1 ml-0 mr-0">
+                  <div class="col-sm-6 col-md-6 col-lg-3 mb-0 ml-0 mr-0">
                     <div class="card bg-info">
                       <div class="card-body">
                         <h5 class="card-title">Grand Total {% if object.wht %}<span class="badge badge-warning">WTH</span>{% endif %} 
@@ -301,12 +301,13 @@
                   </div>
 
                 </div> <!-- end row -->
-              </div> <!-- end col12-->
-              </div> <!-- end container -->
+              <!-- end col12-->
+
+               <!-- end container -->
 
 
-              <div class="containeer">
-                <div class="col-12">
+              <!-- <div class="containeer"> -->
+                <!-- <div class="col-12"> -->
                 <div class="row">
                   <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
                     <h4>Booking : {{object.booking}}</h4>
@@ -316,7 +317,7 @@
                     Tax : {{object.address.tax}}<br>
                     Branch :{{object.address.branch|default_if_none:""}}<br>
                   </div>
-                </div><!--end tow-->
+                </div><!--end row-->
 
                 <div class="row">
                   <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
@@ -361,17 +362,21 @@
                       </tbody>
                     </table>
                   </div> <!-- table-responsive-md -->
-                    </div>
                   </div>
-                </div><!-- end row -->
-                {% if perms.order.verify_payment or perms.order.execute_job  %}
-                  <a href="{% url 'order:execute' order.id %}"><button type="button" class="btn btn-info">Execute Job</button></a>
-                {% endif %}
+                  
+                <!-- end row -->
+                <div class="row">
+                  <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
+                    {% if perms.order.verify_payment or perms.order.execute_job  %}
+                      <a href="{% url 'order:execute' order.id %}"><button type="button" class="btn btn-info">Execute Job</button></a>
+                    {% endif %}
 
-                {% if object.execute_job %}
-                  <hr>
-                  Executed by : {{object.execute_by}} on {{object.execute_date}}
-                {% endif %}
+                    {% if object.execute_job %}
+                      <hr>
+                      Executed by : {{object.execute_by}} on {{object.execute_date}}
+                    {% endif %}
+                    </div>
+                </div>
 
               </div>
 
