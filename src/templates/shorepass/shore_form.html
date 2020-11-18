@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+ {% load crispy_forms_tags %}
+
+{% block content %}
+
+<div id="app">
+    <v-app>
+        <div class="containeer">
+            <div class="row justify-content-center">
+                <div class="col-sm-8">
+                    <div class="card">
+                        <div class="card-body">
+                        <h2>Create New ShorePass</h2>
+                        <a href="{% url 'shorepass:list' %}">Back</a>
+                            <!-- Form Start -->
+                            <template>
+                                <v-form
+                                  ref="form"
+                                  v-model="valid"
+                                  lazy-validation
+                                >
+                                  <v-text-field
+                                    v-model="name"
+                                    :counter="10"
+                                    :rules="nameRules"
+                                    label="Name"
+                                    required
+                                  ></v-text-field>
+                              
+                                  <v-text-field
+                                    v-model="email"
+                                    :rules="emailRules"
+                                    label="E-mail"
+                                    required
+                                  ></v-text-field>
+                              
+                                  <v-select
+                                    v-model="select"
+                                    :items="items"
+                                    :rules="[v => !!v || 'Item is required']"
+                                    label="Item"
+                                    required
+                                  ></v-select>
+                              
+                                  <v-checkbox
+                                    v-model="checkbox"
+                                    :rules="[v => !!v || 'You must agree to continue!']"
+                                    label="Do you agree?"
+                                    required
+                                  ></v-checkbox>
+                              
+                                  <v-btn
+                                    :disabled="!valid"
+                                    color="success"
+                                    class="mr-4"
+                                    @click="validate"
+                                  >
+                                    Validate
+                                  </v-btn>
+                              
+                                  <v-btn
+                                    color="error"
+                                    class="mr-4"
+                                    @click="reset"
+                                  >
+                                    Reset Form
+                                  </v-btn>
+                              
+                                  <v-btn
+                                    color="warning"
+                                    @click="resetValidation"
+                                  >
+                                    Reset Validation
+                                  </v-btn>
+                                </v-form>
+                              </template>
+                            <!-- End Form -->
+
+                        </div>
+                    </div><!-- End Card-->
+                </div><!-- End col-sm-6-->
+            </div><!-- End Row-->
+        </div> <!-- End containeer-->
+    </v-app>
+</div><!-- End id="app"-->
+
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}
+
+
+{% block script %}
+    <script>
+
+        new Vue({
+            delimiters: ['[[', ']]'],
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: {
+            }
+        })
+    </script>
+{% endblock %}

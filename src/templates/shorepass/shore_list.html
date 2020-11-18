@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+
+{% block meta %}
+    <meta http-equiv="refresh" content="180">
+{% endblock meta %}
+
+{% block content %}
+
+
+<div id="app">
+
+ 
+
+<div class="containeer">
+
+  {% if not user.profile.approved %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>ท่านยังไม่ได้รับการอนุมัติในการใช้ระบบ</strong> กรุณายื่นเอกสารบัตรประชาชน และรูปภาพลายเซ็นต์ และรอการยืนยันจากเจ้าหน้าที่อีกครั้ง
+    
+    <a href="{% url 'profile_setting' %}">คลิ้กเพื่ออัพโหลดเอกสาร</a>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+{% endif %}
+
+<div class="row wrapper">
+
+  <div class="col-sm-12 col-md-12">
+    <div class="row">
+    	
+      <div class="col-12 mb-1">
+        <div class="content">
+        	
+        	<div class="card">
+		        <div class="card-body">
+              <h4>Export ShorePass List</h4>
+
+              <div>
+              
+            </div>
+
+		          รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทั้งหมด {{ page_obj.paginator.count }} รายการ <br>
+     {% if is_paginated %}
+     
+                  <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                      <li class="page-item"><a class="page-link" href="?q={{ request.GET.q}}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    {% else %}
+                      <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                      </li>
+                    {% endif %}
+                    
+                    {% for i in paginator.page_range %}
+                      {% if page_obj.number == i %}
+                        
+                        <li class="page-item active" aria-current="page">
+                          <span class="page-link">
+                            {{ i }}
+                            <span class="sr-only">(current)</span>
+                          </span>
+                        </li>
+                      {% else %}
+                        <li class="page-item"><a class="page-link" href="?q={{ request.GET.q}}&page={{ i }}">{{ i }}</a></li>
+                      {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                      <a class="page-link" href="?q={{ request.GET.q}}&page={{ page_obj.next_page_number }}">Next</a>
+                    {% else %}
+                      <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                      </li>
+                    {% endif %}
+                  </ul>
+
+                  
+
+      {% endif %}
+              <div class="table-responsive-md">
+		          <table class="table table-striped">
+					  <thead>
+					    <tr>
+                <th scope="col">Status</th>
+                <th scope="col">Booking</th>
+                <th scope="col">Terminal</th>
+                <th scope="col">Vessel</th>
+                <!-- <th scope="col">Order</th> -->
+					      <!-- <th scope="col">booking</th>
+                <th scope="col">Ref</th> -->
+                <th class="text-center" scope="col">Voy</th>
+                <th class="text-right" scope="col">Pod</th>
+                
+                <th class="text-center" scope="col">Created</th>
+
+                <!-- <th scope="col">Payment Slip</th>
+                
+                <th scope="col">Execute Job</th> -->
+
+                {% if perms.order.verify_payment or perms.order.execute_job %}
+                  <th scope="col">User</th>
+                  <th scope="col">Execute by</th>
+                {% endif %}
+					      
+					    </tr>
+					  </thead>
+					  <tbody>
+		          {% for object in object_list %}
+					    <tr>
+                <td>
+                    {% if object.paid %}
+                      {% if not order.payment_slip %}
+                        <a href="{% url 'order:payslip' object.id %}">
+                            <span class="badge badge-danger">Need pay slip</span>
+                        </a>
+                      {% else %}
+                        {% if object.execute_job %}
+                          
+                            <span class="badge badge-success">ShorePass Completed</span>
+                          
+                        {% else %}
+                          {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          
+
+                              <!-- Added on Oct 28,2020 To support WHT -->
+                              {% if order.wht and not order.wht_slip %}
+                              
+                              <span class="badge badge-danger">Need WHT</span>
+                             
+                            {% else %}
+                            <!-- End WHT -->
+                            <a href="{% url 'order:execute' order.id %}">
+                              <span class="badge badge-warning">Waiting for Execution</span>
+                            </a>
+                            {% endif %}
+
+                          {% else %}
+                                <!-- Added on Oct 28,2020 To support WHT -->
+                                {% if order.wht and not order.wht_slip %}
+                                <a href="{% url 'order:whtslip' order.id %}">
+                                <span class="badge badge-danger">Need WHT</span>
+                                </a>
+                              {% else %}
+                              <!-- End WHT -->
+                                <span class="badge badge-warning">Waiting for Execution</span>
+                              {% endif %}
+                            
+                          {% endif %}
+                        {% endif %}
+                      {% endif %}
+
+                    {% else %}
+                      <span class="badge badge-secondary">UnPaid</span>
+                    {% endif %}
+                  </td>
+                <td><a href="{{order.get_absolute_url}}">{{object.booking}}</a></td>
+                <td class="text-center">{{object.terminal}}</td>
+                <td class="text-center">{{object.vessel_name}}</td>
+                 <td class="text-right">{{object.voy}}</td>
+                 <td class="text-right">{{object.pod}}</td>
+				<td class="text-right">{{object.created}}</td>
+
+                {% if perms.order.verify_payment or perms.order.execute_job  %}
+                    <td>{{order.user}}</td>
+                    <td>{{order.execute_by|default_if_none:""}}</td>
+                {% endif %}
+					      
+					    </tr>
+					    
+		          {% endfor %}
+		          </tbody>
+					</table>
+        </div> <!-- table-responsive -->
+		        </div>
+		      </div>
+        </div>
+      </div>
+
+  <!--     <div class="col-12 mb-2" >
+        <div class="content">
+        	<div class="card">
+		        <div class="card-body">
+		          <h4>Success Booking</h4>
+		          <ul>
+		          	<li>#1</li>
+		          	<li>#2</li>
+		          </ul>
+		        </div>
+		      </div>
+        </div>
+      </div> -->
+    </div>
+
+  </div>
+
+ <!--  <div class="col-sm-12 col-md-3">
+    <div class="sidebar">
+    	
+		          {% for address in addresses %}
+		          	<div class="card mb-2" >
+					  <div class="card-body">
+					    <a href="{% url 'profile:update' address.pk %}"><h5 class="card-title">{{address}}</h5></a>
+					    <p class="card-text">{{address.address}}</p>
+					    <p class="card-text"><i>Tax : {{address.tax}}</i></p>
+					  </div>
+					</div>
+		          {% endfor %}
+    </div>
+  </div>
+</div> -->
+
+	
+</div>
+</div>
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}
+
