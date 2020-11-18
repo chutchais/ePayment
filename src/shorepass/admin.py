@@ -1,7 +1,10 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Shore,Document,Agent,Pod
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportActionModelAdmin
+from .models import Shore,Document,Agent,Pod,Customer
 
 class DocumentInline(admin.TabularInline):
 	model = Document
@@ -15,7 +18,7 @@ class DocumentInline(admin.TabularInline):
 	verbose_name_plural = 'Document detail'
 
 @admin.register(Shore)
-class ShoreAdmin(admin.ModelAdmin):
+class ShoreAdmin(ImportExportModelAdmin,ImportExportActionModelAdmin,admin.ModelAdmin):
 	search_fields = ['booking','vessel_name','pod__name','voy','agent__name']
 	list_filter = ['terminal','execute_job']
 	list_display = ('booking','agent','vessel_name','pod','voy','created','user','execute_job')
@@ -40,8 +43,17 @@ class ShoreAdmin(admin.ModelAdmin):
 	# resource_class      = OrderResource
 
 
+class PodResource(resources.ModelResource):
+	class Meta:
+		model = Pod
+		import_id_fields = ('name',)
+		skip_unchanged = True
+		report_skipped= True
+		exclude = ('id','user','created','updated','status' )
+
+
 @admin.register(Pod)
-class PodAdmin(admin.ModelAdmin):
+class PodAdmin(ImportExportModelAdmin,ImportExportActionModelAdmin,admin.ModelAdmin):
 	search_fields = ['name','description','actual_pod']
 	list_filter = []
 	list_display = ('name','description','actual_pod','created','user')
@@ -52,9 +64,19 @@ class PodAdmin(admin.ModelAdmin):
 		('Basic Information',{'fields': ['name','description','actual_pod']}),
 		('System Information',{'fields':[('user','created')]})
 	]
+	resource_class      = PodResource
+
+
+class AgentResource(resources.ModelResource):
+	class Meta:
+		model = Agent
+		import_id_fields = ('name',)
+		skip_unchanged = True
+		report_skipped= True
+		exclude = ('id','user','created','updated','status' )
 
 @admin.register(Agent)
-class AgentAdmin(admin.ModelAdmin):
+class AgentAdmin(ImportExportModelAdmin,ImportExportActionModelAdmin,admin.ModelAdmin):
 	search_fields = ['name','fullname']
 	list_filter = []
 	list_display = ('name','fullname','created','user')
@@ -65,3 +87,26 @@ class AgentAdmin(admin.ModelAdmin):
 		('Basic Information',{'fields': ['name','fullname']}),
 		('System Information',{'fields':[('user','created')]})
 	]
+	resource_class      = AgentResource
+
+class CustomerResource(resources.ModelResource):
+	class Meta:
+		model = Customer
+		import_id_fields = ('name','tax',)
+		skip_unchanged = True
+		report_skipped= True
+		exclude = ('id','user','created','updated','status' )
+
+@admin.register(Customer)
+class CustomerAdmin(ImportExportModelAdmin,ImportExportActionModelAdmin,admin.ModelAdmin):
+	search_fields = ['name','address','tax']
+	list_filter = ['branch']
+	list_display = ('name','address','tax','branch','created','user')
+	readonly_fields = ('created','user')
+	list_select_related = True
+
+	fieldsets = [
+		('Basic Information',{'fields': ['name','address','tax','branch','description']}),
+		('System Information',{'fields':[('user','created')]})
+	]
+	resource_class      = CustomerResource

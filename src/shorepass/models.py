@@ -9,7 +9,7 @@ import json
 # Create your models here.
 
 class Agent(models.Model):
-    name                = models.CharField(primary_key=True,max_length=10,
+    name                = models.CharField(primary_key=True,max_length=100,
                             verbose_name='Line/Agent name',
                             validators=[
                                 RegexValidator(
@@ -17,7 +17,7 @@ class Agent(models.Model):
                                     message='Agent does not allow special charecters',
                                 ),
                             ])
-    fullname            = models.CharField(max_length=100,blank=True, null=True)
+    fullname            = models.CharField(max_length=200,blank=True, null=True)
     created             = models.DateTimeField(auto_now_add=True)
     updated             = models.DateTimeField(blank=True, null=True,auto_now=True)
     status              = models.BooleanField(default=True)
@@ -61,6 +61,32 @@ class Pod(models.Model):
 def image_file_name(instance, filename):
     return 'images/shore/%s/%s' % (instance.shore.booking, filename)
 
+class Customer(models.Model):
+    name                = models.CharField(max_length=200,
+                            verbose_name='Customer name')
+    address             = models.CharField(max_length=300,null=True,blank = True)
+    tax                 = models.CharField(max_length=20,null=True,blank = True)
+    branch              = models.CharField(max_length=30,null=True,blank = True)
+    description         = models.CharField(max_length=200,blank=True, null=True)
+    created             = models.DateTimeField(auto_now_add=True)
+    updated             = models.DateTimeField(blank=True, null=True,auto_now=True)
+    status              = models.BooleanField(default=True)
+    user                = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            on_delete=models.SET_NULL,
+                            blank=True,null=True)
+    class Meta:
+        unique_together = [['name', 'tax']]
+        indexes = [
+            models.Index(fields=['name'],name='idx_shorepass_customer_name'),
+            models.Index(fields=['tax'],name='idx_shorepass_customer_tax')
+        ]
+
+    def __str__(self):  # __unicode__ for Python 2
+        return f'{self.name}'
+
+    def get_absolute_url(self):
+        return reverse('shorepass:customerdetail', kwargs={'pk': self.pk})
+        
 class Shore(models.Model):
     TERMINAL_CHOICES = (
             ('LCB1', 'LCB1'),
@@ -102,7 +128,12 @@ class Shore(models.Model):
     execute_by          = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.SET_NULL,
                             blank=True,null=True,related_name = 'execute_shore')
-    customer_name       = models.CharField(max_length=500,blank=True, null=True)
+    # Removed on Nov 18,2020 
+    # customer_name       = models.CharField(max_length=500,blank=True, null=True)
+    customer            = models.ForeignKey(Customer,
+                            on_delete=models.SET_NULL,
+                            blank=True,null=True,related_name='shores')
+
     
     class Meta:
         # unique_together = [['booking', 'user']]
@@ -135,28 +166,4 @@ class Document(models.Model):
     created             = models.DateTimeField(auto_now_add=True)
 
 
-class Customer(models.Model):
-    name                = models.CharField(max_length=200,
-                            verbose_name='Customer name')
-    address             = models.CharField(max_length=300,null=True,blank = True)
-    tax                 = models.CharField(max_length=20,null=True,blank = True)
-    branch              = models.CharField(max_length=30,null=True,blank = True)
-    description         = models.CharField(max_length=200,blank=True, null=True)
-    created             = models.DateTimeField(auto_now_add=True)
-    updated             = models.DateTimeField(blank=True, null=True,auto_now=True)
-    status              = models.BooleanField(default=True)
-    user                = models.ForeignKey(settings.AUTH_USER_MODEL,
-                            on_delete=models.SET_NULL,
-                            blank=True,null=True)
-    class Meta:
-        unique_together = [['name', 'tax']]
-        indexes = [
-            models.Index(fields=['name'],name='idx_shorepass_customer_name'),
-            models.Index(fields=['tax'],name='idx_shorepass_customer_tax')
-        ]
 
-    def __str__(self):  # __unicode__ for Python 2
-        return f'{self.name}'
-
-    def get_absolute_url(self):
-        return reverse('shorepass:customerdetail', kwargs={'pk': self.pk})

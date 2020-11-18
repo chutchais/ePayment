@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     'import_export',
     'shorepass',
     'rest_framework',
-    'django_q'
+    'django_q',
+    'django_filters'
 
 ]
 
@@ -263,4 +264,12 @@ Q_CLUSTER = {
         'host': 'redis',
         'port': 6379,
         'db': 1, }
+}
+
+# Added on Nov 18,2020 -- To support filter
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
 }

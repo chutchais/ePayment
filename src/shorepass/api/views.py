@@ -1,24 +1,62 @@
-from shorepass.models import Agent,Pod
+from shorepass.models import Agent,Pod,Customer
 from rest_framework import generics
-from .serializers import AgentSerializer,PodSerializer
+import django_filters.rest_framework
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
+from .serializers import AgentSerializer,PodSerializer,CustomerSerializer
 
 # -----------Agent----------------
+class AgentFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name="name", lookup_expr='icontains')
+    class Meta:
+        model = Agent
+        fields = ['name']
+
 class AgentList(generics.ListAPIView):
 	queryset = Agent.objects.filter(status=True)
 	serializer_class = AgentSerializer
+	filter_backends = [DjangoFilterBackend]
+	filterset_class = AgentFilter
 
 class AgentDetail(generics.RetrieveAPIView):
 	queryset = Agent.objects.filter(status=True)
 	serializer_class = AgentSerializer
 
 # -----------POD----------------
+class PodFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name="name", lookup_expr='icontains')
+    class Meta:
+        model = Pod
+        fields = ['name']
+
 class PodList(generics.ListAPIView):
 	queryset = Pod.objects.all()
 	serializer_class = PodSerializer
+	filter_backends = [DjangoFilterBackend]
+	filterset_class = PodFilter
 
 class PodDetail(generics.RetrieveAPIView):
 	queryset = Pod.objects.all()
 	serializer_class = PodSerializer
+
+# -----------Customer----------------
+class CustomerFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name="name", lookup_expr='icontains')
+    class Meta:
+        model = Customer
+        fields = ['name']
+
+class CustomerList(generics.ListAPIView):
+	queryset = Customer.objects.all()
+	serializer_class = CustomerSerializer
+	filter_backends = [DjangoFilterBackend]
+	filterset_class = CustomerFilter
+	# filterset_fields = ['name', 'tax']
+	# search_fields = ['name', 'tax']
+
+class CustomerDetail(generics.RetrieveAPIView):
+	queryset = Customer.objects.all()
+	serializer_class = CustomerSerializer
 
 
 # 
