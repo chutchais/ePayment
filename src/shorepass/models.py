@@ -135,3 +135,28 @@ class Document(models.Model):
     created             = models.DateTimeField(auto_now_add=True)
 
 
+class Customer(models.Model):
+    name                = models.CharField(max_length=200,
+                            verbose_name='Customer name')
+    address             = models.CharField(max_length=300,null=True,blank = True)
+    tax                 = models.CharField(max_length=20,null=True,blank = True)
+    branch              = models.CharField(max_length=30,null=True,blank = True)
+    description         = models.CharField(max_length=200,blank=True, null=True)
+    created             = models.DateTimeField(auto_now_add=True)
+    updated             = models.DateTimeField(blank=True, null=True,auto_now=True)
+    status              = models.BooleanField(default=True)
+    user                = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            on_delete=models.SET_NULL,
+                            blank=True,null=True)
+    class Meta:
+        unique_together = [['name', 'tax']]
+        indexes = [
+            models.Index(fields=['name'],name='idx_shorepass_customer_name'),
+            models.Index(fields=['tax'],name='idx_shorepass_customer_tax')
+        ]
+
+    def __str__(self):  # __unicode__ for Python 2
+        return f'{self.name}'
+
+    def get_absolute_url(self):
+        return reverse('shorepass:customerdetail', kwargs={'pk': self.pk})

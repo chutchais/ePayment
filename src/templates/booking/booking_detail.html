@@ -58,6 +58,8 @@
                             รายชื่อตู้ที่อยู่ระหว่างดำเนินการ คือ [[onprogress_list]]
                           </v-alert>
 
+                          
+
                         </div>
 
                         <div v-if ="containers.length > 0">
@@ -345,7 +347,18 @@
                           color="success">
                       </v-checkbox>
 
-                      <button type="submit" class="btn btn-primary" :disabled="net == 0 || selected_address == null">Continue Payment ([[net_text]] Baht)</button>
+                      <v-alert
+                            v-model="duplicated"
+                            color="red"
+                            border="left"
+                            elevation="2"
+                            colored-border
+                            icon="mdi-alert"
+                            >
+                            ไม่สามารถดำเนินการต่อได้ เพราะท่านได้เลือกตู้ซ้ำกับตู้ที่อยู่ระหว่างดำเนินการก่อนหน้านี้
+                          </v-alert>
+
+                      <button type="submit" class="btn btn-primary" :disabled="net == 0 || selected_address == null || duplicated">Continue Payment ([[net_text]] Baht)</button>
                     </div>
 
                     
@@ -485,10 +498,22 @@
       agent :'',
       voy :'',
       pod :'',
+      duplicated: false,
     },
     watch: {
       selected () {
         this.selected_json = JSON.stringify(this.selected)
+        // Added on Nov 18,2020 -- To check selected list with Ordered list
+        // Make array of selected container
+        var selected_array = [];
+        for (i in this.selected) {
+          let c = this.selected[i].container;
+          // console.log(c)
+          selected_array.push(c)
+        }
+        // console.log('selected_array = ' + selected_array);
+        // console.log('onprogress_list = ' + this.onprogress_list);
+        this.duplicated = selected_array.some(v => this.onprogress_list.includes(v));
       },
 
     },
@@ -559,7 +584,7 @@
                 this.voy = this.containers[0].voy;
                 this.pod = this.containers[0].pod.port_name;
 
-                console.log('Update Vessel :' + this.containers[0].container)
+                // console.log('Update Vessel :' + this.containers[0].container)
                 axios
                 .get(vessel_url + this.containers[0].vessel_code)
                 .then(
@@ -581,7 +606,7 @@
                 .then(
                     response => {
                         this.address_list = response.data;
-                        console.log(this.address_list)
+                        // console.log(this.address_list)
                     })
                 .catch(error =>{
                         this.address_list = [];

@@ -551,7 +551,7 @@
               // console.log('Hello from ' + name + '!');
               axios
               // .get('http://127.0.0.1:8000/order/booking/'+ this.booking)
-              .get(export_url + this.booking)
+              .get(export_url + this.booking.toUpperCase())
               .then(
                   response => {
                     this.containers = response.data
@@ -570,7 +570,7 @@
                 this.voy = this.containers[0].voy;
                 this.pod = this.containers[0].pod.port_name;
 
-                console.log('Update Vessel :' + this.containers[0].container)
+                // console.log('Update Vessel :' + this.containers[0].container)
                 axios
                 .get(vessel_url + this.containers[0].vessel_code)
                 .then(
