@@ -63,13 +63,14 @@ INSTALLED_APPS = [
     'shorepass',
     'rest_framework',
     'django_q',
-    'django_filters'
+    'django_filters',
+    'corsheaders'
 
 ]
 
 MIDDLEWARE = [
     # 'django.middleware.cache.UpdateCacheMiddleware', #cache
-    # 'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -267,6 +268,8 @@ Q_CLUSTER = {
 }
 
 # Added on Nov 18,2020 -- To support filter
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],

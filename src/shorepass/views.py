@@ -11,39 +11,44 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Shore
 
 class ShoreListView(LoginRequiredMixin,ListView):
-    model = Shore
-    paginate_by = 50
-    # def get_queryset(self):
-    #     query = self.request.GET.get('q')
-    #     # lacking_stock = self.request.GET.get('lacking')
-    #     # over_stock = self.request.GET.get('over')
-    #     print('Verify payment :',self.request.user.has_perm('order.verify_payment'))
-    #     if query :
-    #         if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
-    #             return Order.objects.filter(Q(name__icontains=query) |
-    #                                     Q(booking__name__icontains=query)).select_related('booking').order_by('-updated')
-    #         else:
-    #             return Order.objects.filter(Q(name__icontains=query) |
-    #                                     Q(booking__name__icontains=query) ,
-    #                                     user__username=self.request.user ).select_related('booking').order_by('-updated')
+	model = Shore
+	paginate_by = 50
+	# def get_queryset(self):
+	#     query = self.request.GET.get('q')
+	#     # lacking_stock = self.request.GET.get('lacking')
+	#     # over_stock = self.request.GET.get('over')
+	#     print('Verify payment :',self.request.user.has_perm('order.verify_payment'))
+	#     if query :
+	#         if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
+	#             return Order.objects.filter(Q(name__icontains=query) |
+	#                                     Q(booking__name__icontains=query)).select_related('booking').order_by('-updated')
+	#         else:
+	#             return Order.objects.filter(Q(name__icontains=query) |
+	#                                     Q(booking__name__icontains=query) ,
+	#                                     user__username=self.request.user ).select_related('booking').order_by('-updated')
 
-    #     if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
-    #         return Order.objects.all().select_related('booking').order_by('-updated')[:200]
+	#     if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
+	#         return Order.objects.all().select_related('booking').order_by('-updated')[:200]
 
-    #     return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:200]
-    
-    # def get_context_data(self,**kwargs):
-    #     context = super(OrderListView,self).get_context_data(**kwargs)
-    #     # context['addresses'] = Address.objects.filter(user__username=self.request.user)
-    #     return context
+	#     return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:200]
+	
+	# def get_context_data(self,**kwargs):
+	#     context = super(OrderListView,self).get_context_data(**kwargs)
+	#     # context['addresses'] = Address.objects.filter(user__username=self.request.user)
+	#     return context
 
 class ShoreDetailView(LoginRequiredMixin,DetailView):
-    model = Shore
+	model = Shore
 
 
 class ShoreCreateView(LoginRequiredMixin,CreateView):
-    model = Shore
-    fields = ['booking','vessel_name','pod','voy','terminal','agent']
+	model = Shore
+	fields = ['booking','vessel_name','pod','voy','terminal','agent']
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		# shorepass_base_url 			= f"{reverse_lazy('shorepass:list')}address/"
+		context['shorepass_api_url'] 		= '/api/shorepass/'
+		return context
 
 # class ShoreCreateView(TemplateView):
 # 	template_name = "shorepass/shore_create.html"

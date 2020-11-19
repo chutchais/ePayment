@@ -52,6 +52,9 @@ class Pod(models.Model):
     user                = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.SET_NULL,
                             blank=True,null=True)
+    class Meta:
+        ordering =['name']
+
     def __str__(self):  # __unicode__ for Python 2
         return f'{self.name}'
 
@@ -75,6 +78,7 @@ class Customer(models.Model):
                             on_delete=models.SET_NULL,
                             blank=True,null=True)
     class Meta:
+        ordering = ['name']
         unique_together = [['name', 'tax']]
         indexes = [
             models.Index(fields=['name'],name='idx_shorepass_customer_name'),

@@ -3,6 +3,10 @@
 
 {% block content %}
 
+<script>
+  const shorepass_api_url = '{{shorepass_api_url}}';
+</script>
+
 <div id="app">
     <v-app>
         <div class="containeer">
@@ -19,59 +23,124 @@
                                   v-model="valid"
                                   lazy-validation
                                 >
-                                  <v-text-field
-                                    v-model="name"
-                                    :counter="10"
-                                    :rules="nameRules"
-                                    label="Name"
-                                    required
-                                  ></v-text-field>
-                              
-                                  <v-text-field
-                                    v-model="email"
-                                    :rules="emailRules"
-                                    label="E-mail"
-                                    required
-                                  ></v-text-field>
-                              
-                                  <v-select
-                                    v-model="select"
-                                    :items="items"
-                                    :rules="[v => !!v || 'Item is required']"
-                                    label="Item"
-                                    required
-                                  ></v-select>
-                              
-                                  <v-checkbox
-                                    v-model="checkbox"
-                                    :rules="[v => !!v || 'You must agree to continue!']"
-                                    label="Do you agree?"
-                                    required
-                                  ></v-checkbox>
-                              
-                                  <v-btn
-                                    :disabled="!valid"
-                                    color="success"
-                                    class="mr-4"
-                                    @click="validate"
+
+                               
+                                
+                                <!--Booking  -->
+                                <v-row>
+                                  <v-col
+                                    cols="12"
+                                    sm="6"
                                   >
-                                    Validate
-                                  </v-btn>
-                              
-                                  <v-btn
-                                    color="error"
-                                    class="mr-4"
-                                    @click="reset"
-                                  >
-                                    Reset Form
-                                  </v-btn>
-                              
-                                  <v-btn
-                                    color="warning"
-                                    @click="resetValidation"
-                                  >
-                                    Reset Validation
-                                  </v-btn>
+                                    <v-text-field
+                                      v-model="booking"
+                                      label="Booking number"
+                                      value=""
+                                      hint="For example, flowers or used cars"
+                                    ></v-text-field>
+                                  </v-col>
+                                </v-row>
+                                <!-- End Booking -->
+                                <!-- Vessel/Voy -->
+                                <v-card v-if="booking"
+                                  color="red lighten-2"
+                                  dark
+                                >
+                                  <v-card-text>
+
+                                     <!-- Terminal -->
+                              <v-radio-group
+                                v-model="terminal"
+                                row
+                                dark
+                              >
+                                <template v-slot:label>
+                                  <div>Select <strong>terminal</strong></div>
+                                </template>
+                                <v-radio
+                                  value="B1"
+                                  label="LCB1"
+                                >
+                                </v-radio>
+                                <v-radio
+                                  value="A0"
+                                  label="LCMT"
+                                >
+                                
+                                </v-radio>
+                              </v-radio-group>
+                              <!-- End Terminal -->
+
+                                    <v-autocomplete
+                                      v-model="agent"
+                                      :items="agentitems"
+                                      :loading="AgentisLoading"
+                                      :search-input.sync="search_agent"
+                                      color="white"
+                                      hide-no-data
+                                      hide-selected
+                                      item-text="Description"
+                                      item-value="name"
+                                      label="Line/Agent"
+                                      placeholder="Start typing to Search"
+                                      prepend-icon="mdi-database-search"
+                                      return-object
+                                    ></v-autocomplete>
+
+                                    <v-autocomplete
+                                      v-model="customer"
+                                      :items="customeritems"
+                                      :loading="CustomerisLoading"
+                                      :search-input.sync="search_customer"
+                                      color="white"
+                                      hide-no-data
+                                      hide-selected
+                                      item-text="Description"
+                                      item-value="name"
+                                      label="Customer"
+                                      placeholder="Start typing to Search"
+                                      prepend-icon="mdi-database-search"
+                                      return-object
+                                    ></v-autocomplete>
+                                    
+                                    <v-autocomplete
+                                      v-model="model"
+                                      :items="items"
+                                      :loading="isLoading"
+                                      :search-input.sync="search_vessel"
+                                      color="white"
+                                      hide-no-data
+                                      hide-selected
+                                      item-text="Description"
+                                      item-value="vessel"
+                                      label="Vessel Name or Voy number"
+                                      placeholder="Start typing to Search"
+                                      prepend-icon="mdi-database-search"
+                                      return-object
+                                    ></v-autocomplete>
+
+                                    <v-autocomplete
+                                      v-model="pod"
+                                      :items="poditems"
+                                      :loading="PodisLoading"
+                                      :search-input.sync="search_pod"
+                                      color="white"
+                                      hide-no-data
+                                      hide-selected
+                                      item-text="Description"
+                                      item-value="name"
+                                      label="POD"
+                                      placeholder="Start typing to Search"
+                                      prepend-icon="mdi-database-search"
+                                      return-object
+                                    ></v-autocomplete>
+                                      
+                                  </v-card-text>
+                                                                   
+                                </v-card>
+                               
+                                <!-- End Vessel voy -->
+                                  
                                 </v-form>
                               </template>
                             <!-- End Form -->
@@ -104,8 +173,265 @@
             delimiters: ['[[', ']]'],
             el: '#app',
             vuetify: new Vuetify(),
+            
             data: {
-            }
+              booking:'',
+              // Line/Agent 
+              agents: [],
+              AgentisLoading: false,
+              agent: null,
+              search_agent: null,
+              // Line/Agent
+
+              // Customer 
+              customers: [],
+              CustomerisLoading: false,
+              customer: null,
+              search_customer: null,
+              // Customer
+
+              // for auto complete--vessel
+              descriptionLimit: 60,
+              entries: [],
+              isLoading: false,
+              model: null,
+              search_vessel: null,
+              // End auto complete
+              
+              // POD 
+              pods: [],
+              PodisLoading: false,
+              pod: null,
+              search_pod: null,
+              // End POD
+
+              terminal:'B1',
+
+            },//End Data
+            computed: {
+              // For Vessel
+              fields () {
+                if (!this.model) return []
+
+                return Object.keys(this.model).map(key => {
+                  return {
+                    key,
+                    value: this.model[key] || 'n/a',
+                  }
+                })
+              },
+              items () {
+                return this.entries.map(entry => {
+                  const Description = entry.vessel.length > this.descriptionLimit
+                    ? entry.vessel.slice(0, this.descriptionLimit) + '...'
+                    : entry.vessel + ' (' + entry.voy + ')'
+
+                  return Object.assign({}, entry, { Description })
+                })
+              },//End item
+              // End Vessel
+              // For POD
+              // podfields () {
+              //   if (!this.pod) return []
+
+              //   return Object.keys(this.pod).map(key => {
+              //     return {
+              //       key,
+              //       value: this.pod[key] || 'n/a',
+              //     }
+              //   })
+              // },
+              poditems () {
+                return this.pods.map(entry => {
+                  const Description = entry.name.length > this.descriptionLimit
+                    ? entry.name.slice(0, this.descriptionLimit) + '...'
+                    : entry.name + ' (' + entry.description + ')'
+
+                  return Object.assign({}, entry, { Description })
+                })
+              },//End Poditem
+              customeritems () {
+                return this.customers.map(entry => {
+                  const Description = entry.name.length > this.descriptionLimit
+                    ? entry.name.slice(0, this.descriptionLimit) + '...'
+                    : entry.name 
+
+                  return Object.assign({}, entry, { Description })
+                })
+              },//End Poditem
+              agentitems () {
+                return this.agents.map(entry => {
+                  const Description = entry.name.length > this.descriptionLimit
+                    ? entry.name.slice(0, this.descriptionLimit) + '...'
+                    : entry.name + ' (' + entry.fullname + ')'
+
+                  return Object.assign({}, entry, { Description })
+                })
+              },//End Poditem
+
+            },//End Computed
+            
+            watch: {
+              terminal (){
+                this.entries =[];
+                this.model = null;
+              },
+
+              customer: function () {
+                console.log('Watch customer')
+                // this.answer = 'Waiting for you to stop typing...'
+                this.debouncedGetCustomer()
+              },
+              search_vessel (val) {
+                // Items have already been loaded
+                if (this.items.length > 0) return
+                // Items have already been requested
+                if (this.isLoading) return
+                this.isLoading = true
+                  axios
+                  .get( shorepass_api_url + 'voy/'+ this.terminal +'/')//Only internal use.
+                  .then(
+                      response => {
+                        this.isLoading = false;
+                        // console.log( 'Start loading' );
+                        this.count = 20;
+                        this.entries = response.data;
+                        // console.log( this.entries);
+                      })
+                  .catch(error =>{
+                        this.isLoading = false;
+                    })
+              },//End search_vessel
+              search_pod (val) {
+                // Items have already been loaded
+                if (this.pods.length > 0) return
+                // Items have already been requested
+                if (this.PodisLoading) return
+                this.PodisLoading = true
+                  axios
+                  .get( shorepass_api_url + 'pod/')//Only internal use.
+                  .then(
+                      response => {
+                        this.PodisLoading = false;
+                        console.log( 'Start loading POD' );
+                        this.count = response.data.count;
+                        this.pods = response.data.results;
+                        // console.log( response.data);
+                      })
+                  .catch(error =>{
+                        this.PodisLoading = false;
+                    })
+              },//End search_vessel
+
+              search_customer (val) {
+                // console.log('search_customer')
+                this.debouncedGetCustomer()
+                // Items have already been loaded
+                // if (this.pods.length > 0) return
+                // Items have already been requested
+                // if (this.PodisLoading) return
+                // this.PodisLoading = true
+                // console.log('Search Customer :' + val)
+                  // axios
+                  // .get( 'http://127.0.0.1:8000/api/shorepass/pod/')
+                  // .then(
+                  //     response => {
+                  //       this.PodisLoading = false;
+                  //       console.log( 'Start loading POD' );
+                  //       this.count = response.data.count;
+                  //       this.pods = response.data.results;
+                  //       // console.log( response.data);
+                  //     })
+                  // .catch(error =>{
+                  //       this.PodisLoading = false;
+                  //   })
+                  // this.PodisLoading = false
+              },//End search custoemr
+
+            },//End watch
+            created (){
+              // _.debounce is a function provided by lodash to limit how
+              // often a particularly expensive operation can be run.
+              // In this case, we want to limit how often we access
+              // yesno.wtf/api, waiting until the user has completely
+              // finished typing before making the ajax request. To learn
+              // more about the _.debounce function (and its cousin
+              // _.throttle), visit: https://lodash.com/docs#debounce
+              this.debouncedGetCustomer = _.debounce(this.getCustomer, 500)
+
+              console.log('Pulling Agent')
+              axios
+                  .get( shorepass_api_url + 'agent/')//Only internal use.
+                  .then(
+                      response => {
+                        this.AgentdisLoading = false;
+                        // console.log( 'Start loading POD' );
+                        this.count = response.data.count;
+                        this.agents = response.data.results;
+                        // console.log( response.data);
+                      })
+                  .catch(error =>{
+                        this.AgentdisLoading = false;
+                    })
+              // End pulling POD
+
+              console.log('Pulling POD')
+              axios
+                  .get( shorepass_api_url + 'pod/')//Only internal use.
+                  .then(
+                      response => {
+                        this.PodisLoading = false;
+                        // console.log( 'Start loading POD' );
+                        this.count = response.data.count;
+                        this.pods = response.data.results;
+                        // console.log( response.data);
+                      })
+                  .catch(error =>{
+                        this.PodisLoading = false;
+                    })
+              // End pulling POD
+              // console.log('Pulling Customer')
+              // axios
+              //     .get( 'http://127.0.0.1:8000/api/shorepass/customer/')//Only internal use.
+              //     .then(
+              //         response => {
+              //           this.CustomerisLoading = false;
+              //           // console.log( 'Start loading POD' );
+              //           this.count = response.data.count;
+              //           this.customers = response.data.results;
+              //           // console.log( response.data);
+              //         })
+              //     .catch(error =>{
+              //           this.CustomerisLoading = false;
+              //       })
+              // End pulling POD
+            },//End Create
+          methods: {
+            getCustomer () {
+                // Items have already been loaded
+                if (this.search_customer == '') {
+                  this.customers = [];
+                  return
+                }
+                // Items have already been requested
+                this.CustomerisLoading = true
+                console.log('Searching Customer :' + this.search_customer )
+                  axios
+                  .get( shorepass_api_url + 'customer/?name=' + this.search_customer)
+                  .then(
+                      response => {
+                        this.CustomerisLoading = false;
+                        this.count = response.data.count;
+                        this.customers = response.data.results;
+                        // console.log( response.data);
+                      })
+                  .catch(error =>{
+                        this.CustomerisLoading = false;
+                    })
+                  this.CustomerisLoading = false
+              },//End search custoemr
+          },//End Method
+
         })
     </script>
 {% endblock %}
