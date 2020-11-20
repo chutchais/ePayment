@@ -390,21 +390,24 @@
                         this.PodisLoading = false;
                     })
               // End pulling POD
-              // console.log('Pulling Customer')
-              // axios
-              //     .get( 'http://127.0.0.1:8000/api/shorepass/customer/')//Only internal use.
-              //     .then(
-              //         response => {
-              //           this.CustomerisLoading = false;
-              //           // console.log( 'Start loading POD' );
-              //           this.count = response.data.count;
-              //           this.customers = response.data.results;
-              //           // console.log( response.data);
-              //         })
-              //     .catch(error =>{
-              //           this.CustomerisLoading = false;
-              //       })
-              // End pulling POD
+              
+              //Pulling Vessel
+              console.log('Pulling Vessel')
+                  axios
+                  .get( shorepass_api_url + 'voy/'+ this.terminal +'/')//Only internal use.
+                  .then(
+                      response => {
+                        this.isLoading = false;
+                        // console.log( 'Start loading' );
+                        this.count = 20;
+                        this.entries = response.data;
+                        // console.log( this.entries);
+                      })
+                  .catch(error =>{
+                        this.isLoading = false;
+                    })
+              //End Pulling Vessel
+              
             },//End Create
           methods: {
             getCustomer () {
