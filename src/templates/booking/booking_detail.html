@@ -30,7 +30,7 @@
                           {% endif %}
                         </a> 
                       </h4>
-                      <button type="button" class="btn btn-success mb-2" v-on:click="greet(booking)">Get Container</button>
+                      <button type="button" class="btn btn-success mb-2" v-on:click="greet(booking)">แสดงหมายเลขตู้ทั้งหมด</button>
                       
                       <div class="text-center">
                         <v-progress-circular
@@ -295,7 +295,7 @@
                         <input v-if ="selected_address" type="hidden" name="address" :value="selected_address.pk">
 
                       <div class="form-group">
-                        <label for="exampleInputEmail1">Company Address</label>
+                        <label for="exampleInputEmail1">ที่อยู่สำหรับออกใบเสร็จ</label>
                          <v-autocomplete
                           item-text="company"
                           item-value="pk"

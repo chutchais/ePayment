@@ -31,7 +31,7 @@
 		          <h4>Booking List</h4>
               
               <a href="{% url 'booking:create' %}"><button type="button" class="btn btn-info"
-                {% if not user.profile.approved %}disabled{% endif%}>Create New Booking</button></a>
+                {% if not user.profile.approved %}disabled{% endif%}>เพิ่ม Booking ใหม่</button></a>
               <br>
 		          รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทั้งหมด {{ page_obj.paginator.count }} รายการ <br>
      {% if is_paginated %}
