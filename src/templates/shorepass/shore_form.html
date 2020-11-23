@@ -20,7 +20,6 @@
                             <template>
                                 <v-form
                                   ref="form"
-                                  v-model="valid"
                                   lazy-validation
                                 >
 
@@ -42,17 +41,17 @@
                                 </v-row>
                                 <!-- End Booking -->
                                 <!-- Vessel/Voy -->
-                                <v-card v-if="booking"
+                                <!-- <v-card v-if="booking"
                                   color="red lighten-2"
                                   dark
-                                >
-                                  <v-card-text>
+                                > -->
+                                <v-card v-if="booking">
+                                <v-card-text>
 
                                      <!-- Terminal -->
                               <v-radio-group
                                 v-model="terminal"
                                 row
-                                dark
                               >
                                 <template v-slot:label>
                                   <div>Select <strong>terminal</strong></div>
@@ -76,7 +75,6 @@
                                       :items="agentitems"
                                       :loading="AgentisLoading"
                                       :search-input.sync="search_agent"
-                                      color="white"
                                       hide-no-data
                                       hide-selected
                                       item-text="Description"
@@ -92,7 +90,6 @@
                                       :items="customeritems"
                                       :loading="CustomerisLoading"
                                       :search-input.sync="search_customer"
-                                      color="white"
                                       hide-no-data
                                       hide-selected
                                       item-text="Description"
@@ -108,7 +105,6 @@
                                       :items="items"
                                       :loading="isLoading"
                                       :search-input.sync="search_vessel"
-                                      color="white"
                                       hide-no-data
                                       hide-selected
                                       item-text="Description"
@@ -124,7 +120,6 @@
                                       :items="poditems"
                                       :loading="PodisLoading"
                                       :search-input.sync="search_pod"
-                                      color="white"
                                       hide-no-data
                                       hide-selected
                                       item-text="Description"
@@ -140,8 +135,196 @@
                                 </v-card>
                                
                                 <!-- End Vessel voy -->
+
+                                <!-- Container details -->
+                                <v-card class="mt-2">
+                                  <template>
+                                    <v-data-table
+                                      :headers="headers"
+                                      :items="containers"
+                                      sort-by="calories"
+                                      class="elevation-1"
+                                    >
+                                      <template v-slot:top>
+                                        <v-toolbar
+                                          flat
+                                        >
+                                          <v-toolbar-title>Containers</v-toolbar-title>
+                                          <v-divider
+                                            class="mx-4"
+                                            inset
+                                            vertical
+                                          ></v-divider>
+                                          <v-spacer></v-spacer>
+
+                                          <v-dialog
+                                            v-model="dialog"
+                                            max-width="500px"
+                                          >
+                                            <template v-slot:activator="{ on, attrs }">
+                                              <v-btn
+                                                color="primary"
+                                                dark
+                                                class="mb-2"
+                                                v-bind="attrs"
+                                                v-on="on"
+                                              >
+                                                New Container
+                                              </v-btn>
+                                            </template>
+                                            <v-card>
+                                              <v-card-title>
+                                                <span class="headline">{{ formTitle }}</span>
+                                              </v-card-title>
                                   
-                                </v-form>
+                                              <v-card-text>
+                                                <v-container>
+                                                  <v-row>
+                                                    <v-col
+                                                      cols="12"
+                                                      sm="6"
+                                                      md="4"
+                                                    >
+                                                      <v-text-field
+                                                        v-model="editedItem.name"
+                                                        label="Container number"
+                                                        :rules ="[rules.container]"
+                                                      ></v-text-field>
+                                                    </v-col>
+
+                                                    <v-col
+                                                      cols="12"
+                                                      sm="6"
+                                                      md="4"
+                                                    >
+                                                      <v-select
+                                                        v-model="editedItem.size"
+                                                        :items="sizes"
+                                                        label="Size"
+                                                      ></v-select>
+                                                    </v-col>
+
+                                                    <v-col
+                                                      cols="12"
+                                                      sm="6"
+                                                      md="4"
+                                                    >
+                                                      <v-select
+                                                        v-model="editedItem.container_type"
+                                                        :items="container_type"
+                                                        label="Type"
+                                                      ></v-select>
+                                                    </v-col>
+
+                                                    <v-col
+                                                      cols="12"
+                                                      sm="6"
+                                                      md="4"
+                                                    >
+                                                      <v-text-field
+                                                        v-model="editedItem.temperature"
+                                                        label="Temperature"
+                                                        :rules ="[rules.temperature]"
+                                                      ></v-text-field>
+
+                                                    </v-col>
+                                                    <v-col
+                                                      cols="12"
+                                                      sm="6"
+                                                      md="4"
+                                                    >
+                                                      <v-select
+                                                        v-model="editedItem.stowage"
+                                                        :items="stowages"
+                                                        label="Stowage"
+                                                      ></v-select>
+                                                    </v-col>
+                                                  </v-row>
+                                                </v-container>
+                                              </v-card-text>
+                                  
+                                              <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                  color="blue darken-1"
+                                                  text
+                                                  @click="close"
+                                                >
+                                                  Cancel
+                                                </v-btn>
+                                                <v-btn
+                                                  color="blue darken-1"
+                                                  text
+                                                  @click="save"
+                                                >
+                                                  Save
+                                                </v-btn>
+                                              </v-card-actions>
+                                            </v-card>
+                                          </v-dialog>
+                                          <v-dialog v-model="dialogDelete" max-width="500px">
+                                            <v-card>
+                                              <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+                                              <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+                                                <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                                                <v-spacer></v-spacer>
+                                              </v-card-actions>
+                                            </v-card>
+                                          </v-dialog>
+                                        </v-toolbar>
+                                      </template>
+
+                                      <template v-slot:item.actions="{ item }">
+                                        <v-icon
+                                          small
+                                          class="mr-2"
+                                          @click="editItem(item)"
+                                        >
+                                          mdi-pencil
+                                        </v-icon>
+                                        <v-icon
+                                          small
+                                          @click="deleteItem(item)"
+                                        >
+                                          mdi-delete
+                                        </v-icon>
+                                      </template>
+                                      <template v-slot:no-data>
+                                        <v-btn
+                                          color="primary"
+                                          
+                                        >
+                                          Reset
+                                        </v-btn>
+                                      </template>
+                                    </v-data-table>
+                                  </template>
+                                </v-card>
+                                <!-- End Data table -->
+
+                                <!-- Start File -->
+                                <v-file-input
+                                show-size
+                                label="File input"
+                              ></v-file-input>
+                                <!-- End file -->
+
+                                <v-btn
+                                  color="success"
+                                  class="white--text"
+                                >
+                                  Save Data
+                                  <v-icon
+                                    right
+                                    dark
+                                  >
+                                    mdi-cloud-upload
+                                  </v-icon>
+                                </v-btn>
+
+                              </v-form>
                               </template>
                             <!-- End Form -->
 
@@ -207,8 +390,65 @@
 
               terminal:'B1',
 
+              // Container details
+              sizes : ['20','40','45'],
+              container_type:['DV','DG','RE','OT'],
+              stowages :['','UD','OD'],
+              rules: {
+                required: value => !!value || 'Required.',
+                counter: value => value.length <= 11 || 'Max 11 characters',
+                email: value => {
+                  const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                  return pattern.test(value) || 'Invalid e-mail.'
+                },
+                container: value =>{
+                  const pattern = /^[a-zA-Z]{4}[0-9]{7}$/
+                  return pattern.test(value) || 'Invalid container number'
+                },
+                temperature : value =>{
+                  const pattern = /^([-+]?[0-9]+(\.[0-9]*)?)$/
+                  return pattern.test(value) || 'Invalid temperature'
+                }
+              },
+              // End Container details
+
+              dialog: false,
+              dialogDelete: false,
+              headers: [
+                {
+                  text: 'Container',
+                  align: 'start',
+                  sortable: false,
+                  value: 'name',
+                },
+                { text: 'Size', value: 'size' },
+                { text: 'Type', value: 'container_type' },
+                { text: 'Temperature', value: 'temperature' },
+                { text: 'Stowage', value: 'stowage' },
+                { text: 'Actions', value: 'actions', sortable: false },
+              ],
+              containers: [],
+              editedIndex: -1,
+              editedItem: {
+                name: '',
+                size: '40',
+                container_type: 'DV',
+                temperature: '',
+                stowage: '',
+              },
+              defaultItem: {
+                name: '',
+                size: '40',
+                container_type: 'DV',
+                temperature: '',
+                stowage: '',
+              },
+
             },//End Data
             computed: {
+              formTitle () {
+                return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+              },
               // For Vessel
               fields () {
                 if (!this.model) return []
@@ -272,6 +512,13 @@
             },//End Computed
             
             watch: {
+              dialog (val) {
+                val || this.close()
+              },
+              dialogDelete (val) {
+                val || this.closeDelete()
+              },
+
               terminal (){
                 this.entries =[];
                 this.model = null;
@@ -433,6 +680,48 @@
                     })
                   this.CustomerisLoading = false
               },//End search custoemr
+
+              editItem (item) {
+                this.editedIndex = this.containers.indexOf(item)
+                this.editedItem = Object.assign({}, item)
+                this.dialog = true
+              },//End editItem
+
+              deleteItem (item) {
+                this.editedIndex = this.containers.indexOf(item)
+                this.editedItem = Object.assign({}, item)
+                this.dialogDelete = true
+              },//End deleteItem
+
+              deleteItemConfirm () {
+                this.containers.splice(this.editedIndex, 1)
+                this.closeDelete()
+              }, //End deleteItemConfirm
+
+              close () {
+                console.log('close')
+                this.dialog = false
+                this.$nextTick(() => {
+                  this.editedItem = Object.assign({}, this.defaultItem)
+                  this.editedIndex = -1
+                })
+              },//End CLose
+              closeDelete () {
+                this.dialogDelete = false
+                this.$nextTick(() => {
+                  this.editedItem = Object.assign({}, this.defaultItem)
+                  this.editedIndex = -1
+                })
+              },//End closedDelete
+
+              save () {
+                if (this.editedIndex > -1) {
+                  Object.assign(this.containers[this.editedIndex], this.editedItem)
+                } else {
+                  this.containers.push(this.editedItem)
+                }
+                this.close()
+              },//End Save
           },//End Method
 
         })
