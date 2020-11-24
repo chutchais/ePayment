@@ -101,14 +101,14 @@
                                     ></v-autocomplete>
                                     
                                     <v-autocomplete
-                                      v-model="model"
+                                      v-model="vessel"
                                       :items="items"
                                       :loading="isLoading"
                                       :search-input.sync="search_vessel"
                                       hide-no-data
                                       hide-selected
                                       item-text="Description"
-                                      item-value="vessel"
+                                      item-value="slug"
                                       label="Vessel Name or Voy number"
                                       placeholder="Start typing to Search"
                                       prepend-icon="mdi-database-search"
@@ -304,25 +304,46 @@
                                 </v-card>
                                 <!-- End Data table -->
 
-                                <!-- Start File -->
-                                <v-file-input
-                                show-size
-                                label="File input"
-                              ></v-file-input>
-                                <!-- End file -->
+                                
 
-                                <v-btn
-                                  color="success"
-                                  class="white--text"
-                                >
-                                  Save Data
-                                  <v-icon
-                                    right
-                                    dark
-                                  >
-                                    mdi-cloud-upload
-                                  </v-icon>
-                                </v-btn>
+                                
+                                {% if user.is_authenticated %}
+                                  <form action="" method="post" enctype="multipart/form-data" novalidate>
+                  
+                                    {% csrf_token %}
+                                      <input type="hidden" name="booking" :value="[[booking]]">
+                                      <input type="hidden" name="terminal" :value="[[selected_terminal]]">
+                                      <input type="hidden" name="vessel_name" :value="[[selected_vessel]]">
+                                      <input type="hidden" name="agent" :value="[[selected_agent]]">
+                                      <input type="hidden" name="customer" :value="[[selected_customer]]">
+                                      <input type="hidden" name="pod" :value="[[selected_pod]]">
+                                      <input type="hidden" name="voy" :value="[[selected_voy]]">
+                                      <input type="hidden" name="containers_json" :value="[[selected_containers]]">
+
+                                      <!-- Start File -->
+                                      <!-- <v-file-input
+                                      show-size
+                                      label="File input1"
+                                      v-model="file1"
+                                    ></v-file-input>
+                                    <v-file-input
+                                      show-size
+                                      label="File input2"
+                                      v-model="file2"
+                                    ></v-file-input> -->
+                                <!-- End file -->
+                                <br>
+                                      {{ form.shorefile1.label_tag  }}{{ form.shorefile1 }}<br>
+                                      {{ form.shorefile2.label_tag  }}{{ form.shorefile2 }}<br>
+                                      <button type="submit" class="btn btn-primary" >Upload Data</button>
+                                  </form>
+
+                                  <!-- <form method="post" novalidate>{% csrf_token %}
+                                    {{ form|crispy }}
+                                    <button type="submit" class="btn btn-primary">Create Booking</button>
+                                </form> -->
+                                {% endif %}
+                                
 
                               </v-form>
                               </template>
@@ -377,7 +398,7 @@
               descriptionLimit: 60,
               entries: [],
               isLoading: false,
-              model: null,
+              vessel: null,
               search_vessel: null,
               // End auto complete
               
@@ -446,17 +467,41 @@
 
             },//End Data
             computed: {
+              // Selected Select
+              // this.selected_json = JSON.stringify(this.selected)
+              selected_containers(){
+                return JSON.stringify(this.containers)
+              },
+              selected_terminal(){
+                return this.terminal === 'B1' ? 'LCB1' : 'LCMT'
+              },
+              selected_agent(){
+                return this.agent !== null ? this.agent.name : ''
+              },
+              selected_customer(){
+                return this.customer !== null ? this.customer.pk : ''
+              },
+              selected_vessel(){
+                return this.vessel !== null ? this.vessel.vessel : ''
+              },
+              selected_pod(){
+                return this.pod !== null ? this.pod.name : ''
+              },
+              selected_voy(){
+                return this.vessel !== null ? this.vessel.voy : ''
+              },
+              // End Select
               formTitle () {
                 return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
               },
               // For Vessel
               fields () {
-                if (!this.model) return []
+                if (!this.vessel) return []
 
-                return Object.keys(this.model).map(key => {
+                return Object.keys(this.vessel).map(key => {
                   return {
                     key,
-                    value: this.model[key] || 'n/a',
+                    value: this.vessel[key] || 'n/a',
                   }
                 })
               },
@@ -521,7 +566,7 @@
 
               terminal (){
                 this.entries =[];
-                this.model = null;
+                this.vessel = null;
               },
 
               customer: function () {

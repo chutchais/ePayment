@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<script>
+</script>
+
+<div id="app">
+    <v-app>
+        <div class="containeer">
+            <div class="col-sm-12 col-md-12">
+                <div class="col-12 mb-2">
+                    <div class="content">
+                        <div class="card">
+                            <div class="card-body">
+
+                                    <h2>{{object}}</h2>
+                                    Created on : {{object.created}} ({{object.created|naturaltime}})
+                                    
+                                    <!-- Shore detail -->
+                                    <v-alert
+                                        color="cyan"
+                                        border="left"
+                                        elevation="2"
+                                        colored-border
+                                        icon="mdi-ferry"
+                                    >
+                                        <div class="">  
+                                            Vessel : <strong>{{object.vessel_name}}</strong>  Voy : <strong>{{object.voy}}</strong> 
+                                        </div>
+                                        <div class="">
+                                            POD : <strong>{{object.pod}}</strong>
+                                        </div>
+                                        <div class="">
+                                            Line/Agent : <strong>{{object.agent}}</strong>
+                                        </div>
+
+                                        <div class="">  
+                                            Customer : <strong>{{object.customer}}</strong>
+                                        </div>
+
+                                    </v-alert>
+                                    
+                                    <!-- End Shore detail -->
+
+                                    <!-- Attached files -->
+                                    <div class="row">
+                                        {% if object.shorefile1 %}
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-6 mb-2">
+                                            <div class="card ">
+                                                <img class="card-img-top" 
+                                                    src="{{object.shorefile1.url}}" alt="Card image cap">
+                                                <div class="card-body">
+                                                <h5 class="card-title">แนบเอกสาร1<i class="fas fa-file-invoice"></i></a></h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if object.shorefile2 %}
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-6 mb-2">
+                                            <div class="card ">
+                                                <img class="card-img-top" 
+                                                    src="{{object.shorefile2.url}}" alt="Card image cap">
+                                                <div class="card-body">
+                                                <h5 class="card-title">แนบเอกสาร2<i class="fas fa-file-invoice"></i></a></h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <!-- End Attached file-->
+
+                                    <!-- Container Details -->
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
+                                          <!-- <div class="content"> -->
+                                            <h4>Container List</h4>
+                                            <div class="table-responsive-md">
+                                            <table class="table">
+                                            <thead>
+                                              <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Container</th>
+                                                <th scope="col">Size</th>
+                                                <th scope="col">Type</th>
+                                                <th scope="col">Temperature</th>
+                                                <th scope="col">Stowage</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {% for container in object.containers.all|dictsort:"number" %}
+                                              <tr>
+                                                <th scope="row">{{ forloop.counter }}</th>
+                                                <td>{{container.number}}</td>
+                                                <td>{{container.cont_size}}</td>
+                                                <td>{{container.cont_type}}</td>
+                                                <td>{{container.temperature|default_if_none:"nothing"}}</td>
+                                                <td>{{container.stowage|default_if_none:""}}</td>
+                                              </tr>
+                                              {% endfor %}
+                                            </tbody>
+                                          </table>
+                                        </div> <!-- table-responsive-md -->
+                                        </div>
+                                    <!-- End Container -->
+
+                            </div> <!-- card-body-->
+                        </div><!-- End Card-->
+                    </div>
+                </div><!-- col-12 mb-2-->
+            </div><!-- End col-sm-12 col-md-12--->
+            
+        </div><!-- End Container-->
+    </v-app>
+</div>
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}
+
+
+{% block script %}
+  <script>
+    new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        vuetify: new Vuetify(),
+        data: {
+        }//End data
+    })//End Vue
+  </script>
+{% endblock %}

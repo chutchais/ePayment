@@ -15,4 +15,4 @@ class PodSerializer(serializers.ModelSerializer):
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ('name','address','tax','branch','description','status')
+        fields = ('pk','name','address','tax','branch','description','status')

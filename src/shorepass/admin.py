@@ -4,7 +4,7 @@ from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export.admin import ImportExportActionModelAdmin
-from .models import Shore,Document,Agent,Pod,Customer
+from .models import Shore,Document,Agent,Pod,Customer,Container
 
 class DocumentInline(admin.TabularInline):
 	model = Document
@@ -17,11 +17,22 @@ class DocumentInline(admin.TabularInline):
 	verbose_name = 'Document detail'
 	verbose_name_plural = 'Document detail'
 
+class ContainerInline(admin.TabularInline):
+	model = Container
+	fields = ('number','cont_size','cont_type','temperature','stowage')
+	readonly_fields = ('created',)
+	extra = 0 # how many rows to show
+
+	# autocomplete_fields = ('operation','next_pass','next_fail')
+	# show_change_link = True
+	verbose_name = 'Container detail'
+	verbose_name_plural = 'Container detail'
+
 @admin.register(Shore)
 class ShoreAdmin(ImportExportModelAdmin,ImportExportActionModelAdmin,admin.ModelAdmin):
 	search_fields = ['booking','vessel_name','pod__name','voy','agent__name']
 	list_filter = ['terminal','execute_job']
-	list_display = ('booking','agent','vessel_name','pod','voy','created','user','execute_job')
+	list_display = ('booking','terminal','agent','vessel_name','pod','voy','created','user','execute_job')
 	# list_editable = ('color','move_performa')
 	# autocomplete_fields = ['parent']
 	readonly_fields = ('created','user')
@@ -35,11 +46,12 @@ class ShoreAdmin(ImportExportModelAdmin,ImportExportActionModelAdmin,admin.Model
 	fieldsets = [
 		('Basic Information',{'fields': ['booking','terminal','agent']}),
 		('Vessel Information',{'fields': ['vessel_name','pod','voy']}),
-		('Customer Information',{'fields': ['customer_name']}),
+		('Customer Information',{'fields': ['customer']}),
+		('Files Information',{'fields': ['shorefile1','shorefile2']}),
 		('Execute job',{'fields': ['execute_job','execute_date','execute_by']}),
 		('System Information',{'fields':[('user','created')]})
 	]
-	inlines =[DocumentInline]
+	inlines =[DocumentInline,ContainerInline]
 	# resource_class      = OrderResource
 
 

@@ -87,6 +87,7 @@
                 <th scope="col">Status</th>
                 <th scope="col">Booking</th>
                 <th scope="col">Terminal</th>
+                <th scope="col">#Container</th>
                 <th scope="col">Vessel</th>
                 <!-- <th scope="col">Order</th> -->
 					      <!-- <th scope="col">booking</th>
@@ -156,16 +157,17 @@
                       <span class="badge badge-secondary">UnPaid</span>
                     {% endif %}
                   </td>
-                <td><a href="{{order.get_absolute_url}}">{{object.booking}}</a></td>
+                <td><a href="{{object.get_absolute_url}}">{{object.booking}}</a></td>
                 <td class="text-center">{{object.terminal}}</td>
+                <td class="text-center">{{object.container_count}}</td>
                 <td class="text-center">{{object.vessel_name}}</td>
                  <td class="text-right">{{object.voy}}</td>
                  <td class="text-right">{{object.pod}}</td>
 				<td class="text-right">{{object.created}}</td>
 
                 {% if perms.order.verify_payment or perms.order.execute_job  %}
-                    <td>{{order.user}}</td>
-                    <td>{{order.execute_by|default_if_none:""}}</td>
+                    <td>{{object.user}}</td>
+                    <td>{{object.execute_by|default_if_none:""}}</td>
                 {% endif %}
 					      
 					    </tr>

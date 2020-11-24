@@ -43,12 +43,18 @@ class ShoreDetailView(LoginRequiredMixin,DetailView):
 
 class ShoreCreateView(LoginRequiredMixin,CreateView):
 	model = Shore
-	fields = ['booking','vessel_name','pod','voy','terminal','agent']
+	fields = ['booking','vessel_name','pod','voy',
+			'terminal','agent','customer','shorefile1','shorefile2','containers_json']
+
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		# shorepass_base_url 			= f"{reverse_lazy('shorepass:list')}address/"
 		context['shorepass_api_url'] 		= '/api/shorepass/'
 		return context
+	
+	def form_valid(self, form):
+		form.instance.user = self.request.user
+		return super(ShoreCreateView, self).form_valid(form)
 
 # class ShoreCreateView(TemplateView):
 # 	template_name = "shorepass/shore_create.html"
