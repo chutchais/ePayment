@@ -14,8 +14,46 @@
                         <div class="card">
                             <div class="card-body">
 
-                                    <h2>{{object}}</h2>
+                                    <h2>
+                                        {{object}}
+                                       
+                                        <!-- Status -->
+                                        {% if object.execute_job %}
+                                            <span class="badge badge-success">พร้อมชำระเงิน</span> 
+                                        {% else %}
+                                            <a href="{% url 'shorepass:shoredelete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
+
+                                            {% if object.need_contact %}
+                                                <span class="badge badge-danger">ติดต่อเจ้าหน้าที่</span>
+                                            {% else %}
+                                                {% if object.shorefile1 or  object.shorefile2 %}
+                                                    <span class="badge badge-warning">รออนุมัติ</span>
+                                                {% else %}
+                                                    <span class="badge badge-danger">แนบเอกสารเพิ่ม</span>
+                                                {% endif %}
+                                            {% endif %}
+
+                                            
+                                        {% endif %}<!-- End Job executed-->
+                                        <!-- End Status -->
+                                    </h2>
                                     Created on : {{object.created}} ({{object.created|naturaltime}})
+                                    
+                                    <br>
+                                    <a href="{% url 'shorepass:list' %}">กลับหน้าหลัก</a>
+                                    
+                                    <!-- Need Contact Staff message -->
+                                    {% if object.need_contact %}
+                                    <v-alert
+                                        color="red"
+                                        border="left"
+                                        elevation="2"
+                                        colored-border
+                                        icon="mdi-message-text"
+                                    >
+                                        {{object.message|linebreaksbr}}
+                                    </v-alert>
+                                    {% endif %}
                                     
                                     <!-- Shore detail -->
                                     <v-alert
@@ -45,28 +83,37 @@
 
                                     <!-- Attached files -->
                                     <div class="row">
-                                        {% if object.shorefile1 %}
+                                        
                                         <div class="col-12 col-sm-6 col-md-6 col-lg-6 mb-2">
                                             <div class="card ">
+                                                {% if object.shorefile1 %}
                                                 <img class="card-img-top" 
                                                     src="{{object.shorefile1.url}}" alt="Card image cap">
-                                                <div class="card-body">
-                                                <h5 class="card-title">แนบเอกสาร1<i class="fas fa-file-invoice"></i></a></h5>
+                                                    {% endif %}
+                                                    <div class="card-body">
+                                                <h5 class="card-title">
+                                                    <a href="{% url 'shorepass:file1' object.pk %}">แนบเอกสาร1 <i class="fas fa-file-invoice"></i></a></h5>
                                                 </div>
                                             </div>
                                         </div>
-                                        {% endif %}
-                                        {% if object.shorefile2 %}
+                                     
+
+                                        
+
+                                        
                                         <div class="col-12 col-sm-6 col-md-6 col-lg-6 mb-2">
                                             <div class="card ">
+                                                {% if object.shorefile2 %}
                                                 <img class="card-img-top" 
                                                     src="{{object.shorefile2.url}}" alt="Card image cap">
+                                                    {% endif %}
                                                 <div class="card-body">
-                                                <h5 class="card-title">แนบเอกสาร2<i class="fas fa-file-invoice"></i></a></h5>
+                                                <h5 class="card-title">
+                                                    <a href="{% url 'shorepass:file2' object.pk %}">แนบเอกสาร2<i class="fas fa-file-invoice"></i></a></h5>
                                                 </div>
                                             </div>
                                         </div>
-                                        {% endif %}
+                                        
                                     </div>
                                     <!-- End Attached file-->
 
@@ -101,6 +148,31 @@
                                             </tbody>
                                           </table>
                                         </div> <!-- table-responsive-md -->
+
+                                        <!-- Start Execute -->
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
+                                              {% if perms.shorepass.verify_shore or perms.shorepass.execute_job  %}
+                                              <div> 
+                                              <a href="{% url 'shorepass:message' object.id %}">
+                                                <button type="button" class="btn btn-danger">Contact back</button>
+                                                </a>  
+                                            </div>  
+                                            <div>
+                                                <a href="{% url 'shorepass:execute' object.id %}">
+                                                    <button type="button" class="btn btn-info">Execute Job</button>
+                                                </a>
+                                            </div>
+                                              {% endif %}
+                          
+                                              {% if object.execute_job %}
+                                                <hr>
+                                                Executed by : {{object.execute_by}} on {{object.execute_date}}
+                                              {% endif %}
+                                              </div>
+                                          </div>
+                                          <!-- End Execute -->
+
                                         </div>
                                     <!-- End Container -->
 

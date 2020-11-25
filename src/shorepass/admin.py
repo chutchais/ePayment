@@ -31,7 +31,7 @@ class ContainerInline(admin.TabularInline):
 @admin.register(Shore)
 class ShoreAdmin(ImportExportModelAdmin,ImportExportActionModelAdmin,admin.ModelAdmin):
 	search_fields = ['booking','vessel_name','pod__name','voy','agent__name']
-	list_filter = ['terminal','execute_job']
+	list_filter = ['terminal','execute_job','need_contact']
 	list_display = ('booking','terminal','agent','vessel_name','pod','voy','created','user','execute_job')
 	# list_editable = ('color','move_performa')
 	# autocomplete_fields = ['parent']
@@ -48,6 +48,7 @@ class ShoreAdmin(ImportExportModelAdmin,ImportExportActionModelAdmin,admin.Model
 		('Vessel Information',{'fields': ['vessel_name','pod','voy']}),
 		('Customer Information',{'fields': ['customer']}),
 		('Files Information',{'fields': ['shorefile1','shorefile2']}),
+		('Need contact Information',{'fields': ['need_contact','message']}),
 		('Execute job',{'fields': ['execute_job','execute_date','execute_by']}),
 		('System Information',{'fields':[('user','created')]})
 	]

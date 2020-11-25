@@ -19,6 +19,8 @@ from order.forms import OrderPaySlipForm,CreateOrderForm,OrderPaymentForm
 from oog.models import Oog
 from booking.models import Booking
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 @login_required
 def index(request):
@@ -199,6 +201,18 @@ class OrderCreateView(LoginRequiredMixin,CreateView):
 class OrderDetailView(LoginRequiredMixin,DetailView):
     # model = Order
     queryset = Order.objects.select_related('booking','address')
+
+    # Added on Nov 25,2020 -- To protect access by other
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+
+        if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
+
     def get_context_data(self,**kwargs):
         context = super(OrderDetailView,self).get_context_data(**kwargs)
         # context['qr_url'] = settings.QR_CODE_ENDPOINT_URL#'http://10.24.50.91:8010/billing/'#
@@ -221,12 +235,32 @@ class OrderUpdateSlip(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['payment_slip']
     template_name_suffix = '_update_payslip_form'
+    # Added on Nov 25,2020 -- To protect access by other
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+
+        if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
 
 # Added on Oct 28,2020 -- To support WHT slip upload
 class OrderUpdateWHT(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['wht_slip']
     template_name_suffix = '_update_whtslip_form'
+        # Added on Nov 25,2020 -- To protect access by other
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+
+        if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
 
 class OrderUpdatePaid(LoginRequiredMixin,UpdateView):
     model = Order

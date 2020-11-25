@@ -147,6 +147,9 @@ class Shore(models.Model):
 	shorefile2           = models.ImageField(upload_to=image_shore_file_name,blank=True, null=True)
 	# for keep containers in json format
 	containers_json      = models.TextField(blank=True, null=True)
+	# Added on Nov 25,2020 -- To support Contact staff feature.
+	need_contact		= models.BooleanField(default=False)
+	message 			= models.TextField(blank=True, null=True)
 
 	
 	class Meta:
@@ -184,7 +187,7 @@ def post_save_shore_receiver(sender, instance,created, *args, **kwargs):
 					number=container['name'],
 					cont_size=container['size'],
 					cont_type=container['container_type'],
-					temperature=container['temperature'],
+					temperature = 0 if container['temperature'] == '' else container['temperature'],
 					stowage=container['stowage'],
 					user=instance.user)
 				c.save()
@@ -209,7 +212,7 @@ class Container(models.Model):
 							related_name = 'containers')
 	cont_size           = models.IntegerField(default=40)
 	cont_type           = models.CharField(max_length=5,default='DV')
-	temperature         = models.SmallIntegerField(blank=True,null=True)
+	temperature         = models.SmallIntegerField(default=0,blank=True,null=True)
 	stowage             = models.CharField(max_length=10,blank=True,null=True
 							,choices=STOWAGE_CHOICES)
 	created             = models.DateTimeField(blank=True, null=True,auto_now_add=True)

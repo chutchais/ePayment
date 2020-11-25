@@ -70,7 +70,8 @@
                     <span v-if="seperate_bill" class="badge badge-primary">แยกใบเสร็จ</span>
               </h2>
               <span>Created on : {{object.created}} ({{object.created|naturaltime}})</span>
-
+              <br>
+              <a href="{% url 'order:list' %}">กลับหน้าหลัก</a>
               
 
               {% if object.paid %}
