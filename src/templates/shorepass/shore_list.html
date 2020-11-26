@@ -109,7 +109,7 @@
                 
                 <th scope="col">Execute Job</th> -->
 
-                {% if perms.order.verify_payment or perms.order.execute_job %}
+                {% if perms.shorepass.verify_shore or perms.shorepass.execute_shore %}
                   <th scope="col">User</th>
                   <th scope="col">Execute by</th>
                 {% endif %}
@@ -147,7 +147,7 @@
                  <td class="text-right">{{object.pod}}</td>
 				<td class="text-right">{{object.created}}</td>
 
-                {% if perms.order.verify_payment or perms.order.execute_job  %}
+                {% if perms.shorepass.verify_shore or perms.shorepass.execute_shore  %}
                     <td>{{object.user}}</td>
                     <td>{{object.execute_by|default_if_none:""}}</td>
                 {% endif %}

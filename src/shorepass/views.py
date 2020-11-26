@@ -128,11 +128,11 @@ class ShoreDeleteView(LoginRequiredMixin,DeleteView):
             raise Http404("Not allow to delete") #or return HttpResponse('404_url')
 
 
-class ShoreUpdateExecuteJob(LoginRequiredMixin,UpdateView):
+class ShoreUpdateExecuteJob(PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
     model = Shore
     fields = ['execute_job']
     template_name_suffix = '_update_executejob_form'
-    # permission_required = ('shore.verify_shore', 'shore.execute_job')
+    permission_required = ('shorepass.verify_shore', 'shorepass.execute_job')
 
     def form_valid(self, form):
         import datetime, pytz
@@ -142,8 +142,8 @@ class ShoreUpdateExecuteJob(LoginRequiredMixin,UpdateView):
         form.instance.execute_by = self.request.user
         return super(ShoreUpdateExecuteJob, self).form_valid(form)
 
-class ShoreUpdateContactMessage(LoginRequiredMixin,UpdateView):
+class ShoreUpdateContactMessage(PermissionRequiredMixin,LoginRequiredMixin,UpdateView):
     model = Shore
     fields = ['need_contact','message']
     template_name_suffix = '_update_message_form'
-    # permission_required = ('shorepass.verify_shore', 'shorepass.execute_job')
+    permission_required = ('shorepass.verify_shore', 'shorepass.execute_job')

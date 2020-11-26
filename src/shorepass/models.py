@@ -184,7 +184,7 @@ def post_save_shore_receiver(sender, instance,created, *args, **kwargs):
 			containers_json = json.loads(instance.containers_json)
 			for container in containers_json:
 				c = Container(shore=instance,
-					number=container['name'],
+					number=container['name'].upper(),
 					cont_size=container['size'],
 					cont_type=container['container_type'],
 					temperature = 0 if container['temperature'] == '' else container['temperature'],

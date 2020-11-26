@@ -373,6 +373,11 @@
 {% block script %}
     <script>
 
+        // Vue.filter('uppercase', function (value) {
+        //   return value.toUpperCase()
+        // })
+
+
         new Vue({
             delimiters: ['[[', ']]'],
             el: '#app',
@@ -557,6 +562,9 @@
             },//End Computed
             
             watch: {
+              booking (){
+                this.booking = this.booking.toUpperCase();
+              },
               dialog (val) {
                 val || this.close()
               },
