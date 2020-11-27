@@ -81,6 +81,39 @@
                                     
                                     <!-- End Shore detail -->
 
+                                    <!-- Container Details -->
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
+                                          <!-- <div class="content"> -->
+                                            <h4>Container List</h4>
+                                            <div class="table-responsive-md">
+                                            <table class="table">
+                                            <thead>
+                                              <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Container</th>
+                                                <th scope="col">Size</th>
+                                                <th scope="col">Type</th>
+                                                <th scope="col">Temperature</th>
+                                                <th scope="col">Stowage</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {% for container in object.containers.all|dictsort:"number" %}
+                                              <tr>
+                                                <th scope="row">{{ forloop.counter }}</th>
+                                                <td>{{container.number}}</td>
+                                                <td>{{container.cont_size}}</td>
+                                                <td>{{container.cont_type}}</td>
+                                                <td>{{container.temperature|default_if_none:"nothing"}}</td>
+                                                <td>{{container.stowage|default_if_none:""}}</td>
+                                              </tr>
+                                              {% endfor %}
+                                            </tbody>
+                                          </table>
+                                        </div> <!-- table-responsive-md -->
+                                        <!-- End Container Detail -->
+
                                     <!-- Attached files -->
                                     <div class="row">
                                         
@@ -117,39 +150,7 @@
                                     </div>
                                     <!-- End Attached file-->
 
-                                    <!-- Container Details -->
-                                    <div class="row">
-                                        <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
-                                          <!-- <div class="content"> -->
-                                            <h4>Container List</h4>
-                                            <div class="table-responsive-md">
-                                            <table class="table">
-                                            <thead>
-                                              <tr>
-                                                <th scope="col">#</th>
-                                                <th scope="col">Container</th>
-                                                <th scope="col">Size</th>
-                                                <th scope="col">Type</th>
-                                                <th scope="col">Temperature</th>
-                                                <th scope="col">Stowage</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {% for container in object.containers.all|dictsort:"number" %}
-                                              <tr>
-                                                <th scope="row">{{ forloop.counter }}</th>
-                                                <td>{{container.number}}</td>
-                                                <td>{{container.cont_size}}</td>
-                                                <td>{{container.cont_type}}</td>
-                                                <td>{{container.temperature|default_if_none:"nothing"}}</td>
-                                                <td>{{container.stowage|default_if_none:""}}</td>
-                                              </tr>
-                                              {% endfor %}
-                                            </tbody>
-                                          </table>
-                                        </div> <!-- table-responsive-md -->
-
-                                        <!-- Start Execute -->
+                                    <!-- Start Execute -->
                                         <div class="row">
                                             <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
                                               {% if perms.shorepass.verify_shore or perms.shorepass.execute_job  %}
