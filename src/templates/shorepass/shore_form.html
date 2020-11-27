@@ -335,7 +335,17 @@
                                 <br>
                                       {{ form.shorefile1.label_tag  }}{{ form.shorefile1 }}(รูปภาพเท่านั้น)<br>
                                       {{ form.shorefile2.label_tag  }}{{ form.shorefile2 }}(รูปภาพเท่านั้น)<br>
-                                      <button type="submit" class="btn btn-primary" >Upload Data</button>
+                                      <v-alert
+                                      v-if="containers.length == 0"
+                                      color="red"
+                                      border="left"
+                                      elevation="2"
+                                      colored-border
+                                      icon="mdi-alert"
+                                      >
+                                      ไม่สามารถดำเนินการต่อได้ เพราะไม่มีข้อมูลตู้ container
+                                    </v-alert>
+                                      <button type="submit" class="btn btn-primary" :disabled="containers.length == 0">Upload Data</button>
                                   </form>
 
                                   <!-- <form method="post" novalidate>{% csrf_token %}
@@ -474,6 +484,7 @@
             computed: {
               // Selected Select
               // this.selected_json = JSON.stringify(this.selected)
+              
               selected_containers(){
                 return JSON.stringify(this.containers)
               },
