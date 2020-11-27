@@ -236,6 +236,8 @@
                                                       <v-select
                                                         v-model="editedItem.stowage"
                                                         :items="stowages"
+                                                        item-text="text"
+                                                        item-value="value"
                                                         label="Stowage"
                                                       ></v-select>
                                                     </v-col>
@@ -428,8 +430,13 @@
 
               // Container details
               sizes : ['20','40','45'],
-              container_type:['DV','DG','RE','OT'],
-              stowages :['','UD','OD'],
+              container_type:['DV','HQ','RE','OT'],
+              // stowages :['','UD','OD'],
+              stowages :[
+                        {text:'',value:''},
+                        {text:'Under Deck',value:'UD'},
+                        {text:'Over Deck',value:'OD'}
+                        ],
               rules: {
                 required: value => !!value || 'Required.',
                 counter: value => value.length <= 11 || 'Max 11 characters',
