@@ -76,6 +76,16 @@ def post_container(request):
                 # print(booking,ref,order_name,booking_obj,user)
                 if len(containers) > 0:
 
+                    # Added on Nov 27,2020 -- to prevent duplicated Container on Order
+                    # Check only first container
+                    duplicated_container = Container.objects.filter(order__booking=booking_obj,
+                            container=containers[0]['container'],
+                            user=user).exists()
+                    if duplicated_container :
+                        return render(request,'order/error.html', {'message': 'Test Check Duplicated Order'})
+                    # End Duplicated check
+                        
+
                     order = Order(name=order_name,ref=ref,
                             booking=booking_obj,
                             address=address_obj,
