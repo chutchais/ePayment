@@ -74,6 +74,21 @@
                           Vessel : <strong>[[vessel_name]]</strong> ([[vessel_code]]) . Voy : <strong>[[voy]]</strong> 
                             . Pod : <strong>[[pod]]</strong>
                           </v-alert>
+
+                          <!-- Added on Nov 30,2020 Show Container status summary -->
+                          <v-alert
+                            v-model="vessel_name"
+                            color="green"
+                            border="left"
+                            elevation="2"
+                            colored-border
+                            icon="mdi-chart-bar"
+                          >
+                          จำนวนตู้ทั้งหมด : <strong>[[total_container]]</strong>  
+                          , จำนวนตู้ที่ชำระเงินแล้ว : <strong>[[total_paid]]</strong> 
+                          , จำนวนตู้ที่เข้าท่าแล้ว : <strong>[[total_exe]]</strong>
+                          </v-alert>
+                          <!-- End summary -->
                     
                         </div>
                       <template>
@@ -518,6 +533,32 @@
 
     },
     computed: {
+      // Added on Nov 30,2020 -- To calculate each Status (REG,EXE,)
+      total_act(){
+        const result = this.containers.filter((container) => {
+          return container.status == 'ACT'
+        })
+        return result.length
+      },
+      total_paid(){
+        const result = this.containers.filter((container) => {
+          return container.paid
+        })
+        return result.length
+      },
+      total_exe(){
+        const result = this.containers.filter((container) => {
+          return container.status == 'EXE' || container.status == 'ACT'
+        })
+        return result.length
+      },
+      total_container(){
+        const result = this.containers.filter((container) => {
+          return container.status != 'CAN'
+        })
+        return result.length
+      },
+      // End new function
       
       total () {
         return this.selected.reduce(function (sum, item) {
