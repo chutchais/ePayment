@@ -19,7 +19,7 @@ class DocumentInline(admin.TabularInline):
 
 class ContainerInline(admin.TabularInline):
 	model = Container
-	fields = ('number','cont_size','cont_type','temperature','stowage')
+	fields = ('number','cont_size','cont_type','temperature','vent','stowage')
 	readonly_fields = ('created',)
 	extra = 0 # how many rows to show
 

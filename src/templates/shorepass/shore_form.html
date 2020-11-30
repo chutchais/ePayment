@@ -228,6 +228,20 @@
                                                       ></v-text-field>
 
                                                     </v-col>
+
+                                                    <v-col
+                                                      cols="12"
+                                                      sm="6"
+                                                      md="4"
+                                                    >
+                                                      <v-text-field
+                                                        v-model="editedItem.vent"
+                                                        label="Vent"
+                                                        :rules ="[rules.vent]"
+                                                      ></v-text-field>
+
+                                                    </v-col>
+
                                                     <v-col
                                                       cols="12"
                                                       sm="6"
@@ -446,11 +460,15 @@
                 },
                 container: value =>{
                   const pattern = /^[a-zA-Z]{4}[0-9]{7}$/
-                  return pattern.test(value) || 'Invalid container number'
+                  return pattern.test(value) || 'หมายเลขตู้ไม่ถูกต้อง'
                 },
                 temperature : value =>{
                   const pattern = /^([-+]?[0-9]+(\.[0-9]*)?)$/
-                  return pattern.test(value) || 'Invalid temperature'
+                  return pattern.test(value) || 'อุณหภูมิไม่ถูกต้อง'
+                },
+                vent : value =>{
+                  const pattern = /^([-+]?[0-9]+(\.[0-9]*)?)$/
+                  return pattern.test(value) || 'ข้อมูลVentไม่ถูกต้อง'
                 }
               },
               // End Container details
@@ -467,6 +485,7 @@
                 { text: 'Size', value: 'size' },
                 { text: 'Type', value: 'container_type' },
                 { text: 'Temperature', value: 'temperature' },
+                { text: 'Vent', value: 'vent' },
                 { text: 'Stowage', value: 'stowage' },
                 { text: 'Actions', value: 'actions', sortable: false },
               ],
@@ -478,6 +497,7 @@
                 container_type: 'DV',
                 temperature: '',
                 stowage: '',
+                vent:'',
               },
               defaultItem: {
                 name: '',
@@ -485,6 +505,7 @@
                 container_type: 'DV',
                 temperature: '',
                 stowage: '',
+                vent:'',
               },
 
             },//End Data
