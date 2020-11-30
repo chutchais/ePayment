@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
-{% block content %}
 
+{% block content %}
+<div id="app">
+  <v-app>
 {% if not user.profile.approved %}
   <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <strong>ท่านยังไม่ได้รับการอนุมัติในการใช้ระบบ</strong> กรุณายื่นเอกสารบัตรประชาชน และรูปภาพลายเซ็นต์ และรอการยืนยันจากเจ้าหน้าที่อีกครั้ง
@@ -11,11 +13,29 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
+  
 {% endif %}
 
 <h2>Profile Settings</h2>
   <div class="row">
-    
+    <div class="col-12">
+    <v-alert
+            color="warning"
+            border="left"
+            elevation="2"
+            colored-border
+            >
+            <v-checkbox
+              v-model="warning"
+              label="ข้าพเจ้ายินยอมให้บันทึก เอกสารส่วนบุคคล ลงในระบบเพื่อใช้ในการยืนยันตัวตน
+              การใช้งานระบบการชำระเงิน E-payment  ของทางบริษัท 
+              LCB CONTAINER TERMINAL 1 LTD. & LCMT CO.,LTD. เท่านั้น."
+              color="warning"
+            ></v-checkbox>
+            
+
+      </v-alert>
+    </div>
     <div class="col-sm-6 col-md-4">
       <div class="card">
         <div class="card-body">
@@ -126,7 +146,8 @@
     </div>
 
 
-
+</v-app>
+</div>
 {% endblock %}
 
 {% block style %} 
@@ -137,3 +158,16 @@
       }
 </style>
 {% endblock style %}
+
+{% block script %}
+  <script>
+    new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#app',
+      vuetify: new Vuetify(),
+      data: {
+        warning: true,
+      }
+    })
+  </script>
+{% endblock %}
