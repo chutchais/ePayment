@@ -189,9 +189,9 @@ class OrderListView(LoginRequiredMixin,ListView):
                                         user__username=self.request.user ).select_related('booking').order_by('-updated')
                                         # Q(booking__name__icontains=query) ,-->Removed for optimize
         if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
-            return Order.objects.all().select_related('booking').order_by('-updated')[:200]
+            return Order.objects.all().select_related('booking').order_by('-updated')[:300]
 
-        return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:200]
+        return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:300]
     
     def get_context_data(self,**kwargs):
         context = super(OrderListView,self).get_context_data(**kwargs)

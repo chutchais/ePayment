@@ -40,13 +40,17 @@ class BillofLaddingDetailView(LoginRequiredMixin,DetailView):
 		context = super(BillofLaddingDetailView,self).get_context_data(**kwargs)
 		context['tax'] = Tax.objects.get(name='Default')
 		# context['addresses'] = Address.objects.filter(user__username=self.request.user)
-		context['addresses_items'] = json.dumps(list(Address.objects.filter(
-									user__username=self.request.user
-									).order_by('company').values('pk', 'company','address','tax'))).replace('\\r\\n',' ')
+		# context['addresses_items'] = json.dumps(list(Address.objects.filter(
+		# 							user__username=self.request.user
+		# 							).order_by('company').values('pk', 'company','address','tax'))).replace('\\r\\n',' ')
 		# http://192.168.10.16:5001/booking/
 		bl_url = f"{reverse_lazy('bl:list')}"
 		# print (f"{reverse_lazy('order:list')}booking/")
 		context['import_url'] = f'{bl_url}api/bl/'#settings.EXPORT_BOOKING_ENDPOINT_URL
+		
+		# Added on Dec 1,2020 -- To provide Address url (on user_profile)
+		address_url 				= f"{reverse_lazy('profileapi:index')}address/"
+		context['address_url'] 		= address_url
 		return context
 
 class BillofLaddingCreateView(LoginRequiredMixin,CreateView):

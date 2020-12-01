@@ -6,9 +6,10 @@
   const wht_rate = {{tax.wht}};
   var people = '{{ items_json|safe }}';
   const export_url = '{{export_booking_url}}';
-  var address_items = '{{addresses_items|safe}}';
+  // var address_items = '{{addresses_items|safe}}';
   const import_url = '{{import_url}}';
-  const bl_input = '{{ object.name }}'
+  const bl_input = '{{ object.name }}';
+  var address_url = '{{address_url}}';
 </script>
 
 <div id="app">
@@ -60,7 +61,7 @@
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
                             v-model="date"
-                            label="Select delivery date"
+                            label="เลือกวันลากตู้ออก"
                             readonly
                             v-bind="attrs"
                             v-on="on"
@@ -74,13 +75,13 @@
                    
 
                   </v-row>
-                  <v-row v-if="containers.length > 0">
+                  <!-- <v-row v-if="containers.length > 0">
                       <v-checkbox v-model="isRent" 
                       class="ml-2" 
                       label="ต่อ Rent"
                       color="success">
                     </v-checkbox>
-                  </v-row>
+                  </v-row> -->
                 </template>
 
               <template>
@@ -103,7 +104,8 @@
                           hide-details
                         ></v-text-field>
                       </v-card-title>
-                    </v-card>
+                   
+<!-- show-select -->
                     <v-data-table
                     :items-per-page="50"
                     class="elevation-1"
@@ -112,7 +114,6 @@
                     :items="containers"
                     :search="search"
                     item-key="container"
-                    show-select
                     show-expand
                     class="elevation-1"
                     dense
@@ -169,7 +170,8 @@
                           </v-chip>
                         </td  >
                     </template>
-
+                    </v-data-table>
+                    </v-card>
                   </template>
               </div> <!--  End of Container-->
               <div v-else>
@@ -219,9 +221,6 @@
                   <v-card-title>
                       Lift On
                     </v-card-title>
-                    <v-card-subtitle>
-                      Total charge
-                    </v-card-subtitle>
                     <v-card-text>
                       <p class="display-1 text--primary">
                         [[total_lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
@@ -241,9 +240,7 @@
                   <v-card-title>
                       Relocation
                     </v-card-title>
-                    <v-card-subtitle>
-                      Total charge
-                    </v-card-subtitle>
+                   
                     <v-card-text>
                       <p class="display-1 text--primary">
                         [[total_relo.toLocaleString(undefined, {maximumFractionDigits:2})]]
@@ -263,9 +260,7 @@
                     <v-card-title>
                       Storage
                     </v-card-title>
-                    <v-card-subtitle>
-                      Total Charge
-                    </v-card-subtitle>
+                    
                     <v-card-text>
                       <p class="display-1 text--primary">
                         [[total_storage.toLocaleString(undefined, {maximumFractionDigits:2})]]
@@ -283,11 +278,9 @@
                   outlined
                 >
                     <v-card-title>
-                      Total
+                      Sub-Total
                     </v-card-title>
-                    <v-card-subtitle>
-                      Tariff Charge(s) - exclude VAT
-                    </v-card-subtitle>
+                   
                     <v-card-text>
                       <p class="display-1 text--primary">
                         [[total_grand.toLocaleString(undefined, {maximumFractionDigits:2})]]
@@ -386,44 +379,44 @@
 
             
               <div class="form-group">
-                <label for="exampleInputEmail1">Company Address</label>
-                 <v-autocomplete
-                  item-text="company"
-                  item-value="pk"
-                  :items="address_list"
-                  v-model ="selected_address"
-                  no-data-text="Not found address"
-                  return-object
-                >
-                  <template slot='item' slot-scope='data'>
-                    [[data.item.company]]
-                  </template>
-                </v-autocomplete>
+                <label for="exampleInputEmail1">ที่อยู่สำหรับออกใบเสร็จ</label>
+                         <v-autocomplete
+                          item-text="company"
+                          item-value="pk"
+                          :items="address_list"
+                          v-model ="selected_address"
+                          no-data-text="Not found address"
+                          return-object
+                        >
+                          <template slot='item' slot-scope='data'>
+                            [[data.item.company]]
+                          </template>
+                        </v-autocomplete>
 
 
-                <v-list-item 
-                  three-line 
-                  v-if="selected_address" 
-                  outlined
-                  color="light-blue lighten-4">
-                  <v-list-item-content>
-                    <v-list-item-title>Name</v-list-item-title>
-                    <v-list-item-subtitle>
-                      [[selected_address.company]]
-                    </v-list-item-subtitle>
+                        <v-list-item 
+                          three-line 
+                          v-if="selected_address" 
+                          outlined
+                          color="light-blue lighten-4">
+                          <v-list-item-content>
+                            <v-list-item-title>Name</v-list-item-title>
+                            <v-list-item-subtitle>
+                              [[selected_address.company]]
+                            </v-list-item-subtitle>
 
-                    <v-list-item-title>Address</v-list-item-title>
-                    <v-list-item-subtitle>
-                      [[selected_address.address]]
-                    </v-list-item-subtitle>
+                            <v-list-item-title>Address</v-list-item-title>
+                            <v-list-item-subtitle>
+                              [[selected_address.address]]
+                            </v-list-item-subtitle>
 
-                    <v-list-item-title>Tax</v-list-item-title>
-                    <v-list-item-subtitle>
-                      [[selected_address.tax]]
-                    </v-list-item-subtitle>
+                            <v-list-item-title>Tax</v-list-item-title>
+                            <v-list-item-subtitle>
+                              [[selected_address.tax]]
+                            </v-list-item-subtitle>
 
-                  </v-list-item-content>
-                </v-list-item>
+                          </v-list-item-content>
+                        </v-list-item>
                 
 
                 <!-- <select class="form-control" id="address" name="address">
@@ -436,15 +429,9 @@
 
               <v-checkbox v-model="isWht" 
                   class="ml-2" 
-                  label="Withholding Tax"
+                  label="หักภาษี ณ ที่จ่าย"
                   color="success">
               </v-checkbox>
-
-              <v-checkbox v-model="isSeperateBill" 
-                          class="ml-2" 
-                          label="แยกใบเสร็จ"
-                          color="success">
-                      </v-checkbox>
 
               <button type="submit" class="btn btn-primary" :disabled="net == 0 || selected_address == null">Continue Payment ([[net_text]] Baht)</button>
             </div>
@@ -572,7 +559,7 @@
               isWht: false,
               isRent: false,
             isSeperateBill : false,
-            address_list: JSON.parse(address_items),
+            address_list: [],//JSON.parse(address_items),
             selected_address : null, //JSON.parse(address_items)[0],
           },
           created: function () {
@@ -647,7 +634,11 @@
                     console.log(response.data)
                     this.containers = response.data
                     this.loading = false;
+                    // Added on Dec 1,2020 - To set default to select all containers
+                    this.selected = this.containers;
+                    // ----------------
                     this.update_delivery(this.date);
+                    this.get_address();
                   })
               .catch(error =>{
                     this.loading = false;
@@ -846,6 +837,20 @@
               }
           }.bind(this));//forEach
         },//End update_charge
+        get_address:function(){
+            if (this.containers.length > 0){
+              axios
+                .get(address_url)
+                .then(
+                    response => {
+                        this.address_list = response.data;
+                        // console.log(this.address_list)
+                    })
+                .catch(error =>{
+                        this.address_list = [];
+                  })//End Get
+            }
+          },//End get_address function
       },//End Method
     watch: {
       date () {
