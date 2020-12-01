@@ -189,7 +189,7 @@ def post_save_shore_receiver(sender, instance,created, *args, **kwargs):
 					cont_type=container['container_type'],
 					temperature = 0 if container['temperature'] == '' else container['temperature'],
 					stowage=container['stowage'],
-					vent=container['vent'],
+					vent2=container['vent'],
 					user=instance.user)
 				c.save()
 				print(f'Container : {c} --Successful')
@@ -225,6 +225,7 @@ class Container(models.Model):
 							related_name = 'shorecontainers')
 	# Added on Nov 30,2020 -- To suport Vent data
 	vent 				= models.SmallIntegerField(default=0,blank=True,null=True)
+	vent2 				= models.CharField(max_length=5,default='',blank=True,null=True)
 
 	def __str__(self):  # __unicode__ for Python 2
 		return self.number

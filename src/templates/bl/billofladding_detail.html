@@ -598,24 +598,24 @@
         },
         vat () {
           // return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
-          return (this.total * (this.tax.tax / 100)).toFixed(2)
+          return (this.total_grand * (this.tax.tax / 100)).toFixed(2)
         },
         vat_text () {
-          return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+          return (this.total_grand * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
         },
         wht_text () {
-          return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+          return (this.total_grand * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
         },
         wht () {
           // return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
-          return (this.total * (this.tax.wht / 100)).toFixed(2)
+          return (this.total_grand * (this.tax.wht / 100)).toFixed(2)
         },
         net () {
           let wht = 0
           if (this.isWht) {
             wht = Number(this.wht)
           }
-          return ((Number(this.total) + Number(this.vat)) - wht).toFixed(2)
+          return ((Number(this.total_grand) + Number(this.vat)) - wht).toFixed(2)
         },
         net_text(){
           return this.net.toLocaleString(undefined, {maximumFractionDigits:2})
@@ -816,14 +816,15 @@
               arrayItem.rate3     = this.rate3(arrayItem.discharge.size,arrayItem.on_yard);
               arrayItem.total     = Number(arrayItem.lolo)+Number(arrayItem.relo)+Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
               // if Delivery , total = 0
-              if (arrayItem.delivery.out_by != null) {
-                arrayItem.lolo = 0;
-                arrayItem.relo = 0;
-                arrayItem.rate1 = 0;
-                arrayItem.rate2 = 0;
-                arrayItem.rate3 = 0;
-                arrayItem.total = 0;
-              }
+              // Remove on Dec 1,2020 -- To Show details event container is OUT 
+              // if (arrayItem.delivery.out_by != null) {
+              //   arrayItem.lolo = 0;
+              //   arrayItem.relo = 0;
+              //   arrayItem.rate1 = 0;
+              //   arrayItem.rate2 = 0;
+              //   arrayItem.rate3 = 0;
+              //   arrayItem.total = 0;
+              // }
           }.bind(this));//forEach
         },//End update_delivery
         update_charge:function(){
@@ -834,10 +835,15 @@
           this.total_grand=0;
           this.selected.forEach(function (arrayItem) {
               // console.log(arrayItem)
-              this.total_lolo=this.total_lolo + arrayItem.lolo;
-              this.total_relo=this.total_relo + arrayItem.relo;
-              this.total_storage= this.total_storage + (arrayItem.rate1+arrayItem.rate2+arrayItem.rate3);
-              this.total_grand=(this.total_grand + arrayItem.total).toFixed(2);
+              // Modify on Dec 1,2020 -- To calculate only In-yard container
+              if (arrayItem.delivery.out_by == null){
+                console.log('Updatecharge -- out is null : ' + arrayItem.delivery.out_by)
+                this.total_lolo=this.total_lolo + arrayItem.lolo;
+                this.total_relo=this.total_relo + arrayItem.relo;
+                this.total_storage= this.total_storage + (arrayItem.rate1+arrayItem.rate2+arrayItem.rate3);
+                this.total_grand=(this.total_grand + arrayItem.total);
+                // .toFixed(2)
+              }
           }.bind(this));//forEach
         },//End update_charge
       },//End Method

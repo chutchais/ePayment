@@ -20,7 +20,7 @@ class Order(models.Model):
                                     message='Name does not allow special charecters',
                                 ),
                             ])
-    ref                 = models.CharField(max_length=6) #keep time stamp  I'mmss'
+    ref                 = models.CharField(max_length=20) #keep time stamp  I'mmss'
     bl                  = models.ForeignKey(BillofLadding,
                             on_delete=models.CASCADE,
                             blank=True, null=True,
@@ -62,6 +62,9 @@ class Order(models.Model):
                             blank=True,null=True,
                             related_name = 'execute_importorders')
     seperate_bill       = models.BooleanField(default=False)
+    # Added on Dec 1,2020 -- to save Delivery Document
+    do                  = models.ImageField(verbose_name='Delivery Document',
+                                             upload_to=image_file_name,blank=True, null=True)
 
     def __str__(self):  # __unicode__ for Python 2
         return self.name
