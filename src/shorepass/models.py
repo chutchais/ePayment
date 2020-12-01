@@ -187,7 +187,7 @@ def post_save_shore_receiver(sender, instance,created, *args, **kwargs):
 					number=container['name'].upper(),
 					cont_size=container['size'],
 					cont_type=container['container_type'],
-					temperature = 0 if container['temperature'] == '' else container['temperature'],
+					temperature2 = container['temperature'] ,
 					stowage=container['stowage'],
 					vent2=container['vent'],
 					user=instance.user)
@@ -214,6 +214,7 @@ class Container(models.Model):
 	cont_size           = models.IntegerField(default=40)
 	cont_type           = models.CharField(max_length=5,default='DV')
 	temperature         = models.SmallIntegerField(default=0,blank=True,null=True)
+	temperature2		= models.CharField(max_length=5,default='',blank=True,null=True)
 	stowage             = models.CharField(max_length=10,blank=True,null=True
 							,choices=STOWAGE_CHOICES)
 	created             = models.DateTimeField(blank=True, null=True,auto_now_add=True)
