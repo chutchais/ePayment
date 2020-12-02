@@ -272,6 +272,7 @@
                                                   color="blue darken-1"
                                                   text
                                                   @click="save"
+                                                  :disabled="!isFormValid"
                                                 >
                                                   Save
                                                 </v-btn>
@@ -469,7 +470,7 @@
                 vent : value =>{
                   const pattern = /^([-+]?[0-9]+(\.[0-9]*)?)$/
                   return pattern.test(value) || 'ข้อมูลVentไม่ถูกต้อง'
-                }
+                },
               },
               // End Container details
 
@@ -512,7 +513,11 @@
             computed: {
               // Selected Select
               // this.selected_json = JSON.stringify(this.selected)
-              
+              isFormValid(){
+                const pattern = /^[a-zA-Z]{4}[0-9]{7}$/
+                return pattern.test(this.editedItem.name)? true : false
+                // return this.editedItem.name != '' ? true : false 
+              },
               selected_containers(){
                 return JSON.stringify(this.containers)
               },
