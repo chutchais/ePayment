@@ -97,7 +97,7 @@
                 {% if object.wht and not object.wht_slip %}
                     <div class="alert alert-danger" role="alert">
                       *** Need WHT: ขั้นตอนการชำระยังไม่เสร็จสิ้น เพื่อดำเนินการต่อ กรุณาอัพโหลดเอกสาร WHT
-                    <a href="{% url 'order:whtslip' object.id %}">Upload WHT</a>
+                    <a href="{% url 'order:whtslip' object.id %}">แนบใบหัก</a>
                   </div>
                 {% endif %}
 
@@ -160,13 +160,24 @@
                                 {% for s in summary %}
                                   {{s.cont_size}}"x{{s.count}} = {{s.total_ex_vat}}<br>
                                 {% endfor %}
+
                                 {% if not object.payment_slip %}
-                                
                                   <a href="{% url 'order:payslip' object.id %}">
                                     <button type="button" class="btn btn-success" >
                                     แนบสลิป</button>
                                   </a>
                                 {% endif %}
+                                <!-- Added on Dec 2,2020 , In case Paid but not notified and WHT -->
+                                {% if object.wht %}
+                                
+                                  {% if not object.wht_slip %}
+                                    <a href="{% url 'order:whtslip' object.id %}">
+                                      <button type="button" class="btn btn-warning" >
+                                        แนบใบหัก</button>
+                                    </a>
+                                  {% endif %}
+                                {% endif %}
+
                               </p>
 
                             </div>
@@ -184,8 +195,7 @@
                             <div class="card-body">
                               <h5 class="card-title">แนบสลิป<a href="{% url 'order:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
                               <p class="card-text">
-                                
-                                
+                            
                               </p>
 
 
@@ -193,6 +203,25 @@
                           </div>
                         </div>
                         {% endif %}
+
+                        <!-- Added on Dec 2,2020 --SHow WHT in case Paid but Not Noticfy -->
+                        {% if object.wht_slip %}
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
+                          <div class="card ">
+                            <img class="card-img-top" 
+                            src="{{object.wht_slip.url}}" alt="Card image cap">
+                            <div class="card-body">
+                              <h5 class="card-title">แนบใบหัก<a href="{% url 'order:whtslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
+                              <p class="card-text">
+                            
+                              </p>
+
+
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %}
+                        <!-- End WHT -->
 
 
 
