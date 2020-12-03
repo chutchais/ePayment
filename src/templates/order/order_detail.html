@@ -363,6 +363,9 @@
                           <th scope="col">OOG?</th>
                           <th scope="col">Tariff Charge(s)</th>
                           <th scope="col">Total</th>
+                          {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          <th scope="col">Invoice</th>
+                          {% endif %}
                         </tr>
                       </thead>
                       <tbody>
@@ -387,6 +390,13 @@
                             </table>
                           </td>
                           <td class="subtotal">{{container.total}}</td>
+                          {% if perms.order.verify_payment or perms.order.execute_job  %}
+                            {% if container.invoice %}
+                              <td>CA{{container.invoice|default_if_none:''}}</td>
+                            {% else %}
+                            <td></td>
+                            {% endif %}
+                          {% endif %}
                         </tr>
                         {% endfor %}
                       </tbody>

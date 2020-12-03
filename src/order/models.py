@@ -135,6 +135,8 @@ class Container(models.Model):
     user 			    = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.CASCADE,
                             blank=True,null=True)
+    # Added on Dec 3,2020 -- To record Invice number
+    invoice             = models.CharField(max_length=30,blank=True, null=True)
 
     def __str__(self):  # __unicode__ for Python 2
         return self.container

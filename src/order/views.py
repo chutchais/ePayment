@@ -21,6 +21,7 @@ from booking.models import Booking
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django_q.tasks import async_task
 
 @login_required
 def index(request):
@@ -295,6 +296,12 @@ class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
         form.instance.execute_date = datetime.datetime.now(tz=tz)#datetime.now()
         # Added on Oct 29,2020 -- To save executor
         form.instance.execute_by = self.request.user
+        # Added on Dec 3,2020 -- To Update Invoice number.
+        if form.instance.execute_job :
+            from .tasks import update_invoice_by_order
+            update_invoice_by_order(form.instance)
+            # async_task('order.tasks.update_invoice_by_order',form.instance)
+        # ----------------------------------------------
         return super(OrderUpdateExecuteJob, self).form_valid(form)
 
 class OrderDeleteView(LoginRequiredMixin,DeleteView):

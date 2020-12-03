@@ -110,7 +110,7 @@ class OrderDateFilter(admin.SimpleListFilter):
 
 class ContainerInline(admin.TabularInline):
 	model = Container
-	fields = ('container','cont_size','is_oog','total')
+	fields = ('container','cont_size','is_oog','total','invoice')
 	readonly_fields = ('created','updated','user')
 	extra = 0 # how many rows to show
 
