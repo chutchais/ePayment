@@ -328,7 +328,7 @@
                                         BankRef : [[notify.BankRef]][[notify.bankRef]]<br>
 
                                         
-                                        <a href="{% url 'order:payment-confirm' object.id %}">
+                                        <a href="{% url 'orderimport:payment-confirm' object.id %}">
                                         <button type="button" class="btn btn-info" {% if not  perms.order.update_payment %}disabled{% endif %}>Update</button>
                                         </a>
                                         

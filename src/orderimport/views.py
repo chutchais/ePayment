@@ -31,16 +31,35 @@ class OrderListView(LoginRequiredMixin,ListView):
         query = self.request.GET.get('q')
         # lacking_stock = self.request.GET.get('lacking')
         # over_stock = self.request.GET.get('over')
-        print('Verify payment :',self.request.user.has_perm('order.verify_payment'))
+        # print('Verify payment :',self.request.user.has_perm('order.verify_payment'))
+        # if query :
+        #     return Order.objects.filter(Q(name__icontains=query) |
+        #                             Q(bl__name__icontains=query) ,
+        #                             user__username=self.request.user ).select_related('bl').order_by('-updated')
+
+        # if self.request.user.has_perm('orderimport.verify_payment') or  self.request.user.has_perm('orderimport.update_payment') :
+        #     return Order.objects.all().select_related('bl').order_by('-updated')
+
+        # return Order.objects.filter(user__username=self.request.user).select_related('bl').order_by('-updated')
+    
         if query :
-            return Order.objects.filter(Q(name__icontains=query) |
-                                    Q(booking__name__icontains=query) ,
-                                    user__username=self.request.user ).select_related('bl').order_by('-updated')
+            if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
+                # For Staff or Admin
+                # Modify on Nov 20,2020 -- To support search by User name
+                return Order.objects.filter(Q(name__icontains=query) |
+                                        Q(bl__name__icontains=query)|
+                                        Q(user__username=query)).select_related('bl').order_by('-updated')
+                                        #Q(booking__name__icontains=query)| -->Removed for optimize
+            else:
+                return Order.objects.filter(Q(name__icontains=query) |
+                                        Q(bl__name__icontains=query) ,
+                                        user__username=self.request.user ).select_related('bl').order_by('-updated')
+                                        # Q(booking__name__icontains=query) ,-->Removed for optimize
+        if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
+            return Order.objects.all().select_related('bl').order_by('-updated')[:300]
 
-        if self.request.user.has_perm('orderimport.verify_payment') or  self.request.user.has_perm('orderimport.update_payment') :
-            return Order.objects.all().select_related('bl').order_by('-updated')
-
-        return Order.objects.filter(user__username=self.request.user).select_related('bl').order_by('-updated')
+        return Order.objects.filter(user__username=self.request.user).select_related('bl').order_by('-updated')[:300]
+    
     
     def get_context_data(self,**kwargs):
         context = super(OrderListView,self).get_context_data(**kwargs)
@@ -263,5 +282,26 @@ class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
             return super().dispatch(request,*args,**kwargs)
 
         if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
+
+class OrderUpdatePaid(LoginRequiredMixin,UpdateView):
+    model = Order
+    fields = ['paid','payment_ref']
+    template_name_suffix = '_update_paid_form'
+
+    def form_valid(self, form):
+        form.instance.payment_inspector = self.request.user
+        import datetime, pytz
+        tz = pytz.timezone('Asia/Bangkok')
+        form.instance.payment_date = datetime.datetime.now(tz=tz)#datetime.now()
+        return super(OrderUpdatePaid, self).form_valid(form)
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+        else :
             raise PermissionDenied
         return super().dispatch(request,*args,**kwargs)

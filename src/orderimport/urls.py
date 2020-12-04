@@ -2,7 +2,7 @@ from django.urls import path, include
 from .views import (OrderListView,OrderDetailView,
                     OrderDeleteView,post_container,
                     OrderUpdateSlip,OrderUpdateWHT,OrderUpdateDo,
-                    OrderUpdateExecuteJob)
+                    OrderUpdateExecuteJob,OrderUpdatePaid)
 
 urlpatterns = [
     # Guess access
@@ -21,7 +21,7 @@ urlpatterns = [
     path('<pk>/delete/',OrderDeleteView.as_view(),name='delete'),
 
     # path('<pk>/whtslip/',OrderUpdateWHT.as_view(),name='whtslip'),
-    # path('<pk>/paid/',OrderUpdatePaid.as_view(),name='payment-confirm'),
+    path('<pk>/paid/',OrderUpdatePaid.as_view(),name='payment-confirm'),
     path('<pk>/execute/',OrderUpdateExecuteJob.as_view(),name='execute'),
 
 

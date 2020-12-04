@@ -284,6 +284,16 @@ class OrderUpdatePaid(LoginRequiredMixin,UpdateView):
         tz = pytz.timezone('Asia/Bangkok')
         form.instance.payment_date = datetime.datetime.now(tz=tz)#datetime.now()
         return super(OrderUpdatePaid, self).form_valid(form)
+    
+    # Added on Dec 4,2020 -- To protect normal user access to this function
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+        else :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
 
 class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
     model = Order
