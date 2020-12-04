@@ -18,6 +18,10 @@ from user_profile.models import Address
 from tax.models import Tax
 import json
 
+from django.http import Http404
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import PermissionRequiredMixin
+
 from .forms import CreateOrderForm
 
 class OrderListView(LoginRequiredMixin,ListView):
@@ -63,6 +67,17 @@ class OrderDetailView(LoginRequiredMixin,DetailView):
         # for c in obj.containers.all():
         #     print(c)
         return context
+    
+        # Added on Nov 25,2020 -- To protect access by other
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+
+        if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
 
 
 def post_container(request):
@@ -96,7 +111,7 @@ def post_container(request):
             # Modify on Oct 29,2020 -- To support Timezone
             import datetime, pytz
             tz = pytz.timezone('Asia/Bangkok')
-            ref =   datetime.datetime.now(tz=tz).strftime("%H%M")
+            ref =   datetime.datetime.now(tz=tz).strftime("%H%M%S")
             ref =   f'I{ref}'
 
             # Mofigy on Aug 17,2020
@@ -165,16 +180,61 @@ class OrderDeleteView(DeleteView):
     model = Order
     success_url = reverse_lazy('orderimport:list')
 
+        # Added on Nov 25,2020 -- To protect access by other
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+
+        if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
+
+
+class OrderUpdateDo(LoginRequiredMixin,UpdateView):
+    model = Order
+    fields = ['do']
+    template_name_suffix = '_update_do_form'
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+
+        if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
+
 class OrderUpdateSlip(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['payment_slip']
     template_name_suffix = '_update_payslip_form'
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+
+        if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
 
 # Added on Oct 28,2020 -- To support WHT slip upload
 class OrderUpdateWHT(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['wht_slip']
     template_name_suffix = '_update_whtslip_form'
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+
+        if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)
 
 
 class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
@@ -188,4 +248,20 @@ class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
         form.instance.execute_date = datetime.datetime.now(tz=tz)#datetime.now()
         # Added on Oct 29,2020 -- To save executor
         form.instance.execute_by = self.request.user
+         # Added on Dec 3,2020 -- To Update Invoice number.
+        if form.instance.execute_job :
+            from .tasks import update_invoice_by_order
+            update_invoice_by_order(form.instance)
+            # async_task('order.tasks.update_invoice_by_order',form.instance)
+        # ----------------------------------------------
         return super(OrderUpdateExecuteJob, self).form_valid(form)
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_obj = self.request.user
+        if user_obj.is_staff or user_obj.is_superuser :
+            return super().dispatch(request,*args,**kwargs)
+
+        if not obj.user == self.request.user :
+            raise PermissionDenied
+        return super().dispatch(request,*args,**kwargs)

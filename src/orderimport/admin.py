@@ -6,7 +6,7 @@ from .models import Order,Container
 
 class ContainerInline(admin.TabularInline):
 	model = Container
-	fields = ('container','cont_size','lifton','relocation','storage','total')
+	fields = ('container','cont_size','lifton','relocation','storage','total','invoice')
 	readonly_fields = ('created','updated','user')
 	extra = 0 # how many rows to show
 
@@ -35,6 +35,7 @@ class OrderAdmin(admin.ModelAdmin):
 		('Basic Information',{'fields': ['name','ref','bl','qrid','status']}),
 		('Charge(s)',{'fields': ['paid_until',('vat_rate','wht_rate'),
 								'wht',('charge','grand_total'),'rent']}),
+		('D/O Document',{'fields': ['do']}),
 		('WHT Slip',{'fields': ['wht_slip']}),
 		('Payment',{'fields': ['address','paid','payment_date','payment_ref','payment_inspector']}),
 		('Pay Slip',{'fields': ['payment_slip']}),

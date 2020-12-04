@@ -34,59 +34,156 @@
 
 
                 {% if order.paid %}
-                      {% if not order.payment_slip %}
+                  <!-- New Status -->
+                  {% if not order.payment_slip %}
                         <a href="{% url 'orderimport:payslip' order.id %}">
                             <span class="badge badge-danger">Need pay slip</span>
                         </a>
-                      {% else %}
-                        {% if order.execute_job %}
+                  {% endif %}
+                  {% if not order.do %}
+                        <a href="{% url 'orderimport:do' order.id %}">
+                            <span class="badge badge-danger">Need D/O</span>
+                        </a>
+                  {% endif %}
+                  
+                  {% if order.wht %}
+                    {% if not order.wht_slip %}
+                          <a href="{% url 'orderimport:whtslip' order.id %}">
+                              <span class="badge badge-danger">Need WHT slip</span>
+                          </a>
+                    {% endif %}
+                  {% endif %}
+
+                  {% if order.execute_job and order.paid %}
                           
                             <span class="badge badge-success">Order Completed</span>
-                          
-                        {% else %}
-                          {% if perms.order.verify_payment or perms.order.execute_job  %}
-                          <a href="{% url 'orderimport:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
-                          {% else %}
-                            <span class="badge badge-warning">Waiting for Execution</span>
+                  {% endif %}
+                  
+                  {% if order.do and order.payment_slip and not order.execute_job %}
+                          {% if order.wht and order.wht_slip %}
+                              {% if perms.order.verify_payment or perms.order.execute_job  %}
+                                <a href="{% url 'orderimport:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
+                              {% else %}
+                                <span class="badge badge-warning">Waiting for Execution</span>
+                              {% endif %}
                           {% endif %}
-                        {% endif %}
-                      {% endif %}
+                  {% endif %}
+                  <!-- End new status -->
 
-                    {% else %}
-                      <span class="badge badge-secondary">UnPaid</span>
-                      <a href="{% url 'orderimport:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
-                    {% endif %}
+              <!-- Not Paid -->
+              {% else %}
+                <span class="badge badge-secondary">UnPaid</span>
+                <a href="{% url 'orderimport:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
+              {% endif %}
+
 
                     <span v-if="rent" class="badge badge-primary">ต่อRent</span>
               </h2>
               <span>Created on : {{object.created}} ({{object.created|naturaltime}})</span>
-
+              <br>
+              <a href="{% url 'orderimport:list' %}">กลับหน้าหลัก</a>
               
 
               {% if object.paid %}
                 <div class="alert alert-info" role="alert">
                   Payment Confirmed on : {{object.payment_date}} (BankRef : {{object.payment_ref}})
                    Verified by {{object.payment_inspector|default_if_none:"AutoPayment"}}
-                   {% if object.payment_slip %}
+                   <!-- {% if object.payment_slip %}
                       <a href="{% url 'orderimport:payslip' object.id %}">See pay slip picture</a>
-                  {% endif %}
+                  {% endif %} -->
                 </div>
 
-                {% if not object.payment_slip %}
-                    <div class="alert alert-danger" role="alert">
-                      To continue in next process,Please upload Bank Payslip picture.
-                    <a href="{% url 'orderimport:payslip' object.id %}">Upload Payslip</a>
+                {% if not object.do %}
+                  <div class="alert alert-danger" role="alert">
+                      *** Need D/O : ขั้นตอนการชำระยังไม่เสร็จสิ้น เพื่อดำเนินการต่อ กรุณาอัพโหลดเอกสาร D/O
+                    <a href="{% url 'orderimport:do' object.id %}">แนบ D/O</a>
                   </div>
-                {% else %}
-                  {% if perms.order.verify_payment or perms.order.execute_job  %}
-                  <div class="row">
+                {% endif %}
+
+                {% if not object.payment_slip %}
+                  <div class="alert alert-danger" role="alert">
+                      *** Need Pay slip : ขั้นตอนการชำระยังไม่เสร็จสิ้น เพื่อดำเนินการต่อ กรุณาอัพโหลดเอกสารยืนยันการชำระเงิน(Payslip)
+                    <a href="{% url 'orderimport:payslip' object.id %}">แนบสลิป</a>
+                  </div>
+                {% endif %}
+
+                {% if object.wht and not object.wht_slip %}
+                    <div class="alert alert-danger" role="alert">
+                      *** Need WHT: ขั้นตอนการชำระยังไม่เสร็จสิ้น เพื่อดำเนินการต่อ กรุณาอัพโหลดเอกสาร WHT
+                    <a href="{% url 'orderimport:whtslip' object.id %}">แนบใบหัก</a>
+                  </div>
+                {% endif %}
+
+                <div class="row">
+
+                  {% if object.do %}
+                    <div class="col-md-4">
+                      <img src="{{object.do.url}}" alt="payslip" class="img-thumbnail">
+                      <!-- Added on Nov 13,2020 , to allow staff to delete invalid payslip -->
+                      {% if not object.execute_job %}
+                        {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          <a href="{% url 'orderimport:do' object.id %}">
+                            <button type="button" class="btn btn-danger" >
+                            ลบ D/O</button>
+                          </a>
+                        {% else %}
+                          <a href="{% url 'orderimport:do' object.id %}">
+                            <button type="button" class="btn btn-success" >
+                            เปลี่ยน D/O</button>
+                          </a>
+                        {% endif %}
+                      {% endif %}
+                      <!--End delete pay slip  -->
+                    </div>
+                {% endif %}
+
+                  {% if object.payment_slip %}
                     <div class="col-md-4">
                       <img src="{{object.payment_slip.url}}" alt="payslip" class="img-thumbnail">
+
+                      <!-- Added on Nov 13,2020 , to allow staff to delete invalid payslip -->
+                      {% if not object.execute_job %}
+                        {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          <a href="{% url 'orderimport:payslip' object.id %}">
+                            <button type="button" class="btn btn-danger" >
+                            ลบสลิป</button>
+                          </a>
+                        {% else %}
+                          <a href="{% url 'orderimport:payslip' object.id %}">
+                            <button type="button" class="btn btn-success" >
+                            เปลี่ยนสลิป</button>
+                          </a>
+                        {% endif %}
+                      {% endif %}
+                      <!--End delete pay slip  -->
                     </div>
+                  {% endif %} <!-- end payment slip-->
+
+                  {% if object.wht_slip %}
+                    <div class="col-md-4">
+                      <img src="{{object.wht_slip.url}}" alt="payslip" class="img-thumbnail">
+                      <!-- Added on Nov 13,2020 , to allow staff to delete invalid payslip -->
+                      {% if not object.execute_job %}
+                        {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          <a href="{% url 'orderimport:whtslip' object.id %}">
+                            <button type="button" class="btn btn-danger" >
+                            ลบใบหัก</button>
+                          </a>
+                        {% else %}
+                          <a href="{% url 'orderimport:whtslip' object.id %}">
+                            <button type="button" class="btn btn-success" >
+                            เปลี่ยนใบหัก</button>
+                          </a>
+                        {% endif %}
+                      {% endif %}
+                      <!--End delete pay slip  -->
                     </div>
-                    
-                  {% endif %}
                 {% endif %}
+
+            </div> <!-- end row -->
+            <!-- Show All Slip/Document -->
+
+               
 
               {% else %}
                 <!-- Show QR Code -->
@@ -115,13 +212,31 @@
                                 {% for s in summary %}
                                   {{s.cont_size}}"x{{s.count}} = {{s.total_ex_vat}}<br>
                                 {% endfor %}
+
+                                {% if not object.do %}
+                                  <a href="{% url 'orderimport:do' object.id %}">
+                                    <button type="button" class="btn btn-success" >
+                                      แนบ D/O</button>
+                                  </a>
+                                {% endif %}
+
                                 {% if not object.payment_slip %}
-                                
                                   <a href="{% url 'orderimport:payslip' object.id %}">
                                     <button type="button" class="btn btn-success" >
-                                    Upload Pay Slip</button>
+                                      แนบสลิป</button>
                                   </a>
+                                {% endif %}
+
                                 
+
+                                {% if object.wht %}
+                                
+                                  {% if not object.wht_slip %}
+                                    <a href="{% url 'orderimport:whtslip' object.id %}">
+                                      <button type="button" class="btn btn-warning" >
+                                        แนบใบหัก</button>
+                                    </a>
+                                  {% endif %}
                                 {% endif %}
                               </p>
 
@@ -146,15 +261,46 @@
 
                         </div>
 
+                        {% if object.do %}
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
+                          <div class="card ">
+                            <img class="card-img-top" 
+                            src="{{object.do.url}}" alt="Card image cap">
+                            <div class="card-body">
+                              <h5 class="card-title">แนบ D/O <a href="{% url 'orderimport:do' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
+                              <p class="card-text">      
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %}
+
                         {% if object.payment_slip %}
                         <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
                           <div class="card ">
                             <img class="card-img-top" 
                             src="{{object.payment_slip.url}}" alt="Card image cap">
                             <div class="card-body">
-                              <h5 class="card-title">Update Pay Slip <a href="{% url 'orderimport:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
+                              <h5 class="card-title">แนบสลิป<a href="{% url 'orderimport:payslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
                               <p class="card-text">      
                               </p>
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %}
+
+                        {% if object.wht_slip %}
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-2">
+                          <div class="card ">
+                            <img class="card-img-top" 
+                            src="{{object.wht_slip.url}}" alt="Card image cap">
+                            <div class="card-body">
+                              <h5 class="card-title">แนบใบหัก<a href="{% url 'order:whtslip' object.id %}"><i class="fas fa-file-invoice"></i></a></h5>
+                              <p class="card-text">
+                            
+                              </p>
+
+
                             </div>
                           </div>
                         </div>
@@ -302,6 +448,9 @@
                           <th scope="col">Relocation</th>
                           <th scope="col">Storage</th>
                           <th scope="col">Total</th>
+                          {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          <th scope="col">Invoice</th>
+                          {% endif %}
                         </tr>
                       </thead>
                       <tbody>
@@ -313,7 +462,10 @@
                           <td>{{container.lifton}}</td>
                           <td>{{container.relocation}}</td>
                           <td>{{container.storage}}</td>
-                          <td class="subtotal">{{container.total}}</td>
+                          <td>{{container.total}}</td>
+                          {% if perms.order.verify_payment or perms.order.execute_job  %}
+                          <td>CA{{container.invoice|default_if_none:""}}</td>
+                          {% endif %}
                         </tr>
                         {% endfor %}
                       </tbody>

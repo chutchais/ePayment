@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
 <script>
@@ -25,7 +26,10 @@
           	<div class="card">
   		        <div class="card-body">
                 <h4>Bill of Ladding : [[bl_number]] <a href="{% url 'bl:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a></h4>
-                
+                <span>Created on : {{object.created}} ({{object.created|naturaltime}})</span>
+                <br>
+                <a href="{% url 'bl:list' %}">กลับหน้าหลัก</a>
+
                 <div>เลขที่ใบขน : {{object.declaration}}
                   <v-chip
                   class="ma-2"
@@ -35,8 +39,13 @@
                   </v-chip>
 
                 </div>
+                
+                
+
                 <button type="button" class="btn btn-success mb-2" v-on:click="get_data(bl_number)">Get Container</button>
                 
+                
+
                 <div class="text-center">
                   <v-progress-circular
                     :size="50"
@@ -47,8 +56,26 @@
                 </div>
                 
                 <div v-if="containers">
+
+                  <div v-if ="containers.length > 0" >
+                          
+                    <v-alert v-if="is_payable"
+                      color="red"
+                      border="left"
+                      elevation="2"
+                      colored-border
+                      icon="mdi-alert"
+                      >
+                      ไม่สามารถดำเนินการชำระได้ ระบบจะชำระได้เฉพาะตู้ที่เป็นชนิด DV และ RE เท่านั้น
+                    </v-alert>
+
+                    
+
+                  </div>
+
                 <template>
-                  <v-row>         
+                  
+                  <v-row>
                     <v-col v-if="containers.length > 0" cols="12" sm="6" md="4">
                       <v-menu
                         v-model="menu2"
@@ -181,7 +208,7 @@
                       color="red lighten-2"
                       dark
                     >
-                    Not found BL number [[bl_number]]
+                    ไม่พบ BL หมายเลข [[bl_number]] อยู่ในระบบ
                     </v-alert>
               </div>
               
@@ -433,7 +460,7 @@
                   color="success">
               </v-checkbox>
 
-              <button type="submit" class="btn btn-primary" :disabled="net == 0 || selected_address == null">Continue Payment ([[net_text]] Baht)</button>
+              <button type="submit" class="btn btn-primary" :disabled="net == 0 || selected_address == null || is_payable">Continue Payment ([[net_text]] Baht)</button>
             </div>
 
             
@@ -539,6 +566,7 @@
                   sortable: true,
                   value: 'container'
                 },
+                { text: 'Type', value: 'discharge.container_type' },
                 { text: 'Size', value: 'discharge.size' },
                 { text: 'Item Price', value: 'total' },
                 { text: 'On Yard(days)', value: 'on_yard' },
@@ -578,6 +606,10 @@
             })
           },
     computed:{
+        is_payable(){
+          const result = this.containers.filter(container => (container.discharge.container_type != 'DV' && container.discharge.container_type != 'RE'));
+          return result.length > 0  ? true:false;
+        },
         total () {
           return this.selected.reduce(function (sum, item) {
             return sum + item.total
@@ -635,10 +667,13 @@
                     this.containers = response.data
                     this.loading = false;
                     // Added on Dec 1,2020 - To set default to select all containers
-                    this.selected = this.containers;
+                    
                     // ----------------
-                    this.update_delivery(this.date);
-                    this.get_address();
+                    if (this.containers.length > 0){
+                      this.selected = this.containers;
+                      this.update_delivery(this.date);
+                      this.get_address();
+                    }
                   })
               .catch(error =>{
                     this.loading = false;
@@ -859,8 +894,10 @@
         this.update_charge();
       },
       selected () {
-        this.selected_json = JSON.stringify(this.selected)
-        this.update_charge();
+        if (this.selected != null){
+          this.selected_json = JSON.stringify(this.selected)
+          this.update_charge();
+        }
       },
       bl_number (){
         this.containers = []

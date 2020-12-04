@@ -15,6 +15,10 @@ from user_profile.models import Address
 from tax.models import Tax
 import json
 
+from django.http import Http404
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import PermissionRequiredMixin
+
 from .forms import BillofLaddingForm
 
 class BillofLaddingListView(LoginRequiredMixin,ListView):
@@ -53,6 +57,16 @@ class BillofLaddingDetailView(LoginRequiredMixin,DetailView):
 		context['address_url'] 		= address_url
 		return context
 
+		def dispatch(self, request, *args, **kwargs):
+			obj = self.get_object()
+			user_obj = self.request.user
+			if user_obj.is_staff or user_obj.is_superuser :
+				return super().dispatch(request,*args,**kwargs)
+
+			if not obj.user == self.request.user :
+				raise PermissionDenied
+			return super().dispatch(request,*args,**kwargs)
+
 class BillofLaddingCreateView(LoginRequiredMixin,CreateView):
 	# model = BillofLadding
 	# fields = ['name','declaration']
@@ -74,6 +88,16 @@ class BillofLaddingCreateView(LoginRequiredMixin,CreateView):
 class BillofLaddingDeleteView(DeleteView):
 	model = BillofLadding
 	success_url = reverse_lazy('bl:list')
+
+	def dispatch(self, request, *args, **kwargs):
+		obj = self.get_object()
+		user_obj = self.request.user
+		if user_obj.is_staff or user_obj.is_superuser :
+			return super().dispatch(request,*args,**kwargs)
+
+		if not obj.user == self.request.user :
+			raise PermissionDenied
+		return super().dispatch(request,*args,**kwargs)
 
 
 # Create your views here.

@@ -69,13 +69,13 @@
               </a>
               <div class="dropdown-menu dropdown-menu-left"  aria-labelledby="navbarDropdown">
                 {% if user.is_authenticated %}
-                  <a class="dropdown-item" href="{% url 'booking:list' %}">Booking</a>
-                  <a class="dropdown-item" href="{% url 'order:list' %}">Order</a>
-                  <a class="dropdown-item" href="{% url 'order:container-list' %}">Container</a>
-                  <a class="dropdown-item" href="{% url 'shorepass:list' %}">Shorepass</a>
+                  <!-- <a class="dropdown-item" href="{% url 'booking:list' %}">Booking</a> -->
+                  <a class="dropdown-item" href="{% url 'order:list' %}">ชำระค่ายกตู้/ชำระค่าชอร์</a>
+                  <!-- <a class="dropdown-item" href="{% url 'order:container-list' %}">Container</a> -->
+                  <a class="dropdown-item" href="{% url 'shorepass:list' %}">คีย์ชอร์</a>
                   <div class="dropdown-divider"></div>
                 {% endif %}
-                <a class="dropdown-item" href="{% url 'booking:report' %}">Search by Booking</a>
+                <a class="dropdown-item" href="{% url 'booking:report' %}">ค้นหาด้วย Booking</a>
               </div>
             </li>
 
@@ -87,10 +87,11 @@
                 {% if user.is_authenticated %}
                 <!-- <a class="dropdown-item" href="{% url 'bl:list' %}">Bill of Ladding(BL)</a>
                 <a class="dropdown-item" href="{% url 'orderimport:list' %}">Order</a> -->
+                <a class="dropdown-item" href="{% url 'orderimport:list' %}">ชำระค่าภาระ</a>
                   <div class="dropdown-divider"></div>
                 {% endif %}
-                <a class="dropdown-item" href="{% url 'bl:report' %}">Search by BL</a>
-                <a class="dropdown-item" href="{% url 'bl:container' %}">Search by Container</a>
+                <a class="dropdown-item" href="{% url 'bl:report' %}">ค้นหาด้วย BL</a>
+                <a class="dropdown-item" href="{% url 'bl:container' %}">ค้นหาด้วย Container</a>
               </div>
             </li>
 

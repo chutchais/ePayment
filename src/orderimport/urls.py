@@ -1,7 +1,7 @@
 from django.urls import path, include
 from .views import (OrderListView,OrderDetailView,
                     OrderDeleteView,post_container,
-                    OrderUpdateSlip,OrderUpdateWHT,
+                    OrderUpdateSlip,OrderUpdateWHT,OrderUpdateDo,
                     OrderUpdateExecuteJob)
 
 urlpatterns = [
@@ -17,6 +17,7 @@ urlpatterns = [
     path('<pk>',OrderDetailView.as_view(),name='detail'),
     path('<pk>/payslip/',OrderUpdateSlip.as_view(),name='payslip'),
     path('<pk>/whtslip/',OrderUpdateWHT.as_view(),name='whtslip'),
+    path('<pk>/do/',OrderUpdateDo.as_view(),name='do'),
     path('<pk>/delete/',OrderDeleteView.as_view(),name='delete'),
 
     # path('<pk>/whtslip/',OrderUpdateWHT.as_view(),name='whtslip'),
