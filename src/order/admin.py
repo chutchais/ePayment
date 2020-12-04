@@ -17,7 +17,7 @@ class OrderResource(resources.ModelResource):
 		skip_unchanged = True
 		report_skipped= True
 		fields =('booking__terminal','booking__name','name','ref','grand_total','payment_date','payment_ref','user__username',
-		'execute_by__username','execute_date')
+		'execute_by__username','execute_date','wht')
 		exclude = ('id')
 
 
