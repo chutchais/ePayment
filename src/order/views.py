@@ -182,12 +182,12 @@ class OrderListView(LoginRequiredMixin,ListView):
                 # Modify on Nov 20,2020 -- To support search by User name
                 return Order.objects.filter(Q(name__icontains=query) |
                                         Q(booking__name__icontains=query)|
-                                        Q(user__username=query)).select_related('booking').order_by('-updated')
+                                        Q(user__username=query)).select_related('booking').order_by('-updated')[:300]
                                         #Q(booking__name__icontains=query)| -->Removed for optimize
             else:
                 return Order.objects.filter(Q(name__icontains=query) |
                                         Q(booking__name__icontains=query) ,
-                                        user__username=self.request.user ).select_related('booking').order_by('-updated')
+                                        user__username=self.request.user ).select_related('booking').order_by('-updated')[:300]
                                         # Q(booking__name__icontains=query) ,-->Removed for optimize
         if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
             return Order.objects.all().select_related('booking').order_by('-updated')[:300]
