@@ -87,3 +87,4 @@ src/shorepass/migrations/__pycache__/*.pyc
 src/shorepass/__pycache__/*.pyc
 src/shorepass/api/__pycache__/*.pyc
 src/user_profile/api/__pycache__/*.pyc
+src/utility/__pycache__/*.pyc

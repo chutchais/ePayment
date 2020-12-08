@@ -21,7 +21,10 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from .forms import BillofLaddingForm
 
-class BillofLaddingListView(LoginRequiredMixin,ListView):
+# Added on Dec 8,2020 -- To limit time access from user
+from utility.mixin import TimeLimitMixin
+
+class BillofLaddingListView(TimeLimitMixin,LoginRequiredMixin,ListView):
 	model = BillofLadding
 	paginate_by = 30
 	def get_queryset(self):
@@ -38,7 +41,7 @@ class BillofLaddingListView(LoginRequiredMixin,ListView):
 		# context['export_booking_url'] = settings.EXPORT_BOOKING_ENDPOINT_URL.strip()
 		return context
 
-class BillofLaddingDetailView(LoginRequiredMixin,DetailView):
+class BillofLaddingDetailView(TimeLimitMixin,LoginRequiredMixin,DetailView):
 	model = BillofLadding
 	def get_context_data(self,**kwargs):
 		context = super(BillofLaddingDetailView,self).get_context_data(**kwargs)
@@ -67,7 +70,7 @@ class BillofLaddingDetailView(LoginRequiredMixin,DetailView):
 				raise PermissionDenied
 			return super().dispatch(request,*args,**kwargs)
 
-class BillofLaddingCreateView(LoginRequiredMixin,CreateView):
+class BillofLaddingCreateView(TimeLimitMixin,LoginRequiredMixin,CreateView):
 	# model = BillofLadding
 	# fields = ['name','declaration']
 	template_name = 'bl/billofladding_form.html'
@@ -85,7 +88,7 @@ class BillofLaddingCreateView(LoginRequiredMixin,CreateView):
 			return self.form_invalid(form)  # return the invalid form
 		return super(BillofLaddingCreateView, self).form_valid(form)
 
-class BillofLaddingDeleteView(DeleteView):
+class BillofLaddingDeleteView(TimeLimitMixin,DeleteView):
 	model = BillofLadding
 	success_url = reverse_lazy('bl:list')
 

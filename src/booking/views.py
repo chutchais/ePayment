@@ -17,7 +17,10 @@ import json
 from order.models import Order,Container
 from django.http import Http404
 
-class BookingListView(LoginRequiredMixin,ListView):
+# Added on Dec 8,2020 -- To limit time access from user
+from utility.mixin import TimeLimitMixin
+
+class BookingListView(TimeLimitMixin,LoginRequiredMixin,ListView):
 	model = Booking
 	paginate_by = 30
 	def get_queryset(self):
@@ -38,7 +41,7 @@ class BookingListView(LoginRequiredMixin,ListView):
 		# context['export_booking_url'] = settings.EXPORT_BOOKING_ENDPOINT_URL.strip()
 		return context
 
-class BookingDetailView(LoginRequiredMixin,DetailView):
+class BookingDetailView(TimeLimitMixin,LoginRequiredMixin,DetailView):
 	model = Booking
 	def get_context_data(self,**kwargs):
 		context = super(BookingDetailView,self).get_context_data(**kwargs)
@@ -84,7 +87,7 @@ class BookingDetailQueryView(TemplateView):
 		context['address_url'] 		= address_url
 		return context
 
-class BookingCreateView(LoginRequiredMixin,CreateView):
+class BookingCreateView(TimeLimitMixin,LoginRequiredMixin,CreateView):
 	model = Booking
 	# fields = ['name','terminal']
 	fields = ['name']
@@ -101,7 +104,7 @@ class BookingCreateView(LoginRequiredMixin,CreateView):
 			return self.form_invalid(form)  # return the invalid form
 		return super(BookingCreateView, self).form_valid(form)
 
-class BookingDeleteView(DeleteView):
+class BookingDeleteView(TimeLimitMixin,DeleteView):
 	model = Booking
 	success_url = reverse_lazy('booking:list')
 

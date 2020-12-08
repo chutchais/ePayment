@@ -23,6 +23,9 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django_q.tasks import async_task
 
+# Added on Dec 8,2020 -- To limit time access from user
+from utility.mixin import TimeLimitMixin
+
 @login_required
 def index(request):
     context = {
@@ -168,7 +171,7 @@ def update_payment(request):
 
     return render(request, 'order/order_form.html', {'form': form})
 
-class OrderListView(LoginRequiredMixin,ListView):
+class OrderListView(TimeLimitMixin,LoginRequiredMixin,ListView):
     model = Order
     paginate_by = 50
     def get_queryset(self):
@@ -187,12 +190,12 @@ class OrderListView(LoginRequiredMixin,ListView):
             else:
                 return Order.objects.filter(Q(name__icontains=query) |
                                         Q(booking__name__icontains=query) ,
-                                        user__username=self.request.user ).select_related('booking').order_by('-updated')[:300]
+                                        user__username=self.request.user ).select_related('booking').order_by('-updated')[:100]
                                         # Q(booking__name__icontains=query) ,-->Removed for optimize
         if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
             return Order.objects.all().select_related('booking').order_by('-updated')[:300]
 
-        return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:300]
+        return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:100]
     
     def get_context_data(self,**kwargs):
         context = super(OrderListView,self).get_context_data(**kwargs)
@@ -200,7 +203,7 @@ class OrderListView(LoginRequiredMixin,ListView):
         return context
 
 
-class OrderCreateView(LoginRequiredMixin,CreateView):
+class OrderCreateView(TimeLimitMixin,LoginRequiredMixin,CreateView):
     model = Order
     fields = ['booking','name']
 
@@ -209,7 +212,7 @@ class OrderCreateView(LoginRequiredMixin,CreateView):
         form.instance.ref = datetime.now().strftime("%H%M%S")
         return super(OrderCreateView, self).form_valid(form)
 
-class OrderDetailView(LoginRequiredMixin,DetailView):
+class OrderDetailView(TimeLimitMixin,LoginRequiredMixin,DetailView):
     # model = Order
     queryset = Order.objects.select_related('booking','address')
 
@@ -242,7 +245,7 @@ class OrderDetailView(LoginRequiredMixin,DetailView):
         #     print(c)
         return context
 
-class OrderUpdateSlip(LoginRequiredMixin,UpdateView):
+class OrderUpdateSlip(TimeLimitMixin,LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['payment_slip']
     template_name_suffix = '_update_payslip_form'
@@ -258,7 +261,7 @@ class OrderUpdateSlip(LoginRequiredMixin,UpdateView):
         return super().dispatch(request,*args,**kwargs)
 
 # Added on Oct 28,2020 -- To support WHT slip upload
-class OrderUpdateWHT(LoginRequiredMixin,UpdateView):
+class OrderUpdateWHT(TimeLimitMixin,LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['wht_slip']
     template_name_suffix = '_update_whtslip_form'
@@ -273,7 +276,7 @@ class OrderUpdateWHT(LoginRequiredMixin,UpdateView):
             raise PermissionDenied
         return super().dispatch(request,*args,**kwargs)
 
-class OrderUpdatePaid(LoginRequiredMixin,UpdateView):
+class OrderUpdatePaid(TimeLimitMixin,LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['paid','payment_ref']
     template_name_suffix = '_update_paid_form'
@@ -295,7 +298,7 @@ class OrderUpdatePaid(LoginRequiredMixin,UpdateView):
             raise PermissionDenied
         return super().dispatch(request,*args,**kwargs)
 
-class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
+class OrderUpdateExecuteJob(TimeLimitMixin,LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['execute_job']
     template_name_suffix = '_update_executejob_form'
@@ -314,7 +317,7 @@ class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
         # ----------------------------------------------
         return super(OrderUpdateExecuteJob, self).form_valid(form)
 
-class OrderDeleteView(LoginRequiredMixin,DeleteView):
+class OrderDeleteView(TimeLimitMixin,LoginRequiredMixin,DeleteView):
     model = Order
     success_url = reverse_lazy('order:list')
 

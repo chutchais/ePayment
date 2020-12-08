@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+
+{% block meta %}
+
+{% endblock meta %}
+
+{% block content %}
+    <div class="containeer">
+        <div class="row wrapper">
+            <div class="col-sm-12 col-md-12">
+              <div class="row">
+                <div class="card">
+                    <div class="card-body">
+                        
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <strong>ขออภัยในความไม่สะดวก ท่านไม่สามารถใช้ระบบได้ตอนนี้ <br>
+                              ระบบจะหยุดเพื่อปรับปรุง ระหว่างเวลา 23 - 1 นาฬิกาในวันจันทร์-เสาร์ <br>
+                              และปิดดำเนินการทุกวันอาทิตย์
+                            </strong> 
+                          </div>
+                        
+                    </div>
+                </div>
+              </div><!-- end row-->
+            </div><!-- end col-sm-12 col-md-12-->
+        </div><!-- end row wrapper-->
+    </div><!-- end containeer-->
+{% endblock %}
+
+
+{% block style %} 
+<style type="text/css">
+	a:link {
+        text-decoration: none;
+        color: black;
+      }
+</style>
+{% endblock style %}

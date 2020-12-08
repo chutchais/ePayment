@@ -19,7 +19,10 @@ from django.core.exceptions import PermissionDenied
 
 from .models import Shore
 
-class ShoreListView(LoginRequiredMixin,ListView):
+# Added on Dec 8,2020 -- To limit time access from user
+from utility.mixin import TimeLimitMixin
+
+class ShoreListView(TimeLimitMixin,LoginRequiredMixin,ListView):
     model = Shore
     paginate_by = 50
 
@@ -47,7 +50,7 @@ class ShoreListView(LoginRequiredMixin,ListView):
         # context['addresses'] = Address.objects.filter(user__username=self.request.user)
         return context
 
-class ShoreDetailView(LoginRequiredMixin,DetailView):
+class ShoreDetailView(TimeLimitMixin,LoginRequiredMixin,DetailView):
     model = Shore
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -60,7 +63,7 @@ class ShoreDetailView(LoginRequiredMixin,DetailView):
         return super().dispatch(request,*args,**kwargs)
 
 
-class ShoreCreateView(LoginRequiredMixin,CreateView):
+class ShoreCreateView(TimeLimitMixin,LoginRequiredMixin,CreateView):
     model = Shore
     fields = ['booking','vessel_name','pod','voy',
             'terminal','agent','customer','shorefile1','shorefile2','containers_json']
@@ -77,7 +80,7 @@ class ShoreCreateView(LoginRequiredMixin,CreateView):
 
 
 # For attached file
-class ShoreUpdateFile1(LoginRequiredMixin,UpdateView):
+class ShoreUpdateFile1(TimeLimitMixin,LoginRequiredMixin,UpdateView):
     model = Shore
     fields = ['shorefile1']
     template_name_suffix = '_update_shorefile_form'
@@ -91,7 +94,7 @@ class ShoreUpdateFile1(LoginRequiredMixin,UpdateView):
             raise PermissionDenied
         return super().dispatch(request,*args,**kwargs)
 
-class ShoreUpdateFile2(LoginRequiredMixin,UpdateView):
+class ShoreUpdateFile2(TimeLimitMixin,LoginRequiredMixin,UpdateView):
     model = Shore
     fields = ['shorefile2']
     template_name_suffix = '_update_shorefile_form'
@@ -105,7 +108,7 @@ class ShoreUpdateFile2(LoginRequiredMixin,UpdateView):
             raise PermissionDenied
         return super().dispatch(request,*args,**kwargs)
 
-class ShoreDeleteView(LoginRequiredMixin,DeleteView):
+class ShoreDeleteView(TimeLimitMixin,LoginRequiredMixin,DeleteView):
     model = Shore
     success_url = reverse_lazy('shorepass:list')
 
