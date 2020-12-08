@@ -57,6 +57,7 @@
 					    <tr>
                 <th scope="col">Status</th>
                 <th scope="col">BL</th>
+                <th scope="col">เลขที่ใบขน</th>
                 <th scope="col">Ref</th>
                 <!-- <th scope="col">Order</th> -->
 					      <!-- <th scope="col">booking</th>
@@ -132,6 +133,7 @@
                     <!-- End Status -->
                 </td>
                 <td><a href="{{order.get_absolute_url}}">{{order.bl.name}}</a></td>
+                <td class="text-center">{{order.bl.declaration}}</td>
                 <td class="text-center">{{order.ref}}</td>
                 <td class="text-center">{{order.container_count}}</td>
                  <td class="text-right">{{order.grand_total|floatformat:2|intcomma}}</td>

@@ -340,7 +340,10 @@
                 <!-- <div class="col-12"> -->
                 <div class="row">
                   <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
-                    <h4>Booking : {{object.booking}}</h4>
+                    <h4>
+                      Booking : {{object.booking}} <span v-if="seperate_bill" class="badge badge-primary">แยกใบเสร็จ</span>
+                    </h4>
+                    
                     <h4>Address Detail</h4>
                     <span>{{object.address}}</span><br>
                     Address : {{object.address.address}}<br>
