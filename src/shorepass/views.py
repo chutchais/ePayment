@@ -22,7 +22,7 @@ from .models import Shore
 # Added on Dec 8,2020 -- To limit time access from user
 from utility.mixin import TimeLimitMixin
 
-class ShoreListView(TimeLimitMixin,LoginRequiredMixin,ListView):
+class ShoreListView(LoginRequiredMixin,ListView):
     model = Shore
     paginate_by = 50
 
@@ -108,7 +108,7 @@ class ShoreUpdateFile2(TimeLimitMixin,LoginRequiredMixin,UpdateView):
             raise PermissionDenied
         return super().dispatch(request,*args,**kwargs)
 
-class ShoreDeleteView(TimeLimitMixin,LoginRequiredMixin,DeleteView):
+class ShoreDeleteView(LoginRequiredMixin,DeleteView):
     model = Shore
     success_url = reverse_lazy('shorepass:list')
 

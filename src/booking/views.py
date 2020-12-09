@@ -20,7 +20,7 @@ from django.http import Http404
 # Added on Dec 8,2020 -- To limit time access from user
 from utility.mixin import TimeLimitMixin
 
-class BookingListView(TimeLimitMixin,LoginRequiredMixin,ListView):
+class BookingListView(LoginRequiredMixin,ListView):
 	model = Booking
 	paginate_by = 30
 	def get_queryset(self):
@@ -104,7 +104,7 @@ class BookingCreateView(TimeLimitMixin,LoginRequiredMixin,CreateView):
 			return self.form_invalid(form)  # return the invalid form
 		return super(BookingCreateView, self).form_valid(form)
 
-class BookingDeleteView(TimeLimitMixin,DeleteView):
+class BookingDeleteView(LoginRequiredMixin,DeleteView):
 	model = Booking
 	success_url = reverse_lazy('booking:list')
 

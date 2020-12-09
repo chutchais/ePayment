@@ -171,7 +171,7 @@ def update_payment(request):
 
     return render(request, 'order/order_form.html', {'form': form})
 
-class OrderListView(TimeLimitMixin,LoginRequiredMixin,ListView):
+class OrderListView(LoginRequiredMixin,ListView):
     model = Order
     paginate_by = 50
     def get_queryset(self):
@@ -212,7 +212,7 @@ class OrderCreateView(TimeLimitMixin,LoginRequiredMixin,CreateView):
         form.instance.ref = datetime.now().strftime("%H%M%S")
         return super(OrderCreateView, self).form_valid(form)
 
-class OrderDetailView(TimeLimitMixin,LoginRequiredMixin,DetailView):
+class OrderDetailView(LoginRequiredMixin,DetailView):
     # model = Order
     queryset = Order.objects.select_related('booking','address')
 
@@ -245,7 +245,7 @@ class OrderDetailView(TimeLimitMixin,LoginRequiredMixin,DetailView):
         #     print(c)
         return context
 
-class OrderUpdateSlip(TimeLimitMixin,LoginRequiredMixin,UpdateView):
+class OrderUpdateSlip(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['payment_slip']
     template_name_suffix = '_update_payslip_form'
@@ -261,7 +261,7 @@ class OrderUpdateSlip(TimeLimitMixin,LoginRequiredMixin,UpdateView):
         return super().dispatch(request,*args,**kwargs)
 
 # Added on Oct 28,2020 -- To support WHT slip upload
-class OrderUpdateWHT(TimeLimitMixin,LoginRequiredMixin,UpdateView):
+class OrderUpdateWHT(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['wht_slip']
     template_name_suffix = '_update_whtslip_form'
@@ -276,7 +276,7 @@ class OrderUpdateWHT(TimeLimitMixin,LoginRequiredMixin,UpdateView):
             raise PermissionDenied
         return super().dispatch(request,*args,**kwargs)
 
-class OrderUpdatePaid(TimeLimitMixin,LoginRequiredMixin,UpdateView):
+class OrderUpdatePaid(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['paid','payment_ref']
     template_name_suffix = '_update_paid_form'
@@ -298,7 +298,7 @@ class OrderUpdatePaid(TimeLimitMixin,LoginRequiredMixin,UpdateView):
             raise PermissionDenied
         return super().dispatch(request,*args,**kwargs)
 
-class OrderUpdateExecuteJob(TimeLimitMixin,LoginRequiredMixin,UpdateView):
+class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['execute_job']
     template_name_suffix = '_update_executejob_form'
@@ -317,7 +317,7 @@ class OrderUpdateExecuteJob(TimeLimitMixin,LoginRequiredMixin,UpdateView):
         # ----------------------------------------------
         return super(OrderUpdateExecuteJob, self).form_valid(form)
 
-class OrderDeleteView(TimeLimitMixin,LoginRequiredMixin,DeleteView):
+class OrderDeleteView(LoginRequiredMixin,DeleteView):
     model = Order
     success_url = reverse_lazy('order:list')
 

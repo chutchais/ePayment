@@ -27,7 +27,7 @@ from .forms import CreateOrderForm
 # Added on Dec 8,2020 -- To limit time access from user
 from utility.mixin import TimeLimitMixin
 
-class OrderListView(TimeLimitMixin,LoginRequiredMixin,ListView):
+class OrderListView(LoginRequiredMixin,ListView):
     model = Order
     paginate_by = 50
     def get_queryset(self):
@@ -69,7 +69,7 @@ class OrderListView(TimeLimitMixin,LoginRequiredMixin,ListView):
         # context['addresses'] = Address.objects.filter(user__username=self.request.user)
         return context
 
-class OrderDetailView(TimeLimitMixin,LoginRequiredMixin,DetailView):
+class OrderDetailView(LoginRequiredMixin,DetailView):
     # model = Order
     queryset = Order.objects.select_related('bl','address')
     def get_context_data(self,**kwargs):
@@ -198,7 +198,7 @@ def post_container(request):
     return render(request, 'orderimport/orderimport_form.html', {'form': form})
 
 
-class OrderDeleteView(TimeLimitMixin,LoginRequiredMixin,DeleteView):
+class OrderDeleteView(LoginRequiredMixin,DeleteView):
     model = Order
     success_url = reverse_lazy('orderimport:list')
 
@@ -214,7 +214,7 @@ class OrderDeleteView(TimeLimitMixin,LoginRequiredMixin,DeleteView):
         return super().dispatch(request,*args,**kwargs)
 
 
-class OrderUpdateDo(TimeLimitMixin,LoginRequiredMixin,UpdateView):
+class OrderUpdateDo(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['do']
     template_name_suffix = '_update_do_form'
@@ -229,7 +229,7 @@ class OrderUpdateDo(TimeLimitMixin,LoginRequiredMixin,UpdateView):
             raise PermissionDenied
         return super().dispatch(request,*args,**kwargs)
 
-class OrderUpdateSlip(TimeLimitMixin,LoginRequiredMixin,UpdateView):
+class OrderUpdateSlip(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['payment_slip']
     template_name_suffix = '_update_payslip_form'
@@ -244,7 +244,7 @@ class OrderUpdateSlip(TimeLimitMixin,LoginRequiredMixin,UpdateView):
         return super().dispatch(request,*args,**kwargs)
 
 # Added on Oct 28,2020 -- To support WHT slip upload
-class OrderUpdateWHT(TimeLimitMixin,LoginRequiredMixin,UpdateView):
+class OrderUpdateWHT(LoginRequiredMixin,UpdateView):
     model = Order
     fields = ['wht_slip']
     template_name_suffix = '_update_whtslip_form'
