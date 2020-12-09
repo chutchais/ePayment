@@ -185,7 +185,7 @@ class OrderListView(LoginRequiredMixin,ListView):
                 # Modify on Nov 20,2020 -- To support search by User name
                 return Order.objects.filter(Q(name__icontains=query) |
                                         Q(booking__name__icontains=query)|
-                                        Q(user__username=query)).select_related('booking').order_by('-updated')[:300]
+                                        Q(user__username=query)).select_related('booking').order_by('-updated')[:700]
                                         #Q(booking__name__icontains=query)| -->Removed for optimize
             else:
                 return Order.objects.filter(Q(name__icontains=query) |
