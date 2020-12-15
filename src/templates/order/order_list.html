@@ -49,8 +49,18 @@
               </a>
             </div>
 
-		          รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทั้งหมด {{ page_obj.paginator.count }} รายการ <br>
+            
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              ระบบจะแสดงเฉพาะงานที่กำลังดำเนินการเท่านั้น
+              ท่านสามารถค้นหาประวัติการชำระเงินได้ โดยการกรอกหมายเลขBookingที่ต้องการหาที่ช่อง Search ด้านบน
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            รายการที่ {{ page_obj.start_index }} ถึง {{ page_obj.end_index }} จากทั้งหมด {{ page_obj.paginator.count }} รายการ <br>
      {% if is_paginated %}
+      
+
                   <ul class="pagination">
                     {% if page_obj.has_previous %}
                       <li class="page-item"><a class="page-link" href="?q={{ request.GET.q}}&page={{ page_obj.previous_page_number }}">Previous</a></li>
@@ -96,7 +106,9 @@
                 <!-- <th scope="col">Order</th> -->
 					      <!-- <th scope="col">booking</th>
                 <th scope="col">Ref</th> -->
-                <th class="text-center" scope="col">#Container</th>
+                <!-- Removed on Dec 16,2020 -->
+                <!-- <th class="text-center" scope="col">#Container</th> -->
+
                 <th class="text-right" scope="col">Total Charge</th>
                 
                 <th class="text-center" scope="col">Last Update</th>
@@ -164,8 +176,11 @@
                   </td>
                 <td><a href="{{order.get_absolute_url}}">{{order.booking.name}}</a></td>
                 <td class="text-center">{{order.ref}}</td>
-                <td class="text-center">{{order.container_count}}</td>
-                 <td class="text-right">{{order.grand_total|floatformat:2|intcomma}}</td>
+                
+                <!-- Remove on Dec 16,2020 -- To save resource -->
+                <!-- <td class="text-center">{{order.container_count}}</td> -->
+                
+                <td class="text-right">{{order.grand_total|floatformat:2|intcomma}}</td>
 					      <td class="text-right">{{order.updated}}</td>
 
                 {% if perms.order.verify_payment or perms.order.execute_job  %}

@@ -198,7 +198,9 @@ class OrderListView(LoginRequiredMixin,ListView):
             # Modify on Dec 16,2020 -- To show only Opened Order (execute_job=False)
             return Order.objects.filter(execute_job=False).select_related('booking').order_by('updated')[:200]
 
-        return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:100]
+        # return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:50]
+        # Modify on Dec 16,2020 -- To show only pending job
+        return Order.objects.filter(execute_job=False,user__username=self.request.user).select_related('booking').order_by('-updated')[:50]
     
     def get_context_data(self,**kwargs):
         context = super(OrderListView,self).get_context_data(**kwargs)
