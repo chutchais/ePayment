@@ -99,7 +99,7 @@
                 <th class="text-center" scope="col">#Container</th>
                 <th class="text-right" scope="col">Total Charge</th>
                 
-                <th class="text-center" scope="col">Created</th>
+                <th class="text-center" scope="col">Last Update</th>
 
                 <!-- <th scope="col">Payment Slip</th>
                 
@@ -166,7 +166,7 @@
                 <td class="text-center">{{order.ref}}</td>
                 <td class="text-center">{{order.container_count}}</td>
                  <td class="text-right">{{order.grand_total|floatformat:2|intcomma}}</td>
-					      <td class="text-right">{{order.created}}</td>
+					      <td class="text-right">{{order.updated}}</td>
 
                 {% if perms.order.verify_payment or perms.order.execute_job  %}
                     <td><a href="?q={{order.user}}"> {{order.user}}</a></td>

@@ -196,7 +196,7 @@ class OrderListView(LoginRequiredMixin,ListView):
         if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
             # return Order.objects.all().select_related('booking').order_by('-updated')[:700]
             # Modify on Dec 16,2020 -- To show only Opened Order (execute_job=False)
-            return Order.objects.filter(execute_job=False).select_related('booking').order_by('-updated')[:200]
+            return Order.objects.filter(execute_job=False).select_related('booking').order_by('updated')[:200]
 
         return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:100]
     
