@@ -25,6 +25,7 @@ from django_q.tasks import async_task
 
 # Added on Dec 8,2020 -- To limit time access from user
 from utility.mixin import TimeLimitMixin
+from .tasks import update_invoice_by_order
 
 @login_required
 def index(request):
@@ -185,7 +186,7 @@ class OrderListView(LoginRequiredMixin,ListView):
                 # Modify on Nov 20,2020 -- To support search by User name
                 return Order.objects.filter(Q(name__icontains=query) |
                                         Q(booking__name__icontains=query)|
-                                        Q(user__username=query)).select_related('booking').order_by('-updated')[:700]
+                                        Q(user__username=query)).select_related('booking').order_by('-updated')[:200]
                                         #Q(booking__name__icontains=query)| -->Removed for optimize
             else:
                 return Order.objects.filter(Q(name__icontains=query) |
@@ -193,7 +194,9 @@ class OrderListView(LoginRequiredMixin,ListView):
                                         user__username=self.request.user ).select_related('booking').order_by('-updated')[:100]
                                         # Q(booking__name__icontains=query) ,-->Removed for optimize
         if self.request.user.has_perm('order.verify_payment') or  self.request.user.has_perm('order.update_payment') :
-            return Order.objects.all().select_related('booking').order_by('-updated')[:700]
+            # return Order.objects.all().select_related('booking').order_by('-updated')[:700]
+            # Modify on Dec 16,2020 -- To show only Opened Order (execute_job=False)
+            return Order.objects.filter(execute_job=False).select_related('booking').order_by('-updated')[:200]
 
         return Order.objects.filter(user__username=self.request.user).select_related('booking').order_by('-updated')[:100]
     
@@ -311,7 +314,7 @@ class OrderUpdateExecuteJob(LoginRequiredMixin,UpdateView):
         form.instance.execute_by = self.request.user
         # Added on Dec 3,2020 -- To Update Invoice number.
         if form.instance.execute_job :
-            from .tasks import update_invoice_by_order
+            # from .tasks import update_invoice_by_order #Remove on Dec 9,2020 --move to above
             update_invoice_by_order(form.instance)
             # async_task('order.tasks.update_invoice_by_order',form.instance)
         # ----------------------------------------------
