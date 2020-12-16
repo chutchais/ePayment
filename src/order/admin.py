@@ -160,7 +160,7 @@ class ContainerResource(resources.ModelResource):
 		skip_unchanged = True
 		report_skipped= True
 		fields = ('container','order__booking__name','cont_size','iso','is_oog','total','invoice',
-					'created','user')
+					'order__address__company','order__wht','order__execute_by__username')
 		exclude = ('id')
 
 class ContainerDateFilter(admin.SimpleListFilter):
