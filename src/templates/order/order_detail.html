@@ -341,8 +341,13 @@
                 <div class="row">
                   <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
                     <h4>
-                      Booking : {{object.booking}} <span v-if="seperate_bill" class="badge badge-primary">แยกใบเสร็จ</span>
+                      Booking : <button type="button"
+                      v-clipboard:copy="booking"
+                      v-clipboard:success="onCopy"
+                      v-clipboard:error="onError">{{object.booking}}</button> <span v-if="seperate_bill" class="badge badge-primary">แยกใบเสร็จ</span>
                     </h4>
+
+                    
                     
                     <h4>Address Detail</h4>
                     <span>{{object.address}}</span><br>
@@ -537,6 +542,12 @@
       }
     },
     methods: {
+          onCopy: function (e) {
+            // alert('You just copied: ' + e.text)
+          },
+          onError: function (e) {
+            // alert('Failed to copy texts')
+          },
           check_payment_local: function() {
               var currentDate = new Date();
               this.loading = true;
