@@ -286,6 +286,15 @@ class OrderUpdatePaid(LoginRequiredMixin,UpdateView):
     fields = ['paid','payment_ref']
     template_name_suffix = '_update_paid_form'
 
+    # Added on Dec 17,2020 -- To Keep Bank Reference on manual payment confirm
+    def get_initial(self):
+        initial = super(OrderUpdatePaid, self).get_initial()
+        bank_ref = self.request.GET.get('bank_ref')
+        initial['payment_ref'] = bank_ref.strip() if bank_ref else ''
+        initial['paid'] = True
+        return initial
+        # ----------------------------------
+
     def form_valid(self, form):
         form.instance.payment_inspector = self.request.user
         import datetime, pytz

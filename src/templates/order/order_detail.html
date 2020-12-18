@@ -247,7 +247,7 @@
                                         BankRef : [[notify.BankRef]][[notify.bankRef]]<br>
 
                                         
-                                        <a href="{% url 'order:payment-confirm' object.id %}">
+                                        <a :href="'{% url 'order:payment-confirm' object.id %}' + '?bank_ref='+ [[notify.bankRef]]">
                                         <button type="button" class="btn btn-info" {% if not  perms.order.update_payment %}disabled{% endif %}>Update</button>
                                         </a>
                                         
