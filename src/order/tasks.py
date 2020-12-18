@@ -32,4 +32,6 @@ def update_invoice_by_order(order_obj):
 
 def get_invoice(json_object, container_number):
 	invoice_list = [obj['invoice'] for obj in json_object if obj['container']==container_number]
-	return invoice_list[0] if len(invoice_list) > 0 else ''
+	# return invoice_list[0] if len(invoice_list) > 0 else ''
+	# Edit on Dec 18,2020 -- To support multiple invoice of Booking (in case cancel and recreate)
+	return invoice_list[len(invoice_list) - 1] if len(invoice_list) > 0 else ''
