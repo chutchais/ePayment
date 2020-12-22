@@ -32,50 +32,51 @@
 		          <h2>[[order]]
 
 
+                    <!-- Start Status -->
+                    {% if order.paid %}
+                      {% if order.execute_job %}         
+                        <span class="badge badge-success">Order Completed</span>
+                      {% else %}
+                        {% if not order.payment_slip %}
+                              <a href="{% url 'orderimport:payslip' order.id %}">
+                                  <span class="badge badge-danger">Need pay slip</span>
+                              </a>
+                              <br>
+                        {% endif %}
 
-                {% if order.paid %}
-                  <!-- New Status -->
-                  {% if not order.payment_slip %}
-                        <a href="{% url 'orderimport:payslip' order.id %}">
-                            <span class="badge badge-danger">Need pay slip</span>
-                        </a>
-                  {% endif %}
-                  {% if not order.do %}
-                        <a href="{% url 'orderimport:do' order.id %}">
-                            <span class="badge badge-danger">Need D/O</span>
-                        </a>
-                  {% endif %}
-                  
-                  {% if order.wht %}
-                    {% if not order.wht_slip %}
-                          <a href="{% url 'orderimport:whtslip' order.id %}">
-                              <span class="badge badge-danger">Need WHT slip</span>
-                          </a>
-                    {% endif %}
-                  {% endif %}
+                        {% if not order.do %}
+                              <a href="{% url 'orderimport:do' order.id %}">
+                                  <span class="badge badge-danger">Need D/O</span>
+                              </a>
+                              <br>
+                        {% endif %}
+                    
+                        {% if order.wht %}
+                          {% if not order.wht_slip %}
+                                <a href="{% url 'orderimport:whtslip' order.id %}">
+                                    <span class="badge badge-danger">Need WHT slip</span>
+                                </a>
+                                <br>
+                          {% endif %}
+                        {% endif %}
 
-                  {% if order.execute_job and order.paid %}
-                          
-                            <span class="badge badge-success">Order Completed</span>
-                  {% endif %}
-                  
-                  {% if order.do and order.payment_slip and not order.execute_job %}
-                          {% if order.wht and order.wht_slip %}
+                        {% if order.do and order.payment_slip %}
                               {% if perms.order.verify_payment or perms.order.execute_job  %}
                                 <a href="{% url 'orderimport:execute' order.id %}"><span class="badge badge-warning">Waiting for Execution</span></a>
                               {% else %}
                                 <span class="badge badge-warning">Waiting for Execution</span>
                               {% endif %}
-                          {% endif %}
-                  {% endif %}
-                  <!-- End new status -->
+                        {% endif %}
+                        <!-- End new status -->
+                      {% endif %} <!-- End Execute-->
+                <!-- Not Paid -->
+                {% else %}
+                  <span class="badge badge-secondary">UnPaid</span>
+                  <a href="{% url 'orderimport:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
+                {% endif %}
+                <!-- End Status -->         
 
-              <!-- Not Paid -->
-              {% else %}
-                <span class="badge badge-secondary">UnPaid</span>
-                <a href="{% url 'orderimport:delete' object.id %}"><button type="button" class="btn btn-danger">Delete</button></a>
-              {% endif %}
-
+              
 
                     <span v-if="rent" class="badge badge-primary">ต่อRent</span>
               </h2>
