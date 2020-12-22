@@ -221,14 +221,24 @@
                         </template>
 
                         <template v-slot:expanded-item="{ headers, item }">
-                          <td :colspan="8">
+                          <td :colspan="4" class="align-baseline">
                             <h3>Port of Discharge</h3>
-                            Vessel : [[vessel_name]]([[vessel_code ]]) ,Voy : [[ voy ]] <br>
+                            Vessel : [[vessel_name]]([[item.vessel_code ]]) ,Voy : [[ item.voy ]] <br>
                             POD : [[ item.pod.country ]] -->[[ item.pod.port ]] --> [[ item.pod.port_name ]]<br>
                             Line : [[item.line ]] , Agent : [[item.agent ]]<br>
-                            Terminal : [[item.terminal ]]
                           </td>
-                          <td :colspan="3">
+                          <td :colspan="2" class="align-baseline">
+                            <h3>Container Details</h3>
+                            Container Type : [[item.container_type]]<br>
+                            Full/Empty : <span v-if="item.full == 'F'">
+                              FULL
+                            </span>
+                            <span v-else>
+                              EMPTY
+                            </span><br>
+                            Is OOG? : <span v-if="item.oog">Yes</span>
+                          </td>
+                          <td :colspan="2" class="align-baseline">
                             <h3>Tariff Charge(s)</h3>
                             <span v-for="(value, key) in item.tariff" :key="key.id">
                               [[key]] : [[value]] Baht<br>
@@ -252,7 +262,12 @@
                       </template>
 
                       <template v-slot:item.paid="{ item }">
-                        <v-chip v-if="item.paid" color="green" dark>Y</v-chip>
+                        <v-chip v-if="item.paid && item.cash=='Y'" color="green" dark>Y</v-chip>
+                      </template>
+
+                      <template v-slot:item.cash="{ item }">
+                        <v-chip v-if="item.cash=='Y'" color="green" dark>Cash</v-chip>
+                        <v-chip v-if="item.cash=='N'" color="gray" dark>Credit</v-chip>
                       </template>
 
                   </v-data-table>
@@ -490,13 +505,14 @@
         },
         { text: 'Item Price', value: 'tariff_sum_total' },
         { text: 'Paid', value: 'paid' },
+        { text: 'Payment Term', value: 'cash' },
         { text: 'Terminal', value: 'terminal' },
-        { text: 'Status', value: 'status' },
+        // { text: 'Status', value: 'status' },
         { text: 'Size', value: 'size' },
-        { text: 'Type', value: 'container_type' },
-        { text: 'Full/Empty', value: 'full' },
-        { text: 'Is OOG?', value: 'oog' }
-        // { text: 'Tariff', value: 'tariff' },
+        // { text: 'Type', value: 'container_type' },
+        // { text: 'Full/Empty', value: 'full' },
+        // { text: 'Is OOG?', value: 'oog' }
+
         
       ],
       tax: {

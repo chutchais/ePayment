@@ -62,7 +62,7 @@
                 <!-- <th scope="col">Order</th> -->
 					      <!-- <th scope="col">booking</th>
                 <th scope="col">Ref</th> -->
-                <th class="text-center" scope="col">#Container</th>
+                <!-- <th class="text-center" scope="col">#Container</th> -->
                 <th class="text-right" scope="col">Total Charge</th>
                 <th class="text-right" scope="col">Rent</th>
                 <th class="text-right" scope="col">Paid Until</th>
@@ -135,7 +135,7 @@
                 <td><a href="{{order.get_absolute_url}}">{{order.bl.name}}</a></td>
                 <td class="text-center">{{order.bl.declaration}}</td>
                 <td class="text-center">{{order.ref}}</td>
-                <td class="text-center">{{order.container_count}}</td>
+                <!-- <td class="text-center">{{order.container_count}}</td> -->
                  <td class="text-right">{{order.grand_total|floatformat:2|intcomma}}</td>
                  <td class="text-right">
                     {% if order.rent %}
