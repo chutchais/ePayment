@@ -57,7 +57,10 @@ class BookingDetailView(TimeLimitMixin,LoginRequiredMixin,DetailView):
 		
 		# Added on Nov 9,2020 -- To prevent choose Container that are under processing.
 		booking 					= context['object']
-		orders 						= Order.objects.filter(booking=booking,paid=False)
+		
+		# Modify on Dec 23,2020 -- To do not allow process on Container that already exist in Order
+		# orders 					= Order.objects.filter(booking=booking,paid=False)
+		orders 						= Order.objects.filter(booking=booking,execute_job=False)
 		containers 					= Container.objects.filter(order__in = orders)
 		context['onprogressing'] 	= json.dumps(list(containers.values_list('container',flat=True)))
 
