@@ -40,8 +40,10 @@ class ShoreListView(LoginRequiredMixin,ListView):
                                         user__username=self.request.user ).order_by('-updated')[:200]
                                         # Q(booking__name__icontains=query) ,-->Removed for optimize
         
-        if self.request.user.has_perm('shorepass.verify_shore') or  self.request.user.has_perm('shorepass.execute_job') :
-            return Shore.objects.filter(execute_job=False,need_contact=False).order_by('-updated')[:100]
+        if  (self.request.user.has_perm('shorepass.verify_shore') or  
+            self.request.user.has_perm('shorepass.execute_job') or 
+            self.request.user.is_staff) :
+            return Shore.objects.filter(execute_job=False).order_by('-updated')[:100]
 
         return Shore.objects.filter(user__username=self.request.user).order_by('-updated')[:50]
     
