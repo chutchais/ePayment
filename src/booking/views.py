@@ -60,7 +60,8 @@ class BookingDetailView(TimeLimitMixin,LoginRequiredMixin,DetailView):
 		
 		# Modify on Dec 23,2020 -- To do not allow process on Container that already exist in Order
 		# orders 					= Order.objects.filter(booking=booking,paid=False)
-		orders 						= Order.objects.filter(booking=booking,execute_job=False)
+		orders 						= Order.objects.filter(booking__name=booking,execute_job=False)
+		# print('Booking details' , booking,orders)
 		containers 					= Container.objects.filter(order__in = orders)
 		context['onprogressing'] 	= json.dumps(list(containers.values_list('container',flat=True)))
 
