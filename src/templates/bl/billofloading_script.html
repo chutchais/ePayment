@@ -1,0 +1,371 @@
+
+  <script>
+
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    vuetify: new Vuetify(),
+    data: {
+            // to_day : new Date(),
+            bl_number : bl_input,
+            terminal : '',
+            loading : false,
+            containers :[],
+            selected :[],
+            selected_json:'',
+            search:'',
+            delivery:'',
+            total_lolo:0,
+            total_relo:0,
+            total_storage:0,
+            total_grand:0,
+            headers: [
+                {
+                  text: 'Container',
+                  align: 'start',
+                  sortable: true,
+                  value: 'container'
+                },
+                { text: 'Type', value: 'discharge.container_type' },
+                { text: 'Size', value: 'discharge.size' },
+                { text: 'Term', value: 'containerdetail_status' },
+                { text: 'Item Price', value: 'total' },
+                { text: 'On Yard(days)', value: 'on_yard' },
+                { text: 'Discharge', value: 'discharge.datetime_in' },
+                { text: 'Delivery', value: 'delivery.datetime_out' },
+                
+                
+              ],
+              date: new Date().toISOString().substr(0, 10),
+              nowDate: new Date().toISOString().substr(0, 10),
+              menu: false,
+              modal: false,
+              menu2: false,
+              tax: {
+                tax: tax_rate,
+                wht: wht_rate
+              },
+              isWht: false,
+              isRent: false,
+            isSeperateBill : false,
+            address_list: [],//JSON.parse(address_items),
+            selected_address : null, //JSON.parse(address_items)[0],
+          },
+          created: function () {
+            // `this` points to the vm instance
+            console.log('Created' + this.bl_number)
+          },
+          mounted: function () {
+            this.$nextTick(function () {
+              // Code that will run only after the
+              // entire view has been rendered
+              
+              // if (this.bl_number != ''){
+              //   console.log('Pulling data of :' + this.bl_number)
+              //   this.get_data(this.bl_number)
+              // }
+            })
+          },
+    computed:{
+        is_payable(){
+          const result = this.containers.filter(container => (container.discharge.container_type != 'DV' && container.discharge.container_type != 'RE'));
+          return result.length > 0  ? true:false;
+        },
+        total () {
+          return this.selected.reduce(function (sum, item) {
+            return sum + item.total
+          }, 0)
+        },
+        vat () {
+          // return (this.total * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+          return (this.total_grand * (this.tax.tax / 100)).toFixed(2)
+        },
+        vat_text () {
+          return (this.total_grand * (this.tax.tax / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+        },
+        wht_text () {
+          return (this.total_grand * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+        },
+        wht () {
+          // return (this.total * (this.tax.wht / 100)).toLocaleString(undefined, {maximumFractionDigits:2})
+          return (this.total_grand * (this.tax.wht / 100)).toFixed(2)
+        },
+        net () {
+          let wht = 0
+          if (this.isWht) {
+            wht = Number(this.wht)
+          }
+          return ((Number(this.total_grand) + Number(this.vat)) - wht).toFixed(2)
+        },
+        net_text(){
+          return this.net.toLocaleString(undefined, {maximumFractionDigits:2})
+        },
+      
+    },//end computed
+    
+    methods: {
+      terminal_color(terminal) {
+            let color = terminal=='LCB1' ? 'primary':'red';
+            return color;
+      },
+      container_link(url,bl) {
+            let link = url + '/' + container;
+            return link;
+      },
+        get_data: function(bl_name) {
+              this.loading = true;
+              this.containers = [];
+              this.selected =[];
+              // console.log('Hello from ' + bl_name + '!');
+              // console.log(import_url + this.bl_number)
+              this.date = new Date().toISOString().substr(0, 10)
+              axios
+              // .get('http://127.0.0.1:8000/order/booking/'+ this.booking)
+              .get(import_url + this.bl_number.toUpperCase())
+              .then(
+                  response => {
+                    console.log(response.data)
+                    this.containers = response.data
+                    this.loading = false;
+                    // Added on Dec 1,2020 - To set default to select all containers
+                    
+                    // ----------------
+                    if (this.containers.length > 0){
+                      this.selected = this.containers;
+                      this.update_delivery(this.date);
+                      this.get_address();
+                    }
+                  })
+              .catch(error =>{
+                    this.loading = false;
+                })
+              
+          },
+          dWell:function(date_in,date_out){
+            var starts = moment(date_in);
+            var new_starts = starts.hour(0);
+            new_starts = new_starts.minute(0);
+            new_starts = new_starts.second(0);
+            new_starts = new_starts.milliseconds(0);
+            // Free first day
+            // new_starts = new_starts.add(1,"day")
+
+            var ends = moment(date_out);
+            var new_ends = ends.hour(0);
+            new_ends = new_ends.minute(0);
+            new_ends = new_ends.second(0);
+            new_ends = new_ends.milliseconds(0);
+
+            
+            var duration = moment.duration(new_starts.diff(new_ends));
+            return duration.asDays()
+        },
+        add_day:function(today,n){
+          // console.log(n)
+          
+          var newdate = new Date();
+          newdate.setDate(today.getDate()+n);
+          // console.log(newdate)
+          return moment(newdate).format("MMM D")
+            // return date.setDate(date.getDate()+n)
+        },
+        moment: function () {
+          return moment();
+        },
+        
+        lolo:function(container_size){
+          // console.log('LoLo function')
+          var cost = 0;
+          if (container_size == 20){ cost=670}
+          if (container_size == 40){ cost=1000}
+          if (container_size == 45){ cost=1070}
+          // // this.total_LoLo = cost;
+          // // this.container.lolo = cost;
+          // // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // // this.container.total = this.grand_total;
+          console.log('LOLO :' + cost);
+          return cost
+        },
+        relo:function(container_size,dWell){
+            // console.log('Relo function' + container_size + dWell)
+            var cost = 0;
+            if (dWell <= 7){return 0}
+            if (container_size == 20){ cost=300}
+            if (container_size == 40){ cost=510}
+            if (container_size == 45){ cost=600}
+            // this.total_Relo = cost
+            // this.container.relo = cost;
+            // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+            // this.container.total = this.grand_total;
+            return cost
+        },
+        rate1_day:function(dWell){
+            var day = 0;
+            var day_after_3day = dWell - 3;
+            if (day_after_3day <= 0){
+                return 0;}
+            if (day_after_3day > 7) {
+                return 7;}
+            return day_after_3day
+            },
+        rate2_day:function(dWell){
+          var day = 0;
+          var day_after_rate2 = dWell -10 ;
+          if (day_after_rate2 <= 0 ){
+              return 0;}
+          if (day_after_rate2 <= 7 ){
+              return day_after_rate2;}
+          if (day_after_rate2 > 7) {
+              return 7;}
+          },
+        rate3_day:function(dWell){
+          // console.log('rate3_day' + dWell);
+          var day = 0;
+          var day_after_rate3 = dWell -17 ;
+          // console.log('rate3_day' + day_after_rate3);
+          if (day_after_rate3 <= 0 ){
+              // console.log('rate3_day : return 0' );
+              return 0;
+              }
+          return day_after_rate3
+          },
+        rate1:function(container_size,dWell){
+          var cost = 0;
+          var day = 0;
+          day = this.rate1_day(dWell)
+          if (container_size == 20){ cost=125*day}
+          if (container_size == 40){ cost=250*day}
+          if (container_size == 45){ cost=310*day}
+          // this.total_rate1 = cost;
+          // this.container.rate1 = cost;
+          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // this.container.total = this.grand_total;
+          return cost
+          },
+          //.toLocaleString(undefined, {maximumFractionDigits:2})
+        rate2:function(container_size,dWell){
+          var cost = 0;
+          var day = 0;
+          day = this.rate2_day(dWell)
+          if (container_size == 20){ cost=250*day}
+          if (container_size == 40){ cost=500*day}
+          if (container_size == 45){ cost=620*day}
+          // this.total_rate2 = cost;
+          // this.container.rate2 = cost;
+          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // this.container.total = this.grand_total;
+          return cost
+          },
+        rate3:function(container_size,dWell){
+          // console.log('rate3 -' + dWell);
+          var cost = 0;
+          var day = 0;
+          day = this.rate3_day(dWell)
+          // console.log('rate3:Day -' + day);
+          if (container_size == 20){ cost=400*day}
+          if (container_size == 40){ cost=800*day}
+          if (container_size == 45){ cost=990*day}
+          // this.total_rate3 = cost;
+          // this.container.rate3 = cost;
+          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
+          // this.container.total = this.grand_total;
+          return cost
+          },
+        update_delivery:function(delivery_date){
+          console.log('Delivery date :' + delivery_date )
+          this.containers.forEach(function (arrayItem) {
+          // this.containers.forEach((arrayItem) => {
+              if (arrayItem.delivery == null) {
+                arrayItem.delivery = {'datetime_out': delivery_date};
+                console.log('No delivery');
+              }
+              else{
+                console.log('With delivery');
+                console.log('Total:' + arrayItem.total);
+                // Update datetime_out (**if out_by exist)
+                if (arrayItem.delivery.out_by == null) {
+                  arrayItem.delivery.datetime_out = delivery_date;
+                }
+              }//end delivery==null
+
+              // Added on Oct 20,2020 -- To update Terminal
+              if (arrayItem.discharge != null) {
+                if (this.terminal == ''){
+                  this.terminal = arrayItem.discharge.terminal
+                }
+              }
+
+              arrayItem.on_yard   = this.dWell(arrayItem.delivery.datetime_out,arrayItem.discharge.datetime_in)
+              arrayItem.lolo      = this.lolo(arrayItem.discharge.size);
+              arrayItem.relo      = this.relo(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate1     = this.rate1(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate2     = this.rate2(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate3     = this.rate3(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.total     = Number(arrayItem.lolo)+Number(arrayItem.relo)+Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
+              // if Delivery , total = 0
+              // Remove on Dec 1,2020 -- To Show details event container is OUT 
+              // if (arrayItem.delivery.out_by != null) {
+              //   arrayItem.lolo = 0;
+              //   arrayItem.relo = 0;
+              //   arrayItem.rate1 = 0;
+              //   arrayItem.rate2 = 0;
+              //   arrayItem.rate3 = 0;
+              //   arrayItem.total = 0;
+              // }
+          }.bind(this));//forEach
+        },//End update_delivery
+        update_charge:function(){
+          console.log('Update Charge :')
+          this.total_lolo=0;
+          this.total_relo=0;
+          this.total_storage=0;
+          this.total_grand=0;
+          this.selected.forEach(function (arrayItem) {
+              // console.log(arrayItem)
+              // Modify on Dec 1,2020 -- To calculate only In-yard container
+              if (arrayItem.delivery.out_by == null){
+                console.log('Updatecharge -- out is null : ' + arrayItem.delivery.out_by)
+                this.total_lolo=this.total_lolo + arrayItem.lolo;
+                this.total_relo=this.total_relo + arrayItem.relo;
+                this.total_storage= this.total_storage + (arrayItem.rate1+arrayItem.rate2+arrayItem.rate3);
+                this.total_grand=(this.total_grand + arrayItem.total);
+                // .toFixed(2)
+              }
+          }.bind(this));//forEach
+        },//End update_charge
+        get_address:function(){
+            if (this.containers.length > 0){
+              axios
+                .get(address_url)
+                .then(
+                    response => {
+                        this.address_list = response.data;
+                        // console.log(this.address_list)
+                    })
+                .catch(error =>{
+                        this.address_list = [];
+                  })//End Get
+            }
+          },//End get_address function
+      },//End Method
+    watch: {
+      date () {
+        this.update_delivery(this.date);
+        this.selected_json = JSON.stringify(this.selected)
+        this.update_charge();
+      },
+      selected () {
+        if (this.selected != null){
+          this.selected_json = JSON.stringify(this.selected)
+          this.update_charge();
+        }
+      },
+      bl_number (){
+        this.containers = []
+        this.terminal=''
+        this.selected =[]
+      }
+    },
+    
+  })
+  </script>

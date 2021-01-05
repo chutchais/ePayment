@@ -35,9 +35,6 @@
                 </div>
 
                 <div v-if="container">
-                <template>
-                  
-                </template>
 
                 <!-- Show Container detail -->
                 <!-- [[container]] -->
@@ -65,6 +62,52 @@
                       
                       <v-card-title>[[container_number]]</v-card-title>
                       <v-card-subtitle  >
+                      </v-card-subtitle>
+                      
+                      <v-card-text>               
+                        
+                        <div>
+                          Term :
+                          <v-chip
+                            class="ma-2"
+                            color="info"
+                          >
+                            <div v-if="container.containerdetail_status==4">
+                              MTY
+                            </div>
+                            <div v-if="container.containerdetail_status==7">
+                              LCL
+                            </div>
+                            <div v-if="container.containerdetail_status==8">
+                              FCL
+                            </div>
+                            <div v-if="container.containerdetail_status==9">
+                              LCL/CFS
+                            </div>
+                          </v-chip>
+                          
+                        </div>
+                        <v-divider></v-divider>
+                          <!-- BL list (in case multiple BL) -->
+                          <div v-if="container.containerdetail_status==9" class="text-center">
+                            ตู้นี้ประกอบด้วยหลาย BL ตามนี้
+                            <v-chip-group
+                              active-class="deep-purple accent-4 white--text"
+                              column
+                              v-if="container.discharge.datetime_in !== null"
+                             
+                            >
+                              <v-chip
+                                class="ma-1"
+                                v-for="item in containers" :key="item.bill_of_landing"
+                                @click="updateBL(item.bill_of_landing)"
+                              >
+                                [[item.bill_of_landing]]
+                              </v-chip>
+                            </v-chip-group>
+                            <v-divider></v-divider>
+                          </div>
+                          
                         Bill of Ladding : 
                         <v-chip
                           class="ma-2"
@@ -73,16 +116,17 @@
                         >
                         [[container.bill_of_landing]]
                         </v-chip>
-                      </v-card-subtitle>
-                      
-                      <v-card-text>               
                         <div>
-                            Call sign :[[container.callsign]] , Voy :[[container.voy]] <br>
-                            [[container.consigneeinfo_name]]
+                          Call sign :[[container.callsign]] , Voy :[[container.voy]] <br>
+                          [[container.consigneeinfo_name]]
                         </div>
-                      </v-card-text> 
-                      
-                      <v-card-text>
+
+                        <div v-if="container.containerdetail_status==9">
+                          gross : [[container.gross]] [[container.unit_gross]]<br>
+                          means : [[container.meas]] [[container.unit_meas]]
+                        </div>
+                      <v-divider></v-divider>
+
                         <div class="font-weight-bold ml-8 mb-2">
                           Status
                         </div>
@@ -121,6 +165,7 @@
                           <v-timeline-item
                           :color="color_exist(container.delivery.out_by)"
                             small
+                            v-if="container.containerdetail_status!=9"
                           >
                             <div>
                                 <div class="font-weight-normal">
@@ -141,10 +186,24 @@
                             </div>
                           </v-timeline-item>
 
+                          <!-- Cargo Status -->
+                          <v-timeline-item
+                          :color="color_exist(container.delivery.out_by)"
+                            small
+                            v-if="container.containerdetail_status==9"
+                          >
+                            <div>
+                                <div class="font-weight-normal">
+                                  <strong>Cargo Status</strong> 
+                                </div>
+                                <div>Waiting for Open</div>
+                            </div>
+                          </v-timeline-item>
+
                         </v-timeline>
                         <div v-if="container.delivery.out_by" class="font-weight-bold ml-8 mb-2">
                             Total on Yard : [[container.on_yard]] day(s)
-                          </div>
+                        </div>
                       </v-card-text>
 
                       <v-divider class="mx-4"></v-divider>
@@ -176,12 +235,20 @@
                           column
                           v-if="container.discharge.datetime_in !== null"
                         >
-                        <v-chip class="ma-1" color="green" text-color="white">
+                          <v-chip v-if="container.containerdetail_status!=9" class="ma-1" color="green" text-color="white">
                             Lift On : [[container.lolo.toLocaleString(undefined, {maximumFractionDigits:2})]]
-                            </v-chip>
-                          <v-chip v-if="container.relo" class="ma-1" color="green" text-color="white">
+                          </v-chip>
+
+                           <!-- To support CFS -->
+                           <v-chip v-if="container.containerdetail_status==9" class="ma-1" color="green" text-color="white">
+                            Un stuffing : [[total_unstuffing.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
+                          <!-- End CFS -->
+
+                          <v-chip v-if="container.relo && container.containerdetail_status!=9" class="ma-1" color="green" text-color="white">
                             Relocation : [[container.relo.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
+
                           <v-chip v-if="container.rate1" class="ma-1" color="green" text-color="white">
                             Storage (1-7 days) : [[container.rate1.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
@@ -191,6 +258,9 @@
                           <v-chip v-if="container.rate3" class="ma-1" color="green" text-color="white">
                             Storage (15 days over) : [[container.rate3.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
+
+                         
+                          
                         </v-chip-group>
                       </v-card-text>
                       <v-btn block color="secondary">
@@ -362,6 +432,7 @@
             // containers :[],
             // selected :[],
             container : null,
+            containers : null,//Added on Jan 5,2021
             search:'',
             delivery:'',
             total_lolo:0,
@@ -373,6 +444,8 @@
               menu: false,
               modal: false,
               menu2: false,
+            // To support CFS
+            total_unstuffing :0
           },
     computed:{
 
@@ -404,7 +477,8 @@
                   response => {
                     console.log(response.data)
                     // this.containers = response.data
-                    this.container = response.data
+                    this.container = response.data[0];
+                    this.containers = response.data; //Added on Jan 5,2021
                     this.loading = false;
                     this.update_delivery(this.date);
                   })
@@ -444,6 +518,7 @@
         moment: function () {
           return moment();
         },
+
         
         lolo:function(container_size){
           // console.log('LoLo function')
@@ -508,10 +583,11 @@
           if (container_size == 20){ cost=125*day}
           if (container_size == 40){ cost=250*day}
           if (container_size == 45){ cost=310*day}
-          // this.total_rate1 = cost;
-          // this.container.rate1 = cost;
-          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
-          // this.container.total = this.grand_total;
+          // To support CFS (this.container.containerdetail_status==9)
+          if (this.container.containerdetail_status==9){
+            var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+            cost = 5*revenue_ton*day
+          }
           return cost
           },
           //.toLocaleString(undefined, {maximumFractionDigits:2})
@@ -522,10 +598,11 @@
           if (container_size == 20){ cost=250*day}
           if (container_size == 40){ cost=500*day}
           if (container_size == 45){ cost=620*day}
-          // this.total_rate2 = cost;
-          // this.container.rate2 = cost;
-          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
-          // this.container.total = this.grand_total;
+          // To support CFS (this.container.containerdetail_status==9)
+          if (this.container.containerdetail_status==9){
+            var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+            cost = 10*revenue_ton*day
+          }
           return cost
           },
         rate3:function(container_size,dWell){
@@ -533,14 +610,17 @@
           var cost = 0;
           var day = 0;
           day = this.rate3_day(dWell)
-          // console.log('rate3:Day -' + day);
+
           if (container_size == 20){ cost=400*day}
           if (container_size == 40){ cost=800*day}
           if (container_size == 45){ cost=990*day}
-          // this.total_rate3 = cost;
-          // this.container.rate3 = cost;
-          // this.grand_total = this.total_LoLo+this.total_Relo+this.total_rate1+this.total_rate2+this.total_rate3;
-          // this.container.total = this.grand_total;
+
+          // To support CFS (this.container.containerdetail_status==9)
+          if (this.container.containerdetail_status==9){
+            var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+            cost = 15*revenue_ton*day
+          }
+
           return cost
           },
         update_delivery:function(delivery_date){
@@ -573,6 +653,10 @@
               this.total_lolo=this.container.lolo;
               this.total_relo=this.container.relo;
               this.total_storage= this.container.rate1+this.container.rate2+this.container.rate3;
+
+              // Support CFS
+              this.total_unstuffing = this.unstuffing();
+
               this.total_grand=this.container.total;
               if (this.container.delivery.out_by != null) {
                 this.total_grand=0
@@ -586,6 +670,10 @@
           this.total_relo=0;
           this.total_storage=0;
           this.total_grand=0;
+
+          // To support CFS
+          this.total_unstuffing = this.unstuffing();
+          // --------------
         //   this.selected.forEach(function (arrayItem) {
               // console.log(arrayItem)
               this.total_lolo=this.container.lolo;
@@ -598,6 +686,20 @@
               }
         //   }.bind(this));//forEach
         },//End update_charge
+
+        // Added on Jan 5,2021 -- To support CFS
+        unstuffing:function(){
+          var cost = 0;
+          var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+          console.log('Un stuffing : Revenue ton -->' + revenue_ton);
+          cost = revenue_ton * 35
+          return cost
+        },
+        updateBL:function(bl){
+          // console.log('Update BL : ' + bl)
+          this.container = this.containers.find( ({ bill_of_landing }) => bill_of_landing === bl );
+          // console.log(result)
+        },
       },//End Method
     watch: {
       date () {
