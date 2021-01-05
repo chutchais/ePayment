@@ -264,7 +264,7 @@
                               </p>
                             </div>
                           </div>
-                        </div>
+                        
                         {% endif %} <!-- End permission -->
                         <!-- End Payment confirmation -->
 
@@ -416,7 +416,9 @@
                 <div class="row">
                   <div class="col-sm-12 col-md-12 col-lg-12 mb-2">
                     {% if perms.order.verify_payment or perms.order.execute_job  %}
-                      <a href="{% url 'order:execute' order.id %}"><button type="button" class="btn btn-info">Execute Job</button></a>
+                      <a href="{% url 'order:execute' order.id %}">
+                        <button type="button" class="btn btn-info">Execute Job</button>
+                      </a>
                     {% endif %}
 
                     {% if object.execute_job %}
