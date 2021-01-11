@@ -31,8 +31,8 @@ class ContainerInline(admin.TabularInline):
 @admin.register(Shore)
 class ShoreAdmin(ImportExportModelAdmin,ImportExportActionModelAdmin,admin.ModelAdmin):
 	search_fields = ['booking','vessel_name','pod__name','voy','agent__name']
-	list_filter = ['terminal','execute_job','need_contact']
-	list_display = ('booking','terminal','agent','vessel_name','pod','voy','created','user','execute_job')
+	list_filter = ['terminal','execute_job','need_contact',('execute_by', admin.RelatedOnlyFieldListFilter)]
+	list_display = ('booking','terminal','agent','vessel_name','pod','voy','created','user','execute_job','execute_by')
 	# list_editable = ('color','move_performa')
 	# autocomplete_fields = ['parent']
 	readonly_fields = ('created','user')
