@@ -123,7 +123,7 @@
 
                         <div v-if="container.containerdetail_status==9">
                           gross : [[container.gross]] [[container.unit_gross]]<br>
-                          means : [[container.meas]] [[container.unit_meas]]
+                          meas : [[container.meas]] [[container.unit_meas]]
                         </div>
                       <v-divider></v-divider>
 
@@ -156,7 +156,7 @@
                                     ([[container.discharge.voy_in]])
                                   </div>
                                   <div v-else>
-                                    Not discharge
+                                    No discharge info
                                 </div>
                             </div>
                             
@@ -180,7 +180,7 @@
                                       Still on yard for [[container.on_yard]] day(s)
                                     </div>
                                     <div v-else>
-                                      Not discharge 
+                                      No delivery info 
                                     </div>
                                 </div>
                             </div>
@@ -585,7 +585,8 @@
           if (container_size == 45){ cost=310*day}
           // To support CFS (this.container.containerdetail_status==9)
           if (this.container.containerdetail_status==9){
-            var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+            // var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+            var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
             cost = 5*revenue_ton*day
           }
           return cost
@@ -600,7 +601,8 @@
           if (container_size == 45){ cost=620*day}
           // To support CFS (this.container.containerdetail_status==9)
           if (this.container.containerdetail_status==9){
-            var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+            // var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+            var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
             cost = 10*revenue_ton*day
           }
           return cost
@@ -617,7 +619,8 @@
 
           // To support CFS (this.container.containerdetail_status==9)
           if (this.container.containerdetail_status==9){
-            var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+            // var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+            var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
             cost = 15*revenue_ton*day
           }
 
@@ -690,7 +693,7 @@
         // Added on Jan 5,2021 -- To support CFS
         unstuffing:function(){
           var cost = 0;
-          var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
+          var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
           console.log('Un stuffing : Revenue ton -->' + revenue_ton);
           cost = revenue_ton * 35
           return cost
