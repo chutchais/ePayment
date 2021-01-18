@@ -217,7 +217,7 @@
                         transition="scale-transition"
                         offset-y
                         min-width="290px"
-                        v-if="container.delivery.out_by == null || container.containerdetail_status !='9'"
+                        v-if="container.delivery.out_by == null || container.containerdetail_status =='9'"
                       >
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
@@ -651,6 +651,11 @@
                   arrayItem.delivery.datetime_out = delivery_date;
                 }
               }//end delivery==null
+
+              // For CFS container , not consider open or delivery status -- Jan 18,2021
+              if (arrayItem.containerdetail_status =='9'){
+                arrayItem.delivery.datetime_out = delivery_date;
+              }
 
               arrayItem.on_yard   = this.dWell(arrayItem.delivery.datetime_out,arrayItem.discharge.datetime_in)
               arrayItem.lolo      = this.lolo(arrayItem.discharge.size);
