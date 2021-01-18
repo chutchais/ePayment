@@ -217,7 +217,7 @@
                         transition="scale-transition"
                         offset-y
                         min-width="290px"
-                        v-if="container.delivery.out_by == null"
+                        v-if="container.delivery.out_by == null || container.containerdetail_status !='9'"
                       >
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
@@ -593,7 +593,7 @@
           // To support CFS (this.container.containerdetail_status==9)
           if (this.container.containerdetail_status==9){
             // var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
-            var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
+            var revenue_ton = (Math.ceil(this.container.gross/1000) > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross/1000) : Math.ceil(this.container.meas)
             cost = 5*revenue_ton*day
           }
           return cost
@@ -609,7 +609,7 @@
           // To support CFS (this.container.containerdetail_status==9)
           if (this.container.containerdetail_status==9){
             // var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
-            var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
+            var revenue_ton = (Math.ceil(this.container.gross/1000) > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross/1000) : Math.ceil(this.container.meas)
             cost = 10*revenue_ton*day
           }
           return cost
@@ -627,7 +627,7 @@
           // To support CFS (this.container.containerdetail_status==9)
           if (this.container.containerdetail_status==9){
             // var revenue_ton = (this.container.gross/1000 > this.container.meas ) ? this.container.gross/1000 : this.container.meas
-            var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
+            var revenue_ton = (Math.ceil(this.container.gross/1000) > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross/1000) : Math.ceil(this.container.meas)
             cost = 15*revenue_ton*day
           }
 
@@ -711,14 +711,14 @@
         // Added on Jan 5,2021 -- To support CFS
         unstuffing:function(){
           var cost = 0;
-          var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
+          var revenue_ton = (Math.ceil(this.container.gross/1000) > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross/1000) : Math.ceil(this.container.meas)
           console.log('Un stuffing : Revenue ton -->' + revenue_ton);
           cost = revenue_ton * 35
           return cost
         },
         wharf:function(dWell){
           var cost = 0;
-          var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
+          var revenue_ton = (Math.ceil(this.container.gross/1000) > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross/1000) : Math.ceil(this.container.meas)
           console.log('Un Wharf : Revenue ton -->' + revenue_ton);
           if (dWell > 30) {
             cost = revenue_ton * 26
