@@ -201,6 +201,7 @@
                           </v-timeline-item>
 
                         </v-timeline>
+
                         <div v-if="container.delivery.out_by" class="font-weight-bold ml-8 mb-2">
                             Total on Yard : [[container.on_yard]] day(s)
                         </div>
@@ -243,6 +244,10 @@
                            <v-chip v-if="container.containerdetail_status==9" class="ma-1" color="green" text-color="white">
                             Un stuffing : [[total_unstuffing.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
+
+                          <v-chip v-if="total_wharf && container.containerdetail_status==9" class="ma-1" color="green" text-color="white">
+                            Wharf Handling : [[total_wharf.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
                           <!-- End CFS -->
 
                           <v-chip v-if="container.relo && container.containerdetail_status!=9" class="ma-1" color="green" text-color="white">
@@ -266,6 +271,7 @@
                       <v-btn block color="secondary">
                         Total :[[container.total.toLocaleString(undefined, {maximumFractionDigits:2})]]
                       </v-btn>
+
                      </v-card>
                      
                   </template>
@@ -445,7 +451,8 @@
               modal: false,
               menu2: false,
             // To support CFS
-            total_unstuffing :0
+            total_unstuffing :0,
+            total_wharf : 0
           },
     computed:{
 
@@ -629,43 +636,54 @@
         update_delivery:function(delivery_date){
           console.log('Delivery date :' + delivery_date )
           console.log(this.container.delivery)
-        //   this.containers.forEach(function (arrayItem) {
-          // this.containers.forEach((arrayItem) => {
-              if (this.container.delivery == null) {
-                this.container.delivery = {'datetime_out': delivery_date};
+
+          this.containers.forEach(function (arrayItem) {
+              if (arrayItem.delivery == null) {
+                arrayItem.delivery = {'datetime_out': delivery_date};
                 console.log('No delivery');
                 // console.log(this.container.delivery)
               }
               else{
                 console.log('With delivery');
-                console.log('Total:' + this.container.total);
+                console.log('Total:' + arrayItem.total);
                 // Update datetime_out (**if out_by exist)
-                if (this.container.delivery.out_by == null) {
-                    this.container.delivery.datetime_out = delivery_date;
+                if (arrayItem.delivery.out_by == null) {
+                  arrayItem.delivery.datetime_out = delivery_date;
                 }
               }//end delivery==null
 
-              this.container.on_yard   = this.dWell(this.container.delivery.datetime_out,this.container.discharge.datetime_in)
-              this.container.lolo      = this.lolo(this.container.discharge.size);
-              this.container.relo      = this.relo(this.container.discharge.size,this.container.on_yard);
-              this.container.rate1     = this.rate1(this.container.discharge.size,this.container.on_yard);
-              this.container.rate2     = this.rate2(this.container.discharge.size,this.container.on_yard);
-              this.container.rate3     = this.rate3(this.container.discharge.size,this.container.on_yard);
-              this.container.total     = Number(this.container.lolo)+Number(this.container.relo)+Number(this.container.rate1)+Number(this.container.rate2)+Number(this.container.rate3)
+              arrayItem.on_yard   = this.dWell(arrayItem.delivery.datetime_out,arrayItem.discharge.datetime_in)
+              arrayItem.lolo      = this.lolo(arrayItem.discharge.size);
+              arrayItem.relo      = this.relo(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate1     = this.rate1(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate2     = this.rate2(arrayItem.discharge.size,arrayItem.on_yard);
+              arrayItem.rate3     = this.rate3(arrayItem.discharge.size,arrayItem.on_yard);
               
-              this.total_lolo=this.container.lolo;
-              this.total_relo=this.container.relo;
-              this.total_storage= this.container.rate1+this.container.rate2+this.container.rate3;
+              arrayItem.total     = Number(arrayItem.lolo)+Number(arrayItem.relo)+Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
+              
+              this.total_lolo=arrayItem.lolo;
+              this.total_relo=arrayItem.relo;
+              this.total_storage= arrayItem.rate1+arrayItem.rate2+arrayItem.rate3;
 
               // Support CFS
               this.total_unstuffing = this.unstuffing();
+              this.total_wharf = this.wharf(arrayItem.on_yard);
 
-              this.total_grand=this.container.total;
-              if (this.container.delivery.out_by != null) {
-                this.total_grand=0
-                this.container.total=0
-              }
-        //   }.bind(this));//forEach
+
+              // this.total_grand = arrayItem.total;
+
+              if (arrayItem.containerdetail_status != '9') {
+                  this.total_grand = arrayItem.total;
+                }else{
+                  arrayItem.total = this.total_unstuffing + Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3) + this.total_wharf
+                  // this.total_grand = this.total_unstuffing + Number(arrayItem.rate1)+Number(arrayItem.rate2)+Number(arrayItem.rate3)
+                }
+
+              // if (arrayItem.delivery.out_by != null) {
+              //   this.total_grand=0
+              //   arrayItem.total=0
+              // }
+            }.bind(this));//forEach
         },//End update_delivery
         update_charge:function(){
           console.log('Update Charge :')
@@ -698,14 +716,28 @@
           cost = revenue_ton * 35
           return cost
         },
+        wharf:function(dWell){
+          var cost = 0;
+          var revenue_ton = (Math.ceil(this.container.gross)/1000 > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross)/1000 : Math.ceil(this.container.meas)
+          console.log('Un Wharf : Revenue ton -->' + revenue_ton);
+          if (dWell > 30) {
+            cost = revenue_ton * 26
+          }
+          
+          return cost
+        },
         updateBL:function(bl){
-          // console.log('Update BL : ' + bl)
+          console.log('Update BL : ' + bl)
           this.container = this.containers.find( ({ bill_of_landing }) => bill_of_landing === bl );
           // console.log(result)
         },
       },//End Method
     watch: {
       date () {
+        this.update_delivery(this.date);
+        // this.update_charge();
+      },
+      container () {
         this.update_delivery(this.date);
         // this.update_charge();
       },
