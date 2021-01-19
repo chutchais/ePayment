@@ -242,12 +242,10 @@
 
                            <!-- To support CFS -->
                            <v-chip v-if="container.containerdetail_status==9" class="ma-1" color="green" text-color="white">
-                            Un stuffing : [[total_unstuffing.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                            Un stuffing : [[container.unstuffing.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
 
-                          <v-chip v-if="total_wharf && container.containerdetail_status==9" class="ma-1" color="green" text-color="white">
-                            Wharf Handling : [[total_wharf.toLocaleString(undefined, {maximumFractionDigits:2})]]
-                          </v-chip>
+                          
                           <!-- End CFS -->
 
                           <v-chip v-if="container.relo && container.containerdetail_status!=9" class="ma-1" color="green" text-color="white">
@@ -263,7 +261,10 @@
                           <v-chip v-if="container.rate3" class="ma-1" color="green" text-color="white">
                             Storage (15 days over) : [[container.rate3.toLocaleString(undefined, {maximumFractionDigits:2})]]
                           </v-chip>
-
+                          
+                          <v-chip v-if="container.on_yard > 30 && container.containerdetail_status==9" class="ma-1" color="green" text-color="white">
+                            Wharf Handling : [[container.wharf.toLocaleString(undefined, {maximumFractionDigits:2})]]
+                          </v-chip>
                          
                           
                         </v-chip-group>
@@ -671,6 +672,9 @@
               this.total_storage= arrayItem.rate1+arrayItem.rate2+arrayItem.rate3;
 
               // Support CFS
+              arrayItem.unstuffing = this.unstuffing();
+              arrayItem.wharf = this.wharf(arrayItem.on_yard);
+
               this.total_unstuffing = this.unstuffing();
               this.total_wharf = this.wharf(arrayItem.on_yard);
 
@@ -724,7 +728,7 @@
         wharf:function(dWell){
           var cost = 0;
           var revenue_ton = (Math.ceil(this.container.gross/1000) > Math.ceil(this.container.meas) ) ? Math.ceil(this.container.gross/1000) : Math.ceil(this.container.meas)
-          console.log('Un Wharf : Revenue ton -->' + revenue_ton);
+          console.log('Un Wharf : Revenue ton -->' + revenue_ton + 'dWell = ' + dWell );
           if (dWell > 30) {
             cost = revenue_ton * 26
           }
